@@ -1,0 +1,55 @@
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { CartProvider } from './context/CartContext'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
+import CartSidebar from './components/CartSidebar'
+import Home from './pages/Home'
+import Shop from './pages/Shop'
+import Lessons from './pages/Lessons'
+import Gallery from './pages/Gallery'
+import Booking from './pages/Booking'
+import Partners from './pages/Partners'
+import Community from './pages/Community'
+import About from './pages/About'
+
+const pageVariants = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.22, ease: 'easeIn' } },
+}
+
+function AnimatedRoutes() {
+  const location = useLocation()
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div key={location.pathname} variants={pageVariants} initial="initial" animate="animate" exit="exit">
+        <Routes location={location}>
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/lessons" element={<Lessons />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/booking" element={<Booking />} />
+          <Route path="/partners" element={<Partners />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+        <Footer />
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+export default function App() {
+  return (
+    <CartProvider>
+      <Router>
+        <div className="min-h-screen bg-star-black text-star-white font-sans">
+          <Navbar />
+          <CartSidebar />
+          <AnimatedRoutes />
+        </div>
+      </Router>
+    </CartProvider>
+  )
+}

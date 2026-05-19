@@ -1,0 +1,220 @@
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Play, X, Image, Video, Expand } from 'lucide-react'
+
+const filters = ['All', 'Videos', 'Photos']
+
+const galleryItems = [
+  // Videos
+  { id: 1, type: 'video', title: 'Star Mat Pro — Launch Film', duration: '2:14', category: 'Product', thumb: 'from-blue-900/80 to-star-black', accent: '#007AFF', featured: true },
+  { id: 2, type: 'video', title: 'Morning Flow with Sarah Chen', duration: '30:00', category: 'Class', thumb: 'from-teal-900/80 to-star-black', accent: '#32D4B9' },
+  { id: 3, type: 'video', title: 'Power Core — Full Session', duration: '45:00', category: 'Class', thumb: 'from-red-900/80 to-star-black', accent: '#FF375F' },
+  { id: 4, type: 'video', title: 'Star Mat: Behind the Design', duration: '5:42', category: 'Brand', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700' },
+  { id: 5, type: 'video', title: 'Advanced Flexibility — Elena', duration: '50:00', category: 'Class', thumb: 'from-purple-900/80 to-star-black', accent: '#BF5AF2' },
+  { id: 6, type: 'video', title: 'Mat HIIT: Full Body Burn', duration: '40:00', category: 'Class', thumb: 'from-orange-900/70 to-star-black', accent: '#FF9F0A' },
+  // Real photos
+  { id: 7, type: 'photo', title: 'Star Mat Pro — In the Gym', category: 'Product', image: '/images/mat-product.jpeg', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
+  { id: 8, type: 'photo', title: 'Star Mat — Full View', category: 'Product', image: '/images/mat-gym.jpeg', thumb: 'from-slate-700/60 to-star-black', accent: '#8E8E93' },
+  { id: 9, type: 'photo', title: 'Athlete — Sprint Drill', category: 'Training', image: '/images/athlete-1.png', thumb: 'from-red-900/60 to-star-black', accent: '#FF375F' },
+  { id: 10, type: 'photo', title: 'Athlete — Lateral Drive', category: 'Training', image: '/images/athlete-2.png', thumb: 'from-green-900/60 to-star-black', accent: '#30D158' },
+  { id: 11, type: 'photo', title: 'Athlete — Ready Position', category: 'Training', image: '/images/athlete-3.png', thumb: 'from-cyan-900/60 to-star-black', accent: '#64D2FF' },
+]
+
+const StarShape = ({ size = 40, className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 50 50" fill="currentColor" className={className}>
+    <polygon points="25,3 31,18 47,18 35,29 39,45 25,37 11,45 15,29 3,18 19,18" />
+  </svg>
+)
+
+export default function Gallery() {
+  const [filter, setFilter] = useState('All')
+  const [lightbox, setLightbox] = useState(null)
+
+  const filtered = filter === 'All' ? galleryItems
+    : filter === 'Videos' ? galleryItems.filter(i => i.type === 'video')
+    : galleryItems.filter(i => i.type === 'photo')
+
+  const featured = galleryItems.find(i => i.featured)
+
+  return (
+    <main className="pt-24 pb-20">
+      {/* Header */}
+      <section className="section-padding py-14 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-10 right-1/4 w-[50vw] h-[25vw] rounded-full bg-star-blue/6 blur-[80px]" />
+        </div>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10 max-w-3xl">
+          <p className="text-star-yellow text-sm font-semibold tracking-widest uppercase mb-3">Media</p>
+          <h1 className="text-5xl md:text-6xl font-black mb-4">
+            Gallery & <span className="text-gradient-blue">Videos</span>
+          </h1>
+          <p className="text-star-grey text-lg">Behind-the-scenes, full class recordings, product films, and community moments.</p>
+        </motion.div>
+      </section>
+
+      {/* Featured Video */}
+      {featured && (
+        <div className="section-padding mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="max-w-7xl mx-auto"
+          >
+            <p className="text-star-grey text-sm font-semibold tracking-widest uppercase mb-4">Featured</p>
+            <motion.div
+              whileHover={{ scale: 1.005 }}
+              onClick={() => setLightbox(featured)}
+              className={`relative rounded-3xl overflow-hidden border border-star-border bg-gradient-to-br ${featured.thumb} cursor-pointer group`}
+              style={{ aspectRatio: '16/7' }}
+            >
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+                <motion.div
+                  className="w-20 h-20 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: `${featured.accent}30`, border: `2px solid ${featured.accent}60` }}
+                  whileHover={{ scale: 1.15 }}
+                >
+                  <Play size={30} fill="white" className="text-white ml-1" />
+                </motion.div>
+                <div className="text-center">
+                  <p className="text-white font-black text-2xl md:text-3xl mb-2">{featured.title}</p>
+                  <p className="text-star-grey">{featured.duration} · {featured.category}</p>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+              {/* Animated star bg */}
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }} className="absolute -bottom-10 -right-10 opacity-10">
+                <StarShape size={200} className="text-star-yellow" />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="section-padding mb-8">
+        <div className="max-w-7xl mx-auto flex gap-2">
+          {filters.map((f) => (
+            <motion.button
+              key={f}
+              onClick={() => setFilter(f)}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                filter === f ? 'bg-star-blue text-white' : 'glass text-star-grey hover:text-white border border-star-border'
+              }`}
+            >
+              {f === 'Videos' && <Video size={14} />}
+              {f === 'Photos' && <Image size={14} />}
+              {f}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div className="section-padding">
+        <div className="max-w-7xl mx-auto">
+          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <AnimatePresence mode="popLayout">
+              {filtered.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.85 }}
+                  transition={{ duration: 0.3, delay: i * 0.04 }}
+                  onClick={() => setLightbox(item)}
+                  className="group cursor-pointer"
+                >
+                  <div className={`relative rounded-2xl overflow-hidden border border-star-border aspect-[4/3] flex items-center justify-center ${item.image ? '' : `bg-gradient-to-br ${item.thumb}`}`}>
+                    {/* Real photo */}
+                    {item.image && (
+                      <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                    )}
+
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300" />
+
+                    {/* Play / expand icon — shown on hover */}
+                    <div className="relative z-10 flex flex-col items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <motion.div
+                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: `${item.accent}40`, border: `2px solid ${item.accent}80` }}
+                      >
+                        {item.type === 'video'
+                          ? <Play size={18} fill="white" className="text-white ml-0.5" />
+                          : <Expand size={16} className="text-white" />
+                        }
+                      </motion.div>
+                    </div>
+
+                    {/* Star bg for video placeholders */}
+                    {!item.image && (
+                      <StarShape size={40} className="absolute opacity-10" style={{ color: item.accent }} />
+                    )}
+
+                    {/* Type badge */}
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-xs font-semibold text-white">
+                      {item.type === 'video' ? <Video size={11} /> : <Image size={11} />}
+                      {item.category}
+                    </div>
+
+                    {/* Duration for video */}
+                    {item.type === 'video' && (
+                      <div className="absolute bottom-3 right-3 px-2 py-0.5 rounded bg-black/60 text-white text-xs font-semibold">
+                        {item.duration}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-white text-sm font-semibold mt-2 px-1">{item.title}</p>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightbox && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightbox(null)}
+            className="fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative w-full max-w-3xl rounded-3xl overflow-hidden border border-star-border ${lightbox.image ? 'bg-star-black' : `bg-gradient-to-br ${lightbox.thumb}`}`}
+              style={{ aspectRatio: lightbox.image ? 'auto' : '16/9' }}
+            >
+              {lightbox.image ? (
+                <img src={lightbox.image} alt={lightbox.title} className="w-full h-full object-contain max-h-[80vh]" />
+              ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
+                <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ backgroundColor: `${lightbox.accent}30`, border: `2px solid ${lightbox.accent}60` }}>
+                  {lightbox.type === 'video' ? <Play size={30} fill="white" className="text-white ml-1" /> : <Image size={28} className="text-white" />}
+                </div>
+                <div className="text-center px-8">
+                  <p className="text-white font-black text-2xl mb-1">{lightbox.title}</p>
+                  <p className="text-star-grey">{lightbox.type === 'video' ? lightbox.duration + ' · ' : ''}{lightbox.category}</p>
+                  {lightbox.type === 'video' && <p className="text-star-grey text-sm mt-2 opacity-60">(Video player — connect your media source to enable playback)</p>}
+                </div>
+              </div>
+              )}
+              <button onClick={() => setLightbox(null)} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors">
+                <X size={18} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </main>
+  )
+}
