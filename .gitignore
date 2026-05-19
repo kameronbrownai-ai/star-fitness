@@ -5,3 +5,7 @@ dist/
 .DS_Store
 *.log
 npm-debug.log*
+# Large video files — store these separately
+stare mat/*.mp4
+stare mat/*.mov
+stare mat/*.webloc
