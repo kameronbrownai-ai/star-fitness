@@ -1,18 +1,13 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, Play, Star, Zap, Shield, Award } from 'lucide-react'
-
-const StarShape = ({ size = 60, className = '' }) => (
-  <svg width={size} height={size} viewBox="0 0 50 50" fill="none" className={className}>
-    <polygon points="25,3 31,18 47,18 35,29 39,45 25,37 11,45 15,29 3,18 19,18" fill="currentColor" />
-  </svg>
-)
+import CompassStar from '../components/CompassStar'
 
 const stats = [
   { value: '250K+', label: 'Active Members' },
   { value: '1,200+', label: 'Live Classes' },
   { value: '42', label: 'Countries' },
-  { value: '4.9★', label: 'Average Rating' },
+  { value: '4.9', label: 'Average Rating', starIcon: true },
 ]
 
 const features = [
@@ -59,7 +54,7 @@ const teasers = [
     sub: 'Real people, real results.',
     color: 'from-purple-900/30 to-star-black',
     accent: '#BF5AF2',
-    icon: '★',
+    icon: 'compass',
   },
   {
     label: 'About',
@@ -106,27 +101,27 @@ export default function Home() {
           }}
         />
 
-        {/* Floating star decorations */}
+        {/* Floating logo decorations */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 40, ease: 'linear', repeat: Infinity }}
-          className="absolute top-20 right-[10%] text-star-yellow/20"
+          className="absolute top-20 right-[10%] opacity-20"
         >
-          <StarShape size={120} />
+          <img src="/images/logo.jpeg" alt="" className="w-28 h-28 object-contain" style={{ mixBlendMode: 'screen' }} />
         </motion.div>
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 25, ease: 'linear', repeat: Infinity }}
-          className="absolute bottom-32 left-[8%] text-star-blue/20"
+          className="absolute bottom-32 left-[8%] opacity-20"
         >
-          <StarShape size={80} />
+          <img src="/images/logo.jpeg" alt="" className="w-20 h-20 object-contain" style={{ mixBlendMode: 'screen' }} />
         </motion.div>
         <motion.div
           animate={{ y: [-15, 15, -15] }}
           transition={{ duration: 6, ease: 'easeInOut', repeat: Infinity }}
-          className="absolute top-1/2 right-[5%] text-star-yellow/10 hidden lg:block"
+          className="absolute top-1/2 right-[5%] opacity-10 hidden lg:block"
         >
-          <StarShape size={200} />
+          <img src="/images/logo.jpeg" alt="" className="w-48 h-48 object-contain" style={{ mixBlendMode: 'screen' }} />
         </motion.div>
 
         {/* Hero Content */}
@@ -137,7 +132,7 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="inline-flex items-center gap-2 glass px-4 py-2 rounded-full text-sm font-medium text-star-yellow mb-8"
           >
-            <StarShape size={14} className="text-star-yellow" />
+            <img src="/images/logo.jpeg" alt="" className="w-4 h-4 object-contain" style={{ mixBlendMode: 'screen' }} />
             Introducing the Star Mat Pro 2.0
           </motion.div>
 
@@ -216,7 +211,10 @@ export default function Home() {
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 className="text-center"
               >
-                <p className="text-3xl md:text-4xl font-black text-white mb-1">{stat.value}</p>
+                <p className="text-3xl md:text-4xl font-black text-white mb-1 flex items-center justify-center gap-1">
+                  {stat.value}
+                  {stat.starIcon && <CompassStar size={22} color="#FFD700" />}
+                </p>
                 <p className="text-star-grey text-sm">{stat.label}</p>
               </motion.div>
             ))}
@@ -242,8 +240,8 @@ export default function Home() {
                 {/* Real product photo */}
                 <div className="relative rounded-3xl overflow-hidden border border-star-border shadow-2xl">
                   <img
-                    src="/images/mat-product.jpeg"
-                    alt="Star Mat Pro in gym"
+                    src="/images/mat-clean.jpeg"
+                    alt="Star Mat Pro overhead view"
                     className="w-full h-full object-cover"
                   />
                   {/* Subtle brand overlay at bottom */}
@@ -357,7 +355,10 @@ export default function Home() {
                     className={`relative overflow-hidden rounded-2xl border border-star-border bg-gradient-to-b ${t.color} p-6 md:p-8 h-52 md:h-64 flex flex-col justify-between`}
                   >
                     <div>
-                      <span className="text-3xl md:text-4xl" style={{ color: t.accent }}>{t.icon}</span>
+                      {t.icon === 'compass'
+                        ? <CompassStar size={36} color={t.accent} />
+                        : <span className="text-3xl md:text-4xl" style={{ color: t.accent }}>{t.icon}</span>
+                      }
                       <p className="text-star-grey text-xs font-semibold tracking-widest uppercase mt-3">{t.label}</p>
                     </div>
                     <div>

@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, X, Image, Video, Expand } from 'lucide-react'
+import CompassStar from '../components/CompassStar'
 
 const filters = ['All', 'Videos', 'Photos']
 
 const galleryItems = [
   // Videos
-  { id: 1, type: 'video', title: 'Star Mat Pro — Launch Film', duration: '2:14', category: 'Product', thumb: 'from-blue-900/80 to-star-black', accent: '#007AFF', featured: true },
+  { id: 1, type: 'video', title: 'Star Mat — Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', featured: true, src: '/videos/star-mat-side-lunge.mov' },
   { id: 2, type: 'video', title: 'Morning Flow with Sarah Chen', duration: '30:00', category: 'Class', thumb: 'from-teal-900/80 to-star-black', accent: '#32D4B9' },
   { id: 3, type: 'video', title: 'Power Core — Full Session', duration: '45:00', category: 'Class', thumb: 'from-red-900/80 to-star-black', accent: '#FF375F' },
   { id: 4, type: 'video', title: 'Star Mat: Behind the Design', duration: '5:42', category: 'Brand', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700' },
@@ -19,12 +20,6 @@ const galleryItems = [
   { id: 10, type: 'photo', title: 'Athlete — Lateral Drive', category: 'Training', image: '/images/athlete-2.png', thumb: 'from-green-900/60 to-star-black', accent: '#30D158' },
   { id: 11, type: 'photo', title: 'Athlete — Ready Position', category: 'Training', image: '/images/athlete-3.png', thumb: 'from-cyan-900/60 to-star-black', accent: '#64D2FF' },
 ]
-
-const StarShape = ({ size = 40, className = '' }) => (
-  <svg width={size} height={size} viewBox="0 0 50 50" fill="currentColor" className={className}>
-    <polygon points="25,3 31,18 47,18 35,29 39,45 25,37 11,45 15,29 3,18 19,18" />
-  </svg>
-)
 
 export default function Gallery() {
   const [filter, setFilter] = useState('All')
@@ -84,7 +79,7 @@ export default function Gallery() {
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
               {/* Animated star bg */}
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }} className="absolute -bottom-10 -right-10 opacity-10">
-                <StarShape size={200} className="text-star-yellow" />
+                <CompassStar size={200} color="#FFD700" />
               </motion.div>
             </motion.div>
           </motion.div>
@@ -128,10 +123,14 @@ export default function Gallery() {
                   onClick={() => setLightbox(item)}
                   className="group cursor-pointer"
                 >
-                  <div className={`relative rounded-2xl overflow-hidden border border-star-border aspect-[4/3] flex items-center justify-center ${item.image ? '' : `bg-gradient-to-br ${item.thumb}`}`}>
+                  <div className={`relative rounded-2xl overflow-hidden border border-star-border aspect-[4/3] flex items-center justify-center ${item.image || item.src ? '' : `bg-gradient-to-br ${item.thumb}`}`}>
                     {/* Real photo */}
                     {item.image && (
                       <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                    )}
+                    {/* Real video thumbnail */}
+                    {item.src && (
+                      <video src={item.src} className="absolute inset-0 w-full h-full object-cover" muted playsInline preload="metadata" />
                     )}
 
                     {/* Hover overlay */}
@@ -150,9 +149,9 @@ export default function Gallery() {
                       </motion.div>
                     </div>
 
-                    {/* Star bg for video placeholders */}
-                    {!item.image && (
-                      <StarShape size={40} className="absolute opacity-10" style={{ color: item.accent }} />
+                    {/* Compass star bg for video placeholders */}
+                    {!item.image && !item.src && (
+                      <CompassStar size={40} color={item.accent} className="absolute opacity-10" />
                     )}
 
                     {/* Type badge */}
@@ -192,9 +191,11 @@ export default function Gallery() {
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className={`relative w-full max-w-3xl rounded-3xl overflow-hidden border border-star-border ${lightbox.image ? 'bg-star-black' : `bg-gradient-to-br ${lightbox.thumb}`}`}
-              style={{ aspectRatio: lightbox.image ? 'auto' : '16/9' }}
+              style={{ aspectRatio: lightbox.src || lightbox.image ? 'auto' : '16/9' }}
             >
-              {lightbox.image ? (
+              {lightbox.src ? (
+                <video src={lightbox.src} controls autoPlay className="w-full max-h-[80vh] rounded-3xl" />
+              ) : lightbox.image ? (
                 <img src={lightbox.image} alt={lightbox.title} className="w-full h-full object-contain max-h-[80vh]" />
               ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
@@ -204,7 +205,6 @@ export default function Gallery() {
                 <div className="text-center px-8">
                   <p className="text-white font-black text-2xl mb-1">{lightbox.title}</p>
                   <p className="text-star-grey">{lightbox.type === 'video' ? lightbox.duration + ' · ' : ''}{lightbox.category}</p>
-                  {lightbox.type === 'video' && <p className="text-star-grey text-sm mt-2 opacity-60">(Video player — connect your media source to enable playback)</p>}
                 </div>
               </div>
               )}

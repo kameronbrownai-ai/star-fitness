@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { Link } from 'react-router-dom'
+import CompassStar from './CompassStar'
 
 export default function CartSidebar() {
   const { items, open, setOpen, total, count, removeItem, increment, decrement, clearCart } = useCart()
@@ -84,7 +85,7 @@ export default function CartSidebar() {
                         className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
                         style={{ backgroundColor: `${item.accent || '#007AFF'}15`, border: `1px solid ${item.accent || '#007AFF'}30` }}
                       >
-                        {item.emoji || '⭐'}
+                        {item.emoji || <CompassStar size={24} color={item.accent || '#FFD700'} />}
                       </div>
 
                       <div className="flex-1 min-w-0">

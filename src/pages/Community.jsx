@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Star, Quote, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import CompassStar from '../components/CompassStar'
 
 const testimonials = [
   {
@@ -79,7 +80,7 @@ const partners = [
 const communityStats = [
   { value: '250K+', label: 'Active Members', color: '#007AFF' },
   { value: '98%', label: 'Would Recommend', color: '#30D158' },
-  { value: '4.9★', label: 'Average Rating', color: '#FFD700' },
+  { value: '4.9', label: 'Average Rating', color: '#FFD700', starIcon: true },
   { value: '42', label: 'Countries', color: '#BF5AF2' },
 ]
 
@@ -119,7 +120,10 @@ export default function Community() {
               transition={{ delay: i * 0.1 }}
               className="glass rounded-2xl p-6 text-center border border-star-border"
             >
-              <p className="text-3xl font-black mb-1" style={{ color: stat.color }}>{stat.value}</p>
+              <p className="text-3xl font-black mb-1 flex items-center justify-center gap-1" style={{ color: stat.color }}>
+                {stat.value}
+                {stat.starIcon && <CompassStar size={22} color={stat.color} />}
+              </p>
               <p className="text-star-grey text-sm">{stat.label}</p>
             </motion.div>
           ))}

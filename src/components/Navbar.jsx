@@ -14,12 +14,6 @@ const navLinks = [
   { label: 'About', to: '/about' },
 ]
 
-const StarLogo = () => (
-  <svg width="30" height="30" viewBox="0 0 50 50" fill="none">
-    <polygon points="25,3 31,18 47,18 35,29 39,45 25,37 11,45 15,29 3,18 19,18" fill="#FFD700" />
-  </svg>
-)
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -73,7 +67,7 @@ export default function Navbar() {
           {/* CENTER — Logo */}
           <Link to="/" className="flex items-center gap-2.5 group absolute left-1/2 -translate-x-1/2">
             <motion.div whileHover={{ rotate: 72 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
-              <StarLogo />
+              <img src="/images/logo.jpeg" alt="Star Fitness logo" className="w-8 h-8 object-contain" style={{ mixBlendMode: 'screen' }} />
             </motion.div>
             <span className="text-lg font-black tracking-tight text-white whitespace-nowrap">
               STAR <span className="text-star-yellow">FITNESS</span>
@@ -128,7 +122,7 @@ export default function Navbar() {
               {/* Menu header */}
               <div className="flex items-center justify-between p-5 border-b border-star-border">
                 <Link to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
-                  <StarLogo />
+                  <img src="/images/logo.jpeg" alt="Star Fitness logo" className="w-8 h-8 object-contain" style={{ mixBlendMode: 'screen' }} />
                   <span className="font-black text-white text-sm tracking-tight">STAR <span className="text-star-yellow">FITNESS</span></span>
                 </Link>
                 <button onClick={() => setMobileOpen(false)} className="text-star-grey hover:text-white transition-colors p-1">
