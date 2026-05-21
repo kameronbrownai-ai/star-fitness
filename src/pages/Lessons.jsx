@@ -1,375 +1,380 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Clock, Flame, ChevronDown, Lock } from 'lucide-react'
+import { Play, Clock, Lock, Activity, Heart } from 'lucide-react'
 
-const intensityLevels = ['All', 'Beginner', 'Intermediate', 'Advanced']
-const instructors = ['All Instructors', 'Sarah Chen', 'Marcus Johnson', 'Elena Rodriguez']
-
-const classes = [
+const sports = [
   {
-    id: 1,
-    title: 'Morning Flow & Breath',
-    instructor: 'Sarah Chen',
-    intensity: 'Beginner',
-    duration: '30 min',
-    category: 'Yoga',
-    color: 'from-blue-900/50 to-star-black',
-    accent: '#007AFF',
-    free: true,
-    desc: 'Start your day grounded. Gentle stretches, breathwork, and intention-setting.',
+    id: 'football',
+    name: 'Football',
+    emoji: '🏈',
+    color: '#FF6B00',
+    desc: 'Speed, power, and explosion',
+    train: [
+      { id: 1, title: 'Speed & Explosion', targets: ['Legs', 'Glutes', 'Hip Flexors'], instructor: 'Marcus Johnson', duration: '45 min', free: true, desc: 'Directional speed drills using the Star Mat grid to build first-step quickness and burst.' },
+      { id: 2, title: 'Lateral Agility Patterns', targets: ['Legs', 'Ankles', 'Core'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Star Mat arrow drills for change-of-direction speed, cutting, and defensive footwork.' },
+      { id: 3, title: 'Core Power for Linemen', targets: ['Core', 'Shoulders', 'Hips'], instructor: 'Elena Rodriguez', duration: '35 min', free: false, desc: 'Rotational core strength and hip drive for blocking, tackling, and ground leverage.' },
+      { id: 4, title: 'Hip Flexor Activation', targets: ['Hip Flexors', 'Glutes', 'Lower Back'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Pre-game hip priming to unlock stride length and prevent common groin strains.' },
+    ],
+    recover: [
+      { id: 5, title: 'ACL Recovery Protocol', injury: 'ACL Tear', targets: ['Knee', 'Quads', 'Hamstrings'], instructor: 'Elena Rodriguez', duration: '30 min', free: true, desc: 'Low-impact strengthening sequence designed for post-ACL rehabilitation on a cushioned surface.' },
+      { id: 6, title: 'Hamstring Rehab', injury: 'Hamstring Strain', targets: ['Hamstrings', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Progressive hamstring loading from passive stretching to active eccentric strengthening.' },
+      { id: 7, title: 'Ankle Stability & Rebuild', injury: 'Ankle Sprain', targets: ['Ankles', 'Calves', 'Foot'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Balance and proprioception drills to restore ankle strength after a sprain.' },
+    ],
   },
   {
-    id: 2,
-    title: 'Power Core Ignition',
-    instructor: 'Marcus Johnson',
-    intensity: 'Advanced',
-    duration: '45 min',
-    category: 'HIIT',
-    color: 'from-red-900/40 to-star-black',
-    accent: '#FF375F',
-    free: false,
-    desc: 'High-intensity core-focused training. No breaks, all gains.',
+    id: 'basketball',
+    name: 'Basketball',
+    emoji: '🏀',
+    color: '#FF6B35',
+    desc: 'Vertical, agility, and endurance',
+    train: [
+      { id: 8, title: 'Vertical Jump Program', targets: ['Legs', 'Glutes', 'Calves'], instructor: 'Marcus Johnson', duration: '50 min', free: true, desc: 'Plyometric progressions using the Star Mat to build explosive jumping power and landing mechanics.' },
+      { id: 9, title: 'Ankle Conditioning', targets: ['Ankles', 'Calves', 'Feet'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Stability and strength work to bulletproof your ankles for the demands of the hardwood.' },
+      { id: 10, title: 'Core Balance & Control', targets: ['Core', 'Hips', 'Lower Back'], instructor: 'Sarah Chen', duration: '35 min', free: false, desc: 'Single-leg balance and core control for body control in traffic and post play.' },
+      { id: 11, title: 'Upper Body for Bigs', targets: ['Shoulders', 'Arms', 'Core'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Strength and mobility for boxing out, finishing through contact, and post positioning.' },
+    ],
+    recover: [
+      { id: 12, title: 'Knee Tendinitis Relief', injury: 'Patellar Tendinitis', targets: ['Knee', 'Quads', 'IT Band'], instructor: 'Elena Rodriguez', duration: '25 min', free: true, desc: 'Targeted quad eccentric work and foam rolling to relieve jumper\'s knee pain.' },
+      { id: 13, title: 'Ankle Sprain Recovery', injury: 'Ankle Sprain', targets: ['Ankles', 'Foot', 'Calves'], instructor: 'Sarah Chen', duration: '20 min', free: false, desc: 'Gentle mobilization and progressive loading to return ankle strength and confidence.' },
+      { id: 14, title: 'Wrist & Finger Rehab', injury: 'Jammed Fingers', targets: ['Wrists', 'Hands', 'Forearms'], instructor: 'Elena Rodriguez', duration: '15 min', free: false, desc: 'Range-of-motion and grip exercises to restore finger function after common basketball hand injuries.' },
+    ],
   },
   {
-    id: 3,
-    title: 'Mindful Stretch Flow',
-    instructor: 'Elena Rodriguez',
-    intensity: 'Beginner',
-    duration: '25 min',
-    category: 'Stretch',
-    color: 'from-purple-900/40 to-star-black',
-    accent: '#BF5AF2',
-    free: true,
-    desc: 'Slow, deliberate stretching guided by breath and body awareness.',
+    id: 'soccer',
+    name: 'Soccer',
+    emoji: '⚽',
+    color: '#30D158',
+    desc: 'Endurance, hips, and footwork',
+    train: [
+      { id: 15, title: 'Hip Flexor Power', targets: ['Hip Flexors', 'Groin', 'Core'], instructor: 'Marcus Johnson', duration: '35 min', free: true, desc: 'Kicking power and stride mechanics start with the hips. Build the engine that drives every touch.' },
+      { id: 16, title: 'Lower Body Endurance', targets: ['Legs', 'Glutes', 'Calves'], instructor: 'Marcus Johnson', duration: '50 min', free: false, desc: 'High-rep leg circuits designed for the aerobic and anaerobic demands of 90-minute matches.' },
+      { id: 17, title: 'Rotational Core', targets: ['Core', 'Obliques', 'Hips'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Twisting power for shooting, shielding, and turning defenders using Star Mat pivot points.' },
+      { id: 18, title: 'Goalkeeper Explosiveness', targets: ['Legs', 'Shoulders', 'Core'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Lateral explosion, dive recovery, and shoulder stability specific to goalkeeping demands.' },
+    ],
+    recover: [
+      { id: 19, title: 'Groin Strain Protocol', injury: 'Groin Strain', targets: ['Groin', 'Hip Flexors', 'Inner Thigh'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'Progressive adductor loading and hip mobility to safely return from a groin pull.' },
+      { id: 20, title: 'Shin Splint Relief', injury: 'Shin Splints', targets: ['Shins', 'Calves', 'Foot'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Calf stretching, tibial strengthening, and soft-tissue work to eliminate shin splint pain.' },
+      { id: 21, title: 'Hamstring Recovery', injury: 'Hamstring Strain', targets: ['Hamstrings', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'The most common soccer injury — a structured return-to-play hamstring program.' },
+    ],
   },
   {
-    id: 4,
-    title: 'Mat HIIT: Full Body',
-    instructor: 'Marcus Johnson',
-    intensity: 'Intermediate',
-    duration: '40 min',
-    category: 'HIIT',
-    color: 'from-orange-900/40 to-star-black',
-    accent: '#FF9F0A',
-    free: false,
-    desc: 'A sweat-inducing full-body circuit, all done on the Star Mat.',
+    id: 'baseball',
+    name: 'Baseball / Softball',
+    emoji: '⚾',
+    color: '#007AFF',
+    desc: 'Rotation, shoulders, and arms',
+    train: [
+      { id: 22, title: 'Rotational Power', targets: ['Hips', 'Core', 'Obliques'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Hip-to-shoulder rotation mechanics for pitchers and hitters. Power starts at the ground.' },
+      { id: 23, title: 'Shoulder Stability', targets: ['Shoulders', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '35 min', free: false, desc: 'Pre-season shoulder health program used by pro pitchers to build durability and velocity.' },
+      { id: 24, title: 'Forearm & Grip Strength', targets: ['Forearms', 'Wrists', 'Hands'], instructor: 'Marcus Johnson', duration: '25 min', free: false, desc: 'Grip, wrist stability, and forearm endurance for bat speed and throwing velocity.' },
+      { id: 25, title: 'Explosive Lower Half', targets: ['Legs', 'Glutes', 'Hip Flexors'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Lower-half drive for pitchers — leg power is where velocity is generated.' },
+    ],
+    recover: [
+      { id: 26, title: 'Rotator Cuff Rehab', injury: 'Rotator Cuff Tear', targets: ['Rotator Cuff', 'Shoulders'], instructor: 'Elena Rodriguez', duration: '30 min', free: true, desc: 'The gold-standard shoulder rehab sequence for throwers — external rotation focus.' },
+      { id: 27, title: 'Elbow Recovery (UCL)', injury: 'Tommy John / UCL', targets: ['Elbow', 'Forearm', 'Wrist'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Conservative elbow rehab targeting the medial structures stressed in throwing athletes.' },
+      { id: 28, title: 'Lower Back Relief', injury: 'Lower Back Strain', targets: ['Lower Back', 'Core', 'Hips'], instructor: 'Sarah Chen', duration: '20 min', free: false, desc: 'Spinal decompression and lumbar stability work for the rotational stress of batting and pitching.' },
+    ],
   },
   {
-    id: 5,
-    title: 'Yoga Fundamentals',
-    instructor: 'Sarah Chen',
-    intensity: 'Beginner',
-    duration: '60 min',
-    category: 'Yoga',
-    color: 'from-teal-900/40 to-star-black',
-    accent: '#32D4B9',
-    free: false,
-    desc: 'Master the 12 foundational poses. Build your practice from the ground up.',
+    id: 'track',
+    name: 'Track & Field',
+    emoji: '🏃',
+    color: '#FFD700',
+    desc: 'Explosiveness, stride, and power',
+    train: [
+      { id: 29, title: 'Sprint Mechanics', targets: ['Legs', 'Glutes', 'Hip Flexors'], instructor: 'Marcus Johnson', duration: '45 min', free: true, desc: 'Star Mat directional drills for stride length, frequency, and drive phase mechanics.' },
+      { id: 30, title: 'Explosive Starts', targets: ['Glutes', 'Hamstrings', 'Calves'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Block start simulation and first-step power work for sprinters and field event athletes.' },
+      { id: 31, title: 'Core Drive', targets: ['Core', 'Obliques', 'Hip Flexors'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Core transfer for arm drive, sprint posture, and throwing rotational force.' },
+      { id: 32, title: 'Glute Activation', targets: ['Glutes', 'Hamstrings', 'Hips'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Pre-workout glute firing sequence to maximize power output and protect the lower back.' },
+    ],
+    recover: [
+      { id: 33, title: 'Hamstring Protocol', injury: 'Hamstring Strain', targets: ['Hamstrings', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'The Nordic and eccentric hamstring program — the most evidence-backed sprint rehab method.' },
+      { id: 34, title: 'Shin Splint Recovery', injury: 'Shin Splints / MTSS', targets: ['Shins', 'Calves', 'Feet'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Load reduction, tissue work, and progressive calf strengthening for medial tibial stress syndrome.' },
+      { id: 35, title: 'Stress Fracture Prevention', injury: 'Stress Fractures', targets: ['Feet', 'Shins', 'Hips'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Low-impact strength work targeting the bone stress areas most common in high-volume runners.' },
+    ],
   },
   {
-    id: 6,
-    title: 'Advanced Flexibility',
-    instructor: 'Elena Rodriguez',
-    intensity: 'Advanced',
-    duration: '50 min',
-    category: 'Stretch',
-    color: 'from-pink-900/40 to-star-black',
-    accent: '#FF6B9D',
-    free: false,
-    desc: 'Deep flexibility work for athletes and experienced practitioners.',
+    id: 'tennis',
+    name: 'Tennis',
+    emoji: '🎾',
+    color: '#BF5AF2',
+    desc: 'Shoulder, agility, and wrist',
+    train: [
+      { id: 36, title: 'Shoulder Conditioning', targets: ['Shoulders', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '35 min', free: true, desc: 'Service arm durability and shoulder health for high-volume hitters and servers.' },
+      { id: 37, title: 'Lateral Court Agility', targets: ['Legs', 'Ankles', 'Hips'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Split-step and lateral movement patterns on the Star Mat grid for court coverage.' },
+      { id: 38, title: 'Wrist & Forearm Strength', targets: ['Wrists', 'Forearms', 'Grip'], instructor: 'Marcus Johnson', duration: '25 min', free: false, desc: 'Racket control starts at the wrist — strength and stability training for groundstroke power.' },
+      { id: 39, title: 'Core Rotation for Power', targets: ['Core', 'Obliques', 'Hips'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Topspin and serve power generated from trunk rotation — the kinetic chain for tennis.' },
+    ],
+    recover: [
+      { id: 40, title: 'Tennis Elbow Relief', injury: 'Lateral Epicondylitis', targets: ['Elbow', 'Forearm', 'Wrist'], instructor: 'Sarah Chen', duration: '20 min', free: true, desc: 'Eccentric wrist extension and soft-tissue release for lateral elbow pain.' },
+      { id: 41, title: 'Shoulder Impingement Protocol', injury: 'Shoulder Impingement', targets: ['Shoulder', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Posterior capsule stretching and rotator cuff strengthening to restore pain-free serving.' },
+      { id: 42, title: 'Knee Pain Recovery', injury: 'Patellar Tendinitis', targets: ['Knee', 'Quads', 'IT Band'], instructor: 'Sarah Chen', duration: '20 min', free: false, desc: 'Eccentric quad loading and IT band release for knee pain from repetitive court movement.' },
+    ],
   },
   {
-    id: 7,
-    title: 'Balance & Stability',
-    instructor: 'Marcus Johnson',
-    intensity: 'Intermediate',
-    duration: '35 min',
-    category: 'Strength',
-    color: 'from-cyan-900/40 to-star-black',
-    accent: '#64D2FF',
-    free: false,
-    desc: 'Single-leg drills, proprioception work, and functional balance training.',
-  },
-  {
-    id: 8,
-    title: 'Restorative Evening',
-    instructor: 'Sarah Chen',
-    intensity: 'Beginner',
-    duration: '20 min',
-    category: 'Yoga',
-    color: 'from-indigo-900/40 to-star-black',
-    accent: '#5E5CE6',
-    free: true,
-    desc: 'Wind down with passive holds and guided relaxation before sleep.',
-  },
-  {
-    id: 9,
-    title: 'Explosive Plyometrics',
-    instructor: 'Marcus Johnson',
-    intensity: 'Advanced',
-    duration: '55 min',
-    category: 'HIIT',
-    color: 'from-yellow-900/40 to-star-black',
-    accent: '#FFD700',
-    free: false,
-    desc: 'Jump training, fast-twitch activation, and peak athletic performance.',
+    id: 'mma',
+    name: 'MMA / Combat',
+    emoji: '🥊',
+    color: '#FF375F',
+    desc: 'Full body, power, and endurance',
+    train: [
+      { id: 43, title: 'Full Body Power Circuit', targets: ['Full Body', 'Core', 'Legs'], instructor: 'Marcus Johnson', duration: '50 min', free: true, desc: 'High-intensity mat circuit combining striking power, wrestling strength, and conditioning.' },
+      { id: 44, title: 'Core & Clinch Strength', targets: ['Core', 'Obliques', 'Grip'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Cage control, clinch work, and anti-rotation core strength for grappling situations.' },
+      { id: 45, title: 'Explosive Hip Drive', targets: ['Hips', 'Glutes', 'Core'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Takedown power, striking drive, and guard passing all start at the hips.' },
+      { id: 46, title: 'Neck & Cervical Strength', targets: ['Neck', 'Traps', 'Shoulders'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Often neglected — neck strength for striking defense, wrestling, and submission resistance.' },
+    ],
+    recover: [
+      { id: 47, title: 'Shoulder Joint Recovery', injury: 'Shoulder Dislocation / Separation', targets: ['Shoulder', 'Rotator Cuff', 'Biceps'], instructor: 'Elena Rodriguez', duration: '30 min', free: true, desc: 'Progressive shoulder stabilization for the most common upper-body injury in combat sports.' },
+      { id: 48, title: 'Knee Stability Rebuild', injury: 'Knee Sprain / MCL', targets: ['Knee', 'Quads', 'Hamstrings'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Medial knee support work for the lateral stress of takedowns and guard work.' },
+      { id: 49, title: 'Cervical & Neck Care', injury: 'Neck Strain / Whiplash', targets: ['Neck', 'Cervical Spine', 'Traps'], instructor: 'Sarah Chen', duration: '20 min', free: false, desc: 'Gentle mobility and isometric strengthening for neck strains from clinching and scrambles.' },
+    ],
   },
 ]
 
-const intensityColors = {
-  Beginner: { bg: 'bg-green-500/15', text: 'text-green-400', border: 'border-green-500/20' },
-  Intermediate: { bg: 'bg-yellow-500/15', text: 'text-yellow-400', border: 'border-yellow-500/20' },
-  Advanced: { bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/20' },
+const instructorColors = {
+  'Marcus Johnson': '#FF375F',
+  'Elena Rodriguez': '#BF5AF2',
+  'Sarah Chen': '#007AFF',
 }
 
-const instructorBios = {
-  'Sarah Chen': { initials: 'SC', color: '#007AFF', classes: 342, specialty: 'Yoga & Mindfulness' },
-  'Marcus Johnson': { initials: 'MJ', color: '#FF375F', classes: 289, specialty: 'HIIT & Strength' },
-  'Elena Rodriguez': { initials: 'ER', color: '#BF5AF2', classes: 198, specialty: 'Flexibility & Stretch' },
+const instructorInitials = {
+  'Marcus Johnson': 'MJ',
+  'Elena Rodriguez': 'ER',
+  'Sarah Chen': 'SC',
 }
 
 export default function Lessons() {
-  const [intensity, setIntensity] = useState('All')
-  const [instructor, setInstructor] = useState('All Instructors')
+  const [selectedSport, setSelectedSport] = useState(sports[0])
+  const [tab, setTab] = useState('train')
   const [playing, setPlaying] = useState(null)
 
-  const filtered = classes.filter((c) => {
-    const byIntensity = intensity === 'All' || c.intensity === intensity
-    const byInstructor = instructor === 'All Instructors' || c.instructor === instructor
-    return byIntensity && byInstructor
-  })
+  const classes = tab === 'train' ? selectedSport.train : selectedSport.recover
 
   return (
     <main className="pt-24 pb-20">
       {/* Header */}
-      <section className="section-padding py-16 relative overflow-hidden">
+      <section className="section-padding py-14 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[50vw] h-[25vw] rounded-full bg-star-yellow/5 blur-[80px]" />
+          <div className="absolute top-0 right-0 w-[50vw] h-[25vw] rounded-full opacity-10 blur-[80px]" style={{ backgroundColor: selectedSport.color }} />
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="relative z-10 max-w-3xl"
-        >
-          <p className="text-star-yellow text-sm font-semibold tracking-widest uppercase mb-3">On-Demand Classes</p>
-          <h1 className="text-5xl md:text-6xl font-black mb-5">
-            Train with the <span className="text-gradient-blue">Best.</span>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10 max-w-3xl">
+          <p className="text-star-yellow text-sm font-semibold tracking-widest uppercase mb-3">Sport-Specific Training</p>
+          <h1 className="text-5xl md:text-6xl font-black mb-4">
+            Train for <span className="text-gradient-blue">Your Sport.</span>
           </h1>
           <p className="text-star-grey text-lg leading-relaxed">
-            Over 1,200 classes led by world-class instructors. Filter by intensity and style — find your
-            perfect session on the Star Mat.
+            Select your sport below. Get targeted training for the body parts that matter most —
+            and recovery programs built around your most common injuries.
           </p>
         </motion.div>
       </section>
 
-      {/* Filters */}
-      <div className="section-padding mb-8 sticky top-[68px] z-30 py-4 bg-star-black/90 backdrop-blur-xl border-b border-star-border">
-        <div className="max-w-7xl mx-auto flex flex-wrap gap-4 items-center justify-between">
-          <div className="flex flex-wrap gap-2">
-            <span className="text-star-grey text-sm font-medium flex items-center gap-1.5">
-              <Flame size={14} /> Intensity:
-            </span>
-            {intensityLevels.map((level) => (
-              <motion.button
-                key={level}
-                onClick={() => setIntensity(level)}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
-                  intensity === level
-                    ? 'bg-star-blue text-white'
-                    : 'glass text-star-grey hover:text-white border border-star-border'
-                }`}
-              >
-                {level}
-              </motion.button>
-            ))}
-          </div>
-
-          <div className="relative">
-            <select
-              value={instructor}
-              onChange={(e) => setInstructor(e.target.value)}
-              className="appearance-none glass border border-star-border text-star-grey text-sm px-4 py-2 pr-8 rounded-full focus:outline-none focus:border-star-blue cursor-pointer"
+      {/* Sport Selector */}
+      <div className="section-padding mb-8">
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {sports.map((sport) => (
+            <motion.button
+              key={sport.id}
+              onClick={() => { setSelectedSport(sport); setTab('train'); setPlaying(null) }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className={`flex-shrink-0 flex flex-col items-center gap-2 px-5 py-4 rounded-2xl border transition-all duration-300 min-w-[90px] ${
+                selectedSport.id === sport.id
+                  ? 'border-opacity-100 text-white'
+                  : 'border-star-border text-star-grey hover:text-white hover:border-white/20 bg-star-card/40'
+              }`}
+              style={selectedSport.id === sport.id ? {
+                backgroundColor: `${sport.color}15`,
+                borderColor: sport.color,
+                boxShadow: `0 0 20px ${sport.color}30`,
+              } : {}}
             >
-              {instructors.map((i) => (
-                <option key={i} value={i} className="bg-star-card">
-                  {i}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-star-grey pointer-events-none" />
-          </div>
+              <span className="text-2xl">{sport.emoji}</span>
+              <span className="text-xs font-semibold text-center leading-tight">{sport.name}</span>
+            </motion.button>
+          ))}
         </div>
       </div>
 
-      {/* Class count */}
-      <div className="section-padding mb-6">
-        <p className="text-star-grey text-sm">
-          Showing <span className="text-white font-semibold">{filtered.length}</span> classes
-        </p>
-      </div>
+      {/* Sport Header + Tabs */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={selectedSport.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}
+          className="section-padding mb-8"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl" style={{ backgroundColor: `${selectedSport.color}15`, border: `1px solid ${selectedSport.color}40` }}>
+                {selectedSport.emoji}
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-white">{selectedSport.name}</h2>
+                <p className="text-star-grey text-sm">{selectedSport.desc}</p>
+              </div>
+            </div>
 
-      {/* Classes Grid */}
-      <div className="section-padding">
-        <div className="max-w-7xl mx-auto">
-          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <AnimatePresence mode="popLayout">
-              {filtered.map((cls, i) => {
-                const iColors = intensityColors[cls.intensity]
-                const isBio = instructorBios[cls.instructor]
-                return (
-                  <motion.div
-                    key={cls.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.35, delay: i * 0.04 }}
-                    className="card-hover group"
-                  >
-                    <div className={`rounded-2xl border border-star-border bg-gradient-to-b ${cls.color} overflow-hidden`}>
-                      {/* Thumbnail */}
-                      <div className="relative h-48 flex items-center justify-center overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-star-black/60" />
-                        {/* Animated play button */}
-                        <motion.button
-                          onClick={() => setPlaying(playing === cls.id ? null : cls.id)}
-                          className="relative z-10 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
-                          style={{
-                            backgroundColor: `${cls.accent}30`,
-                            border: `2px solid ${cls.accent}60`,
-                          }}
-                          whileHover={{ scale: 1.15 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          {playing === cls.id ? (
-                            <div className="flex gap-1">
-                              <div className="w-1.5 h-5 rounded-full bg-white" />
-                              <div className="w-1.5 h-5 rounded-full bg-white" />
-                            </div>
-                          ) : (
-                            <Play size={22} fill="white" className="text-white ml-1" />
-                          )}
-                        </motion.button>
-
-                        {/* Free badge */}
-                        {cls.free && (
-                          <div className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 rounded-full text-xs font-bold text-black">
-                            FREE
-                          </div>
-                        )}
-
-                        {/* Lock for premium */}
-                        {!cls.free && (
-                          <div className="absolute top-3 left-3 w-7 h-7 rounded-full glass border border-white/10 flex items-center justify-center">
-                            <Lock size={12} className="text-star-grey" />
-                          </div>
-                        )}
-
-                        {/* Category chip */}
-                        <div
-                          className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold"
-                          style={{ backgroundColor: `${cls.accent}20`, color: cls.accent, border: `1px solid ${cls.accent}30` }}
-                        >
-                          {cls.category}
-                        </div>
-
-                        {/* Duration */}
-                        <div className="absolute bottom-3 right-3 flex items-center gap-1 text-white text-xs">
-                          <Clock size={12} />
-                          {cls.duration}
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-5">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="text-white font-bold text-lg leading-tight">{cls.title}</h3>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${iColors.bg} ${iColors.text} border ${iColors.border}`}>
-                            {cls.intensity}
-                          </span>
-                        </div>
-                        <p className="text-star-grey text-sm mb-4 leading-relaxed">{cls.desc}</p>
-
-                        {/* Instructor */}
-                        <div className="flex items-center gap-3 pt-3 border-t border-white/8">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                            style={{ backgroundColor: isBio?.color || '#007AFF' }}
-                          >
-                            {isBio?.initials}
-                          </div>
-                          <div>
-                            <p className="text-white text-sm font-semibold">{cls.instructor}</p>
-                            <p className="text-star-grey text-xs">{isBio?.specialty}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </AnimatePresence>
-          </motion.div>
-
-          {filtered.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-20"
-            >
-              <p className="text-star-grey text-xl">No classes match your filters.</p>
+            {/* Train / Recover tabs */}
+            <div className="flex gap-2 glass rounded-xl p-1 border border-star-border w-fit">
               <button
-                onClick={() => { setIntensity('All'); setInstructor('All Instructors') }}
-                className="mt-4 text-star-blue hover:underline text-sm"
+                onClick={() => setTab('train')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                  tab === 'train' ? 'text-white' : 'text-star-grey hover:text-white'
+                }`}
+                style={tab === 'train' ? { backgroundColor: selectedSport.color } : {}}
               >
-                Clear filters
+                <Activity size={15} /> Train
               </button>
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      {/* Instructor Spotlight */}
-      <section className="section-padding mt-20 pt-20 border-t border-star-border">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">World-Class Coaching</p>
-            <h2 className="text-4xl font-black">Meet Your Instructors</h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {Object.entries(instructorBios).map(([name, bio], i) => (
-              <motion.div
-                key={name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.5 }}
-                className="glass rounded-2xl p-8 text-center border border-star-border card-hover"
+              <button
+                onClick={() => setTab('recover')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                  tab === 'recover' ? 'text-white' : 'text-star-grey hover:text-white'
+                }`}
+                style={tab === 'recover' ? { backgroundColor: '#30D158' } : {}}
               >
-                <div
-                  className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-2xl font-black text-white mb-4"
-                  style={{ backgroundColor: bio.color }}
-                >
-                  {bio.initials}
+                <Heart size={15} /> Recover
+              </button>
+            </div>
+          </div>
+
+          {/* Body part targets */}
+          {tab === 'train' && (
+            <div className="mt-5">
+              <p className="text-star-grey text-xs uppercase tracking-widest mb-2">Key Areas for {selectedSport.name}</p>
+              <div className="flex flex-wrap gap-2">
+                {[...new Set(selectedSport.train.flatMap(c => c.targets))].map((target) => (
+                  <span key={target} className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: `${selectedSport.color}15`, borderColor: `${selectedSport.color}40`, color: selectedSport.color }}>
+                    {target}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {tab === 'recover' && (
+            <div className="mt-5">
+              <p className="text-star-grey text-xs uppercase tracking-widest mb-2">Common {selectedSport.name} Injuries</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedSport.recover.map(c => (
+                  <span key={c.injury} className="px-3 py-1 rounded-full text-xs font-semibold border border-green-500/30 bg-green-500/10 text-green-400">
+                    {c.injury}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Class Cards */}
+      <div className="section-padding">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${selectedSport.id}-${tab}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 max-w-7xl mx-auto"
+          >
+            {classes.map((cls, i) => (
+              <motion.div
+                key={cls.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.07 }}
+                className="card-hover"
+              >
+                <div className="rounded-2xl border border-star-border bg-star-card overflow-hidden h-full flex flex-col">
+                  {/* Thumbnail */}
+                  <div
+                    className="relative h-40 flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${tab === 'recover' ? '#0d2b1a' : `${selectedSport.color}15`}, #111)` }}
+                  >
+                    <motion.button
+                      onClick={() => setPlaying(playing === cls.id ? null : cls.id)}
+                      className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
+                      style={{
+                        backgroundColor: tab === 'recover' ? '#30D15825' : `${selectedSport.color}25`,
+                        border: `2px solid ${tab === 'recover' ? '#30D15860' : `${selectedSport.color}60`}`,
+                      }}
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      {playing === cls.id ? (
+                        <div className="flex gap-1">
+                          <div className="w-1 h-4 rounded-full bg-white" />
+                          <div className="w-1 h-4 rounded-full bg-white" />
+                        </div>
+                      ) : (
+                        <Play size={18} fill="white" className="text-white ml-0.5" />
+                      )}
+                    </motion.button>
+
+                    {/* Free badge */}
+                    {cls.free && (
+                      <div className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 rounded-full text-xs font-bold text-black">FREE</div>
+                    )}
+                    {!cls.free && (
+                      <div className="absolute top-3 left-3 w-7 h-7 rounded-full glass border border-white/10 flex items-center justify-center">
+                        <Lock size={11} className="text-star-grey" />
+                      </div>
+                    )}
+
+                    {/* Recovery injury tag */}
+                    {tab === 'recover' && cls.injury && (
+                      <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/30">
+                        {cls.injury}
+                      </div>
+                    )}
+
+                    <div className="absolute bottom-3 right-3 flex items-center gap-1 text-white/70 text-xs">
+                      <Clock size={11} /> {cls.duration}
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5 flex-1 flex flex-col">
+                    <h3 className="text-white font-bold text-base mb-2 leading-tight">{cls.title}</h3>
+                    <p className="text-star-grey text-sm leading-relaxed mb-3 flex-1">{cls.desc}</p>
+
+                    {/* Target tags */}
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {cls.targets.map((t) => (
+                        <span
+                          key={t}
+                          className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                          style={{
+                            backgroundColor: tab === 'recover' ? '#30D15815' : `${selectedSport.color}15`,
+                            color: tab === 'recover' ? '#30D158' : selectedSport.color,
+                            border: `1px solid ${tab === 'recover' ? '#30D15830' : `${selectedSport.color}30`}`,
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Instructor */}
+                    <div className="flex items-center gap-2.5 pt-3 border-t border-white/8">
+                      <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0"
+                        style={{ backgroundColor: instructorColors[cls.instructor] }}
+                      >
+                        {instructorInitials[cls.instructor]}
+                      </div>
+                      <p className="text-star-grey text-xs">{cls.instructor}</p>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-white font-bold text-xl mb-1">{name}</h3>
-                <p className="text-star-grey text-sm mb-3">{bio.specialty}</p>
-                <p className="text-star-blue font-semibold text-sm">{bio.classes}+ Classes</p>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </main>
   )
 }
