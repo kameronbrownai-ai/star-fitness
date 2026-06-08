@@ -7,14 +7,14 @@ const filters = ['All', 'Videos', 'Photos']
 
 const galleryItems = [
   // Real videos
-  { id: 1, type: 'video', title: 'Star Mat — Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', featured: true, src: '/videos/star-mat-side-lunge.mov' },
-  { id: 2, type: 'video', title: 'Split Lunge Matrix', duration: '0:20', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', src: '/videos/star-mat-split-lunge.mov' },
-  { id: 3, type: 'video', title: 'Apex Foot Fire Plus', duration: '0:18', category: 'Training', thumb: 'from-orange-900/70 to-star-black', accent: '#FF9F0A', src: '/videos/star-mat-apex-foot-fire.mov' },
-  { id: 4, type: 'video', title: 'Alternating Lunge Upright Row', duration: '0:22', category: 'Training', thumb: 'from-green-900/70 to-star-black', accent: '#30D158', src: '/videos/star-mat-alternating-lunge-row.mov' },
-  { id: 5, type: 'video', title: 'Fast Feet Apex', duration: '0:15', category: 'Training', thumb: 'from-red-900/70 to-star-black', accent: '#FF375F', src: '/videos/star-mat-fast-feet.mov' },
-  { id: 6, type: 'video', title: 'Speed Lateral Skaters', duration: '0:20', category: 'Training', thumb: 'from-cyan-900/70 to-star-black', accent: '#64D2FF', src: '/videos/star-mat-lateral-skaters.mov' },
-  { id: 7, type: 'video', title: 'Star Mat Training Drill', duration: '0:22', category: 'Training', thumb: 'from-purple-900/70 to-star-black', accent: '#BF5AF2', src: '/videos/star-mat-drill.mov' },
-  { id: 8, type: 'video', title: 'Star Mat Full Session', duration: '0:25', category: 'Training', thumb: 'from-teal-900/70 to-star-black', accent: '#32D4B9', src: '/videos/star-mat-training-drill.mov' },
+  { id: 1, type: 'video', title: 'Star Mat — Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', featured: true, src: '/videos/star-mat-side-lunge.mov', poster: '/images/thumbs/star-mat-side-lunge.mov.png' },
+  { id: 2, type: 'video', title: 'Split Lunge Matrix', duration: '0:20', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', src: '/videos/star-mat-split-lunge.mov', poster: '/images/thumbs/star-mat-split-lunge.mov.png' },
+  { id: 3, type: 'video', title: 'Apex Foot Fire Plus', duration: '0:18', category: 'Training', thumb: 'from-orange-900/70 to-star-black', accent: '#FF9F0A', src: '/videos/star-mat-apex-foot-fire.mov', poster: '/images/thumbs/star-mat-apex-foot-fire.mov.png' },
+  { id: 4, type: 'video', title: 'Alternating Lunge Upright Row', duration: '0:22', category: 'Training', thumb: 'from-green-900/70 to-star-black', accent: '#30D158', src: '/videos/star-mat-alternating-lunge-row.mov', poster: '/images/thumbs/star-mat-alternating-lunge-row.mov.png' },
+  { id: 5, type: 'video', title: 'Fast Feet Apex', duration: '0:15', category: 'Training', thumb: 'from-red-900/70 to-star-black', accent: '#FF375F', src: '/videos/star-mat-fast-feet.mov', poster: '/images/thumbs/star-mat-fast-feet.mov.png' },
+  { id: 6, type: 'video', title: 'Speed Lateral Skaters', duration: '0:20', category: 'Training', thumb: 'from-cyan-900/70 to-star-black', accent: '#64D2FF', src: '/videos/star-mat-lateral-skaters.mov', poster: '/images/thumbs/star-mat-lateral-skaters.mov.png' },
+  { id: 7, type: 'video', title: 'Star Mat Training Drill', duration: '0:22', category: 'Training', thumb: 'from-purple-900/70 to-star-black', accent: '#BF5AF2', src: '/videos/star-mat-drill.mov', poster: '/images/thumbs/star-mat-drill.mov.png' },
+  { id: 8, type: 'video', title: 'Star Mat Full Session', duration: '0:25', category: 'Training', thumb: 'from-teal-900/70 to-star-black', accent: '#32D4B9', src: '/videos/star-mat-training-drill.mov', poster: '/images/thumbs/star-mat-training-drill.mov.png' },
   // Real photos
   { id: 9, type: 'photo', title: 'Star Mat Pro — In the Gym', category: 'Product', image: '/images/mat-product.jpeg', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
   { id: 10, type: 'photo', title: 'Star Mat — Clean Design', category: 'Product', image: '/images/mat-clean.jpeg', thumb: 'from-slate-700/60 to-star-black', accent: '#8E8E93' },
@@ -67,6 +67,9 @@ export default function Gallery() {
               className={`relative rounded-3xl overflow-hidden border border-star-border bg-gradient-to-br ${featured.thumb} cursor-pointer group`}
               style={{ aspectRatio: '16/7' }}
             >
+              {featured.poster && (
+                <img src={featured.poster} alt={featured.title} className="absolute inset-0 w-full h-full object-cover opacity-40" />
+              )}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
                 <motion.div
                   className="w-20 h-20 rounded-full flex items-center justify-center"
@@ -127,14 +130,14 @@ export default function Gallery() {
                   onClick={() => setLightbox(item)}
                   className="group cursor-pointer"
                 >
-                  <div className={`relative rounded-2xl overflow-hidden border border-star-border aspect-[4/3] flex items-center justify-center ${item.image || item.src ? '' : `bg-gradient-to-br ${item.thumb}`}`}>
+                  <div className={`relative rounded-2xl overflow-hidden border border-star-border aspect-[4/3] flex items-center justify-center ${item.image || item.poster ? '' : `bg-gradient-to-br ${item.thumb}`}`}>
                     {/* Real photo */}
                     {item.image && (
                       <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
                     )}
                     {/* Real video thumbnail */}
-                    {item.src && (
-                      <video src={item.src} className="absolute inset-0 w-full h-full object-cover" muted playsInline preload="metadata" />
+                    {item.poster && (
+                      <img src={item.poster} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
                     )}
 
                     {/* Hover overlay */}
@@ -154,7 +157,7 @@ export default function Gallery() {
                     </div>
 
                     {/* Compass star bg for video placeholders */}
-                    {!item.image && !item.src && (
+                    {!item.image && !item.poster && (
                       <CompassStar size={40} color={item.accent} className="absolute opacity-10" />
                     )}
 
