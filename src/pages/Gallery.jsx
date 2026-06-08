@@ -20,9 +20,6 @@ const galleryItems = [
   { id: 10, type: 'photo', title: 'Star Mat — Clean Design', category: 'Product', image: '/images/mat-clean.jpeg', thumb: 'from-slate-700/60 to-star-black', accent: '#8E8E93' },
   { id: 14, type: 'photo', title: 'Star Mat — All Angles & Specs', category: 'Product', image: '/images/mat-onesheet-specs.png', thumb: 'from-slate-700/60 to-star-black', accent: '#FFD700' },
   { id: 15, type: 'photo', title: 'Star Mat — Size & Scale Reference', category: 'Product', image: '/images/mat-onesheet-scale.png', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
-  { id: 11, type: 'photo', title: 'Athlete — Sprint Drill', category: 'Training', image: '/images/athlete-1.png', thumb: 'from-red-900/60 to-star-black', accent: '#FF375F' },
-  { id: 12, type: 'photo', title: 'Athlete — Lateral Drive', category: 'Training', image: '/images/athlete-2.png', thumb: 'from-green-900/60 to-star-black', accent: '#30D158' },
-  { id: 13, type: 'photo', title: 'Athlete — Ready Position', category: 'Training', image: '/images/athlete-3.png', thumb: 'from-cyan-900/60 to-star-black', accent: '#64D2FF' },
 ]
 
 export default function Gallery() {
