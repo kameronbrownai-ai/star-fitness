@@ -6,19 +6,23 @@ import CompassStar from '../components/CompassStar'
 const filters = ['All', 'Videos', 'Photos']
 
 const galleryItems = [
-  // Videos
+  // Real videos
   { id: 1, type: 'video', title: 'Star Mat — Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', featured: true, src: '/videos/star-mat-side-lunge.mov' },
-  { id: 2, type: 'video', title: 'Morning Flow with Sarah Chen', duration: '30:00', category: 'Class', thumb: 'from-teal-900/80 to-star-black', accent: '#32D4B9' },
-  { id: 3, type: 'video', title: 'Power Core — Full Session', duration: '45:00', category: 'Class', thumb: 'from-red-900/80 to-star-black', accent: '#FF375F' },
-  { id: 4, type: 'video', title: 'Star Mat: Behind the Design', duration: '5:42', category: 'Brand', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700' },
-  { id: 5, type: 'video', title: 'Advanced Flexibility — Elena', duration: '50:00', category: 'Class', thumb: 'from-purple-900/80 to-star-black', accent: '#BF5AF2' },
-  { id: 6, type: 'video', title: 'Mat HIIT: Full Body Burn', duration: '40:00', category: 'Class', thumb: 'from-orange-900/70 to-star-black', accent: '#FF9F0A' },
+  { id: 2, type: 'video', title: 'Split Lunge Matrix', duration: '0:20', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', src: '/videos/star-mat-split-lunge.mov' },
+  { id: 3, type: 'video', title: 'Apex Foot Fire Plus', duration: '0:18', category: 'Training', thumb: 'from-orange-900/70 to-star-black', accent: '#FF9F0A', src: '/videos/star-mat-apex-foot-fire.mov' },
+  { id: 4, type: 'video', title: 'Alternating Lunge Upright Row', duration: '0:22', category: 'Training', thumb: 'from-green-900/70 to-star-black', accent: '#30D158', src: '/videos/star-mat-alternating-lunge-row.mov' },
+  { id: 5, type: 'video', title: 'Fast Feet Apex', duration: '0:15', category: 'Training', thumb: 'from-red-900/70 to-star-black', accent: '#FF375F', src: '/videos/star-mat-fast-feet.mov' },
+  { id: 6, type: 'video', title: 'Speed Lateral Skaters', duration: '0:20', category: 'Training', thumb: 'from-cyan-900/70 to-star-black', accent: '#64D2FF', src: '/videos/star-mat-lateral-skaters.mov' },
+  { id: 7, type: 'video', title: 'Star Mat Training Drill', duration: '0:22', category: 'Training', thumb: 'from-purple-900/70 to-star-black', accent: '#BF5AF2', src: '/videos/star-mat-drill.mov' },
+  { id: 8, type: 'video', title: 'Star Mat Full Session', duration: '0:25', category: 'Training', thumb: 'from-teal-900/70 to-star-black', accent: '#32D4B9', src: '/videos/star-mat-training-drill.mov' },
   // Real photos
-  { id: 7, type: 'photo', title: 'Star Mat Pro — In the Gym', category: 'Product', image: '/images/mat-product.jpeg', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
-  { id: 8, type: 'photo', title: 'Star Mat — Full View', category: 'Product', image: '/images/mat-gym.jpeg', thumb: 'from-slate-700/60 to-star-black', accent: '#8E8E93' },
-  { id: 9, type: 'photo', title: 'Athlete — Sprint Drill', category: 'Training', image: '/images/athlete-1.png', thumb: 'from-red-900/60 to-star-black', accent: '#FF375F' },
-  { id: 10, type: 'photo', title: 'Athlete — Lateral Drive', category: 'Training', image: '/images/athlete-2.png', thumb: 'from-green-900/60 to-star-black', accent: '#30D158' },
-  { id: 11, type: 'photo', title: 'Athlete — Ready Position', category: 'Training', image: '/images/athlete-3.png', thumb: 'from-cyan-900/60 to-star-black', accent: '#64D2FF' },
+  { id: 9, type: 'photo', title: 'Star Mat Pro — In the Gym', category: 'Product', image: '/images/mat-product.jpeg', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
+  { id: 10, type: 'photo', title: 'Star Mat — Clean Design', category: 'Product', image: '/images/mat-clean.jpeg', thumb: 'from-slate-700/60 to-star-black', accent: '#8E8E93' },
+  { id: 14, type: 'photo', title: 'Star Mat — All Angles & Specs', category: 'Product', image: '/images/mat-onesheet-specs.png', thumb: 'from-slate-700/60 to-star-black', accent: '#FFD700' },
+  { id: 15, type: 'photo', title: 'Star Mat — Size & Scale Reference', category: 'Product', image: '/images/mat-onesheet-scale.png', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
+  { id: 11, type: 'photo', title: 'Athlete — Sprint Drill', category: 'Training', image: '/images/athlete-1.png', thumb: 'from-red-900/60 to-star-black', accent: '#FF375F' },
+  { id: 12, type: 'photo', title: 'Athlete — Lateral Drive', category: 'Training', image: '/images/athlete-2.png', thumb: 'from-green-900/60 to-star-black', accent: '#30D158' },
+  { id: 13, type: 'photo', title: 'Athlete — Ready Position', category: 'Training', image: '/images/athlete-3.png', thumb: 'from-cyan-900/60 to-star-black', accent: '#64D2FF' },
 ]
 
 export default function Gallery() {

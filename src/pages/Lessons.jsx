@@ -160,11 +160,13 @@ export default function Lessons() {
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10 max-w-3xl">
           <p className="text-star-yellow text-sm font-semibold tracking-widest uppercase mb-3">Sport-Specific Training</p>
           <h1 className="text-5xl md:text-6xl font-black mb-4">
-            Train for <span className="text-gradient-blue">Your Sport.</span>
+            Dominate <span className="text-gradient-blue">Your Sport.</span>
           </h1>
-          <p className="text-star-grey text-lg leading-relaxed">
-            Select your sport below. Get targeted training for the body parts that matter most —
-            and recovery programs built around your most common injuries.
+          <p className="text-star-grey text-lg leading-relaxed mb-3">
+            There is no other training program out there to prepare you to dominate in your sport. Select your sport below and get targeted training for the body parts that matter most — plus recovery built around your most common injuries.
+          </p>
+          <p className="text-white font-semibold">
+            Train in all planes of motion. Become a king in your sport.
           </p>
         </motion.div>
       </section>

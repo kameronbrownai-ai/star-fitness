@@ -104,13 +104,10 @@ export default function About() {
               Existed.
             </h1>
             <p className="text-star-grey text-lg leading-relaxed mb-6">
-              Star Fitness began with a single frustration: every fitness mat on the market
-              compromised somewhere. Too thin. Too slippery. Too cheap. Too vague.
+              There is no other training program out there to help you prepare and dominate in your sport — until now. Star Fitness was built for athletes who know that every step they take is an impact of improvement.
             </p>
             <p className="text-star-grey text-lg leading-relaxed mb-10">
-              We refused to accept that. Three years of R&D, 300+ prototypes, and input from
-              professional athletes led to the Star Mat — a piece of equipment designed to perform
-              exactly as hard as you do.
+              You don't need big bulky equipment or expensive trainers. You just need to know what direction to go in. Train in all planes of motion and become a king in your sport.
             </p>
             <div className="flex gap-4 flex-wrap">
               <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
@@ -186,11 +183,11 @@ export default function About() {
         <div className="max-w-4xl mx-auto text-center">
           <motion.div {...fadeUp()}>
             <p className="text-star-blue text-sm font-semibold tracking-widest uppercase mb-5">Our Mission</p>
-            <blockquote className="text-3xl md:text-4xl font-black leading-snug text-white mb-8">
-              "To make premium fitness accessible — by building tools so good
-              they make excuses <span className="text-gradient-yellow">impossible.</span>"
+            <blockquote className="text-3xl md:text-4xl font-black leading-snug text-white mb-6">
+              "There is no other workout that will improve your balance, core, speed, strength, and endurance — faster or better — than training in all planes of motion."
             </blockquote>
-            <p className="text-star-grey text-lg">— Marcus Lin, Founder of Star Fitness</p>
+            <p className="text-star-yellow font-bold text-lg mt-4">Become a king in your sport.</p>
+            <p className="text-star-grey text-lg mt-2">— The Star Fitness Mission</p>
           </motion.div>
         </div>
       </section>

@@ -133,7 +133,7 @@ export default function Home() {
             className="inline-flex items-center gap-2 glass px-4 py-2 rounded-full text-sm font-medium text-star-yellow mb-8"
           >
             <img src="/images/logo.jpeg" alt="" className="w-4 h-4 object-contain" style={{ mixBlendMode: 'screen' }} />
-            Introducing the Star Mat Pro 2.0
+            Every step you take is an impact of improvement
           </motion.div>
 
           <motion.h1
@@ -155,8 +155,7 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.55 }}
             className="text-star-grey text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            The Star Mat is engineered for athletes who refuse to compromise. Premium grip,
-            unmatched cushion, and a design built around your performance.
+            There is no other workout that will improve your balance, core, speed, strength, and endurance — faster or better — than training in all planes of motion. The Star Mat is your direction.
           </motion.p>
 
           <motion.div
@@ -287,10 +286,11 @@ export default function Home() {
                 The Mat That Changes
                 <span className="text-gradient-yellow block">Everything.</span>
               </h2>
+              <p className="text-star-grey text-lg leading-relaxed mb-4">
+                You don't need big bulky equipment or expensive trainers. We just need to know what direction to go in — and the Star Mat gives you exactly that.
+              </p>
               <p className="text-star-grey text-lg leading-relaxed mb-10">
-                We obsessed over every millimeter so you don't have to think about your equipment —
-                only your performance. The Star Mat is the result of three years of engineering,
-                athlete feedback, and relentless refinement.
+                Train in all planes of motion and become a king in your sport. The Star Mat is the only tool built to help you dominate from every angle.
               </p>
 
               <div className="space-y-6 mb-10">
@@ -322,6 +322,40 @@ export default function Home() {
               </motion.div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* ── BRAND STATEMENT ── */}
+      <section className="section-padding py-24 bg-star-card/30 border-y border-star-border overflow-hidden relative">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[60vw] h-[30vw] rounded-full bg-star-yellow/5 blur-[100px]" />
+        </div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <img src="/images/logo.jpeg" alt="" className="w-12 h-12 object-contain mx-auto mb-8" style={{ mixBlendMode: 'screen', opacity: 0.8 }} />
+            <p className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tight">
+              The most important move
+              <span className="text-gradient-yellow block">you can make</span>
+              is the next move.
+            </p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-10"
+            >
+              <Link to="/shop" className="btn-yellow text-base">
+                Make Your Move
+                <ArrowRight size={18} />
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 

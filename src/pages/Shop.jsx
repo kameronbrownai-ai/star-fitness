@@ -3,10 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Check, Heart, Star } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 
-const StarShape = ({ size = 16, className = '' }) => (
-  <svg width={size} height={size} viewBox="0 0 50 50" fill="currentColor" className={className}>
-    <polygon points="25,3 31,18 47,18 35,29 39,45 25,37 11,45 15,29 3,18 19,18" />
-  </svg>
+const LogoIcon = ({ size = 16, className = '' }) => (
+  <img src="/images/logo.jpeg" alt="" width={size} height={size} className={`object-contain ${className}`} style={{ mixBlendMode: 'screen' }} />
 )
 
 const categories = ['All', 'Mats', 'Accessories', 'Bundles', 'Apparel']
@@ -196,13 +194,40 @@ export default function Shop() {
         </div>
       </div>
 
+      {/* ── ONE-SHEET SHOWCASE ── */}
+      <div className="section-padding mt-24">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">Product Details</p>
+            <h2 className="text-4xl font-black">See the Star Mat <span className="text-gradient-yellow">Up Close</span></h2>
+          </motion.div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+              className="rounded-3xl overflow-hidden border border-star-border bg-star-card"
+            >
+              <img src="/images/mat-onesheet-specs.png" alt="Star Mat — all angles and specifications" className="w-full h-full object-cover" />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+              className="rounded-3xl overflow-hidden border border-star-border bg-star-card"
+            >
+              <img src="/images/mat-onesheet-scale.png" alt="Star Mat — size and scale reference" className="w-full h-full object-cover" />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
       {/* Guarantee */}
       <div className="section-padding mt-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
           className="max-w-7xl mx-auto glass rounded-3xl p-10 text-center border border-star-blue/20"
         >
-          <StarShape size={40} className="text-star-yellow mx-auto mb-4" />
+          <LogoIcon size={40} className="mx-auto mb-4" />
           <h3 className="text-2xl font-black mb-2">30-Day Star Guarantee</h3>
           <p className="text-star-grey max-w-lg mx-auto">Not in love? Return it, no questions asked.</p>
         </motion.div>
