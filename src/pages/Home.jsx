@@ -239,8 +239,8 @@ export default function Home() {
                 {/* Real product photo */}
                 <div className="relative rounded-3xl overflow-hidden border border-star-border shadow-2xl">
                   <img
-                    src="/images/mat-clean.jpeg"
-                    alt="Star Mat Pro overhead view"
+                    src="/images/commercial/unrolling-mat.jpeg"
+                    alt="Athlete unrolling Star Mat in premium gym"
                     className="w-full h-full object-cover"
                   />
                   {/* Subtle brand overlay at bottom */}

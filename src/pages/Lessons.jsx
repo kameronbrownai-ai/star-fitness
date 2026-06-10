@@ -62,6 +62,7 @@ const sports = [
     name: 'Baseball / Softball',
     emoji: '⚾',
     color: '#007AFF',
+    image: '/images/commercial/baseball-1.png',
     desc: 'Rotation, shoulders, and arms',
     train: [
       { id: 22, title: 'Rotational Power', targets: ['Hips', 'Core', 'Obliques'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Hip-to-shoulder rotation mechanics for pitchers and hitters. Power starts at the ground.' },
@@ -116,6 +117,7 @@ const sports = [
     name: 'MMA / Combat',
     emoji: '🥊',
     color: '#FF375F',
+    image: '/images/commercial/boxing.png',
     desc: 'Full body, power, and endurance',
     train: [
       { id: 43, title: 'Full Body Power Circuit', targets: ['Full Body', 'Core', 'Legs'], instructor: 'Marcus Johnson', duration: '50 min', free: true, desc: 'High-intensity mat circuit combining striking power, wrestling strength, and conditioning.' },
@@ -147,8 +149,14 @@ export default function Lessons() {
   const [selectedSport, setSelectedSport] = useState(sports[0])
   const [tab, setTab] = useState('train')
   const [playing, setPlaying] = useState(null)
+  const [selectedTarget, setSelectedTarget] = useState(null)
 
-  const classes = tab === 'train' ? selectedSport.train : selectedSport.recover
+  const allClasses = tab === 'train' ? selectedSport.train : selectedSport.recover
+  const classes = selectedTarget
+    ? tab === 'train'
+      ? allClasses.filter(c => c.targets.includes(selectedTarget))
+      : allClasses.filter(c => c.injury === selectedTarget)
+    : allClasses
 
   return (
     <main className="pt-24 pb-20">
@@ -177,7 +185,7 @@ export default function Lessons() {
           {sports.map((sport) => (
             <motion.button
               key={sport.id}
-              onClick={() => { setSelectedSport(sport); setTab('train'); setPlaying(null) }}
+              onClick={() => { setSelectedSport(sport); setTab('train'); setPlaying(null); setSelectedTarget(null) }}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               className={`flex-shrink-0 flex flex-col items-center gap-2 px-5 py-4 rounded-2xl border transition-all duration-300 min-w-[90px] ${
@@ -222,7 +230,7 @@ export default function Lessons() {
             {/* Train / Recover tabs */}
             <div className="flex gap-2 glass rounded-xl p-1 border border-star-border w-fit">
               <button
-                onClick={() => setTab('train')}
+                onClick={() => { setTab('train'); setSelectedTarget(null) }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
                   tab === 'train' ? 'text-white' : 'text-star-grey hover:text-white'
                 }`}
@@ -231,7 +239,7 @@ export default function Lessons() {
                 <Activity size={15} /> Train
               </button>
               <button
-                onClick={() => setTab('recover')}
+                onClick={() => { setTab('recover'); setSelectedTarget(null) }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
                   tab === 'recover' ? 'text-white' : 'text-star-grey hover:text-white'
                 }`}
@@ -245,12 +253,46 @@ export default function Lessons() {
           {/* Body part targets */}
           {tab === 'train' && (
             <div className="mt-5">
-              <p className="text-star-grey text-xs uppercase tracking-widest mb-2">Key Areas for {selectedSport.name}</p>
+              <p className="text-star-grey text-xs uppercase tracking-widest mb-2">
+                Key Areas for {selectedSport.name} — <span style={{ color: selectedSport.color }}>tap a body part to filter</span>
+              </p>
               <div className="flex flex-wrap gap-2">
+                {/* All pill */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedTarget(null)}
+                  className="px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                  style={!selectedTarget ? {
+                    backgroundColor: selectedSport.color,
+                    borderColor: selectedSport.color,
+                    color: '#000',
+                  } : {
+                    backgroundColor: 'transparent',
+                    borderColor: `${selectedSport.color}40`,
+                    color: selectedSport.color,
+                  }}
+                >
+                  All
+                </motion.button>
                 {[...new Set(selectedSport.train.flatMap(c => c.targets))].map((target) => (
-                  <span key={target} className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ backgroundColor: `${selectedSport.color}15`, borderColor: `${selectedSport.color}40`, color: selectedSport.color }}>
+                  <motion.button
+                    key={target}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedTarget(selectedTarget === target ? null : target)}
+                    className="px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                    style={selectedTarget === target ? {
+                      backgroundColor: selectedSport.color,
+                      borderColor: selectedSport.color,
+                      color: '#000',
+                    } : {
+                      backgroundColor: `${selectedSport.color}15`,
+                      borderColor: `${selectedSport.color}40`,
+                      color: selectedSport.color,
+                    }}
+                  >
                     {target}
-                  </span>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -258,12 +300,46 @@ export default function Lessons() {
 
           {tab === 'recover' && (
             <div className="mt-5">
-              <p className="text-star-grey text-xs uppercase tracking-widest mb-2">Common {selectedSport.name} Injuries</p>
+              <p className="text-star-grey text-xs uppercase tracking-widest mb-2">
+                Common {selectedSport.name} Injuries — <span className="text-green-400">tap an injury to filter</span>
+              </p>
               <div className="flex flex-wrap gap-2">
+                {/* All pill */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedTarget(null)}
+                  className="px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                  style={!selectedTarget ? {
+                    backgroundColor: '#30D158',
+                    borderColor: '#30D158',
+                    color: '#000',
+                  } : {
+                    backgroundColor: 'rgba(48,209,88,0.1)',
+                    borderColor: 'rgba(48,209,88,0.3)',
+                    color: '#30D158',
+                  }}
+                >
+                  All
+                </motion.button>
                 {selectedSport.recover.map(c => (
-                  <span key={c.injury} className="px-3 py-1 rounded-full text-xs font-semibold border border-green-500/30 bg-green-500/10 text-green-400">
+                  <motion.button
+                    key={c.injury}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedTarget(selectedTarget === c.injury ? null : c.injury)}
+                    className="px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                    style={selectedTarget === c.injury ? {
+                      backgroundColor: '#30D158',
+                      borderColor: '#30D158',
+                      color: '#000',
+                    } : {
+                      backgroundColor: 'rgba(48,209,88,0.1)',
+                      borderColor: 'rgba(48,209,88,0.3)',
+                      color: '#30D158',
+                    }}
+                  >
                     {c.injury}
-                  </span>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -275,7 +351,7 @@ export default function Lessons() {
       <div className="section-padding">
         <AnimatePresence mode="wait">
           <motion.div
-            key={`${selectedSport.id}-${tab}`}
+            key={`${selectedSport.id}-${tab}-${selectedTarget}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -293,9 +369,12 @@ export default function Lessons() {
                 <div className="rounded-2xl border border-star-border bg-star-card overflow-hidden h-full flex flex-col">
                   {/* Thumbnail */}
                   <div
-                    className="relative h-40 flex items-center justify-center"
+                    className="relative h-40 flex items-center justify-center overflow-hidden"
                     style={{ background: `linear-gradient(135deg, ${tab === 'recover' ? '#0d2b1a' : `${selectedSport.color}15`}, #111)` }}
                   >
+                    {selectedSport.image && tab === 'train' && (
+                      <img src={selectedSport.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
+                    )}
                     <motion.button
                       onClick={() => setPlaying(playing === cls.id ? null : cls.id)}
                       className="w-14 h-14 rounded-full flex items-center justify-center transition-all"

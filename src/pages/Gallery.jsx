@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Play, X, Image, Video, Expand } from 'lucide-react'
 import CompassStar from '../components/CompassStar'
 
-const filters = ['All', 'Videos', 'Photos']
+const filters = ['All', 'Videos', 'Photos', 'Training', 'Lifestyle', 'Product']
 
 const galleryItems = [
   // Real videos
@@ -16,10 +16,21 @@ const galleryItems = [
   { id: 7, type: 'video', title: 'Star Mat Training Drill', duration: '0:22', category: 'Training', thumb: 'from-purple-900/70 to-star-black', accent: '#BF5AF2', src: '/videos/star-mat-drill.mov', poster: '/images/thumbs/star-mat-drill.mov.png' },
   { id: 8, type: 'video', title: 'Star Mat Full Session', duration: '0:25', category: 'Training', thumb: 'from-teal-900/70 to-star-black', accent: '#32D4B9', src: '/videos/star-mat-training-drill.mov', poster: '/images/thumbs/star-mat-training-drill.mov.png' },
   // Real photos
-  { id: 9, type: 'photo', title: 'Star Mat Pro — In the Gym', category: 'Product', image: '/images/mat-product.jpeg', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
-  { id: 10, type: 'photo', title: 'Star Mat — Clean Design', category: 'Product', image: '/images/mat-clean.jpeg', thumb: 'from-slate-700/60 to-star-black', accent: '#8E8E93' },
-  { id: 14, type: 'photo', title: 'Star Mat — All Angles & Specs', category: 'Product', image: '/images/mat-onesheet-specs.png', thumb: 'from-slate-700/60 to-star-black', accent: '#FFD700' },
-  { id: 15, type: 'photo', title: 'Star Mat — Size & Scale Reference', category: 'Product', image: '/images/mat-onesheet-scale.png', thumb: 'from-blue-900/60 to-star-black', accent: '#007AFF' },
+  { id: 9,  type: 'photo', title: 'Star Mat Pro — In the Gym',          category: 'Product',   image: '/images/mat-product.jpeg',                    thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
+  { id: 10, type: 'photo', title: 'Star Mat — Clean Design',             category: 'Product',   image: '/images/mat-clean.jpeg',                      thumb: 'from-slate-700/60 to-star-black',  accent: '#8E8E93' },
+  { id: 14, type: 'photo', title: 'Star Mat — All Angles & Specs',       category: 'Product',   image: '/images/mat-onesheet-specs.png',               thumb: 'from-slate-700/60 to-star-black',  accent: '#FFD700' },
+  { id: 15, type: 'photo', title: 'Star Mat — Size & Scale Reference',   category: 'Product',   image: '/images/mat-onesheet-scale.png',               thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
+  // Commercial shots
+  { id: 16, type: 'photo', title: 'Athlete Holds the Star Mat',          category: 'Product',   image: '/images/commercial/hold-mat.jpeg',            thumb: 'from-slate-800/60 to-star-black',  accent: '#FFD700' },
+  { id: 17, type: 'photo', title: 'Rolling Up — Built to Go',            category: 'Product',   image: '/images/commercial/rolling-mat.jpeg',         thumb: 'from-slate-800/60 to-star-black',  accent: '#8E8E93' },
+  { id: 18, type: 'photo', title: 'Unrolling in the Gym',                category: 'Training',  image: '/images/commercial/unrolling-mat.jpeg',       thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
+  { id: 19, type: 'photo', title: 'Train at Home — Every Day',           category: 'Lifestyle', image: '/images/commercial/home-lifestyle.jpeg',      thumb: 'from-amber-900/40 to-star-black',  accent: '#FF9F0A' },
+  { id: 20, type: 'photo', title: 'Woman Athlete — Lateral Speed',       category: 'Training',  image: '/images/commercial/woman-athlete.png',        thumb: 'from-pink-900/50 to-star-black',   accent: '#FF375F' },
+  { id: 21, type: 'photo', title: 'MMA — Stance & Control',              category: 'Training',  image: '/images/commercial/mma-fighter.png',          thumb: 'from-yellow-900/50 to-star-black', accent: '#FFD700' },
+  { id: 22, type: 'photo', title: 'Boxing — Power on the Mat',           category: 'Training',  image: '/images/commercial/boxing.png',               thumb: 'from-red-900/60 to-star-black',    accent: '#FF375F' },
+  { id: 23, type: 'photo', title: 'Baseball — Explosive Footwork',       category: 'Training',  image: '/images/commercial/baseball-1.png',           thumb: 'from-blue-900/50 to-star-black',   accent: '#007AFF' },
+  { id: 24, type: 'photo', title: 'Baseball — Rotational Drive',         category: 'Training',  image: '/images/commercial/baseball-2.png',           thumb: 'from-blue-900/50 to-star-black',   accent: '#64D2FF' },
+  { id: 25, type: 'photo', title: 'Veteran Athlete — Still Dominating',  category: 'Lifestyle', image: '/images/commercial/veteran-athlete.png',      thumb: 'from-green-900/40 to-star-black',  accent: '#30D158' },
 ]
 
 export default function Gallery() {
@@ -28,7 +39,8 @@ export default function Gallery() {
 
   const filtered = filter === 'All' ? galleryItems
     : filter === 'Videos' ? galleryItems.filter(i => i.type === 'video')
-    : galleryItems.filter(i => i.type === 'photo')
+    : filter === 'Photos' ? galleryItems.filter(i => i.type === 'photo')
+    : galleryItems.filter(i => i.category === filter)
 
   const featured = galleryItems.find(i => i.featured)
 
