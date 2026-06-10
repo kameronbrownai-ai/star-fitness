@@ -132,7 +132,7 @@ export default function Shop() {
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-full object-cover object-center"
+                          className="w-full h-full object-contain p-2"
                         />
                       ) : (
                         <motion.span
