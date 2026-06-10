@@ -233,15 +233,15 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="relative"
             >
-              <div className="max-w-lg mx-auto relative">
+              <div className="relative w-full">
                 {/* Glow */}
                 <div className="absolute inset-0 rounded-3xl bg-star-blue/15 blur-3xl scale-95 pointer-events-none" />
                 {/* Real product photo */}
-                <div className="relative rounded-3xl overflow-hidden border border-star-border shadow-2xl">
+                <div className="relative rounded-3xl overflow-hidden border border-star-border shadow-2xl" style={{ height: '600px' }}>
                   <img
                     src="/images/commercial/unrolling-mat.jpeg"
                     alt="Athlete unrolling Star Mat in premium gym"
-                    className="w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                   {/* Subtle brand overlay at bottom */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-star-black/80 to-transparent p-6">
