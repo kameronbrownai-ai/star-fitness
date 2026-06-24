@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ArrowRight, Play, Star, Zap, Shield, Award } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Play, Star, Zap, Shield, Award, ChevronDown } from 'lucide-react'
 import CompassStar from '../components/CompassStar'
+import AIWorkoutChat from '../components/AIWorkoutChat'
 
 const stats = [
   { value: '250K+', label: 'Active Members' },
@@ -451,6 +453,157 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── AI COACH SECTION ── */}
+      <section className="section-padding py-24 border-t border-star-border bg-gradient-to-b from-star-card/20 to-star-black relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60vw] h-[30vw] rounded-full bg-star-blue/8 blur-[100px]" />
+        </div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-star-blue/30 bg-star-blue/10 mb-6">
+                <CompassStar size={14} color="#007AFF" />
+                <span className="text-star-blue text-xs font-semibold tracking-wider uppercase">AI-Powered Training</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black leading-tight mb-5">
+                Get Your Custom
+                <span className="text-gradient-blue block">Star Mat Workout</span>
+              </h2>
+              <p className="text-star-grey text-lg leading-relaxed mb-6">
+                Tell our AI Coach your sport, your goal, or a problem area — and it will build a workout designed specifically for the Star Mat in under 30 seconds.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Sport-specific training for 7 sports',
+                  'Injury-safe modifications included',
+                  'Built around all planes of motion',
+                  'Sets, reps, and compass directions included',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-star-grey">
+                    <span className="w-5 h-5 rounded-full bg-star-blue/20 border border-star-blue/40 flex items-center justify-center flex-shrink-0">
+                      <CompassStar size={10} color="#007AFF" />
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <AIWorkoutChat inline />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ (AEO) ── */}
+      <FAQSection />
+
+      {/* Floating AI Chat widget */}
+      <AIWorkoutChat />
     </main>
+  )
+}
+
+const faqs = [
+  {
+    q: 'What is the Star Mat and how does it work?',
+    a: 'The Star Mat is a premium directional training mat with compass-style markers at 8 angles (360°, 270°, 180°, 90°, 315°, 225°, 135°, 45°) and a center "LOAD DECIDE" badge. Athletes use these markers to train in all planes of motion — sagittal, frontal, and transverse — improving balance, core strength, speed, strength, and endurance simultaneously.',
+  },
+  {
+    q: 'What sports is the Star Mat designed for?',
+    a: 'The Star Mat is built for multi-sport athletes: Football, Basketball, Soccer, Baseball and Softball, Track & Field, Tennis, and MMA/Combat Sports. Each sport has specific training programs targeting the key body areas and movements that matter most for performance and injury prevention.',
+  },
+  {
+    q: 'How does training in all planes of motion improve athletic performance?',
+    a: 'Most traditional workouts only train in one plane (front to back). The Star Mat forces your body to move laterally, rotationally, and diagonally — the same directions your body moves in actual sports. This builds functional strength, faster reaction time, and sport-specific conditioning that translates directly to competition.',
+  },
+  {
+    q: 'Can I use the Star Mat for injury recovery and rehabilitation?',
+    a: 'Yes. The Star Mat includes guided recovery protocols for common sports injuries. The directional markers allow controlled, low-impact movements that rebuild stability around injured joints. Always consult a medical professional for serious injuries, but the mat is specifically designed to support safe, progressive recovery.',
+  },
+  {
+    q: 'What is the difference between the Star Mat Pro and Star Mat Lite?',
+    a: 'The Star Mat Pro ($149) is our flagship mat, built with premium 8mm high-density foam, a non-slip micro-suede surface, and full compass directional printing. The Star Mat Lite is a lighter weight version ideal for travel and home use. Both feature the full Star directional training system.',
+  },
+  {
+    q: 'Do I need a trainer or gym to use the Star Mat?',
+    a: 'No. The Star Mat is designed for solo training — at home, in a hotel room, outdoors, or in a gym. The directional markers act as your built-in trainer, telling you exactly where to step, pivot, and move. Our AI Coach can generate a complete workout in seconds based on your goals.',
+  },
+]
+
+function FAQSection() {
+  const [open, setOpen] = useState(null)
+  return (
+    <section
+      className="section-padding py-24 border-t border-star-border"
+      itemScope
+      itemType="https://schema.org/FAQPage"
+    >
+      <div className="max-w-3xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-14"
+        >
+          <p className="text-star-yellow text-xs font-semibold tracking-widest uppercase mb-3">Common Questions</p>
+          <h2 className="text-4xl font-black">Everything About the Star Mat</h2>
+        </motion.div>
+        <div className="space-y-3">
+          {faqs.map((faq, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.07 }}
+              itemScope
+              itemProp="mainEntity"
+              itemType="https://schema.org/Question"
+            >
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="w-full flex items-center justify-between gap-4 px-6 py-5 rounded-2xl border border-star-border bg-star-card/40 hover:bg-star-card/70 text-left transition-all"
+              >
+                <span className="text-white font-semibold text-sm leading-snug" itemProp="name">{faq.q}</span>
+                <motion.div animate={{ rotate: open === i ? 180 : 0 }} transition={{ duration: 0.25 }} className="flex-shrink-0">
+                  <ChevronDown size={18} className="text-star-grey" />
+                </motion.div>
+              </button>
+              <AnimatePresence>
+                {open === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                    itemScope
+                    itemProp="acceptedAnswer"
+                    itemType="https://schema.org/Answer"
+                  >
+                    <p className="px-6 py-4 text-star-grey text-sm leading-relaxed border border-t-0 border-star-border rounded-b-2xl bg-star-card/20" itemProp="text">
+                      {faq.a}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }

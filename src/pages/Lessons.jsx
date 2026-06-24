@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Clock, Lock, Activity, Heart } from 'lucide-react'
+import AIWorkoutChat from '../components/AIWorkoutChat'
 
 const sports = [
   {
@@ -456,6 +457,58 @@ export default function Lessons() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* ── AI COACH PANEL ── */}
+      <section className="section-padding py-16 border-t border-star-border bg-gradient-to-b from-star-card/10 to-star-black relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[40vw] h-[20vw] rounded-full opacity-10 blur-[80px]" style={{ backgroundColor: selectedSport.color }} />
+        </div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: selectedSport.color }}>
+                {selectedSport.name} AI Coach
+              </p>
+              <h2 className="text-3xl md:text-4xl font-black leading-tight mb-4">
+                Not sure where to start?
+                <span className="text-gradient-blue block">Ask the AI Coach.</span>
+              </h2>
+              <p className="text-star-grey text-base leading-relaxed mb-5">
+                Tell us your position, a specific goal, or a body part you want to strengthen — and we'll generate a custom Star Mat workout in seconds. Built around your sport, your body, your next move.
+              </p>
+              <ul className="space-y-2 text-sm text-star-grey">
+                {[
+                  `Custom ${selectedSport.name} drills on the mat`,
+                  'Injury-safe modifications',
+                  'Sets, reps, and compass directions',
+                  'Recovery workouts included',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: selectedSport.color }} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <AIWorkoutChat inline />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Floating AI Chat widget */}
+      <AIWorkoutChat />
     </main>
   )
 }
