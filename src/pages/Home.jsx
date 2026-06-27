@@ -289,7 +289,7 @@ export default function Home() {
                 <span className="text-gradient-yellow block">Everything.</span>
               </h2>
               <p className="text-star-grey text-lg leading-relaxed mb-4">
-                You don't need big bulky equipment or expensive trainers. We just need to know what direction to go in — and the Star Mat gives you exactly that.
+                You don't need big bulky equipment or expensive trainers. We just need to know what direction to go in, and the Star Mat gives you exactly that.
               </p>
               <p className="text-star-grey text-lg leading-relaxed mb-10">
                 Train in all planes of motion and become a king in your sport. The Star Mat is the only tool built to help you dominate from every angle.
@@ -477,7 +477,7 @@ export default function Home() {
                 <span className="text-gradient-blue block">Star Mat Workout</span>
               </h2>
               <p className="text-star-grey text-lg leading-relaxed mb-6">
-                Tell our AI Coach your sport, your goal, or a problem area — and it will build a workout designed specifically for the Star Mat in under 30 seconds.
+                Tell our AI Coach your sport, your goal, or a problem area and it will build a workout designed specifically for the Star Mat in under 30 seconds.
               </p>
               <ul className="space-y-3 mb-8">
                 {[
