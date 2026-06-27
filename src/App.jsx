@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CartProvider } from './context/CartContext'
@@ -17,6 +18,12 @@ const pageVariants = {
   initial: { opacity: 0, y: 16 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
   exit: { opacity: 0, y: -8, transition: { duration: 0.22, ease: 'easeIn' } },
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
 }
 
 function AnimatedRoutes() {
@@ -45,6 +52,7 @@ export default function App() {
     <CartProvider>
       <Router>
         <div className="min-h-screen bg-star-black text-star-white font-sans">
+          <ScrollToTop />
           <Navbar />
           <CartSidebar />
           <AnimatedRoutes />

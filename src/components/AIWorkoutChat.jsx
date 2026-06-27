@@ -221,7 +221,7 @@ export default function AIWorkoutChat({ inline = false }) {
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
             placeholder="Ask about a goal, sport, or body area…"
             className="flex-1 min-w-0 bg-star-black border border-star-border rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none focus:border-star-blue/50 transition-colors"
           />
