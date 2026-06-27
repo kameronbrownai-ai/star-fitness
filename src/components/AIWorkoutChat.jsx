@@ -75,7 +75,7 @@ export default function AIWorkoutChat({ inline = false }) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const bottomRef = useRef(null)
+  const messagesRef = useRef(null)
   const inputRef = useRef(null)
 
   useEffect(() => {
@@ -85,7 +85,9 @@ export default function AIWorkoutChat({ inline = false }) {
   }, [open])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+    }
   }, [messages, loading])
 
   async function sendMessage(text) {
@@ -158,7 +160,7 @@ export default function AIWorkoutChat({ inline = false }) {
       </div>
 
       {/* Messages */}
-      <div className={`overflow-y-auto overflow-x-hidden px-4 py-4 space-y-3 bg-star-black ${inline ? 'h-64' : 'h-72'}`}>
+      <div ref={messagesRef} className={`overflow-y-auto overflow-x-hidden px-4 py-4 space-y-3 bg-star-black ${inline ? 'h-64' : 'h-72'}`}>
         {messages.map((msg, i) => (
           <div key={i} className={`flex min-w-0 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
@@ -195,7 +197,6 @@ export default function AIWorkoutChat({ inline = false }) {
             </div>
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       {/* Starter prompts (only show when just the intro message) */}
