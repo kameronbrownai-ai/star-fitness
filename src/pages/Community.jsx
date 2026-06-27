@@ -22,7 +22,7 @@ const testimonials = [
     initials: 'DK',
     color: '#FF375F',
     rating: 5,
-    text: '"I do box jumps, burpees, and HIIT on this mat every morning. It has never slipped once. The surface texture is incredible — it actually gets more grip when wet. 100% worth every dollar."',
+    text: '"I do box jumps, burpees, and HIIT on this mat every morning. It has never slipped once. The surface texture is incredible, it actually gets more grip when wet. 100% worth every dollar."',
   },
   {
     id: 3,
@@ -62,7 +62,7 @@ const testimonials = [
     initials: 'JO',
     color: '#FF9F0A',
     rating: 5,
-    text: '"Pilates demands precision. The Star Mat delivers it. Every pose is stable, every transition is controlled. My students perform better on this mat — and they notice it immediately."',
+    text: '"Pilates demands precision. The Star Mat delivers it. Every pose is stable, every transition is controlled. My students perform better on this mat, and they notice it immediately."',
   },
 ]
 
@@ -242,7 +242,7 @@ export default function Community() {
               <p className="text-star-yellow text-sm font-semibold tracking-widest uppercase mb-3">Partner Program</p>
               <h3 className="text-3xl font-black mb-4">Bring Star Fitness to Your Studio</h3>
               <p className="text-star-grey mb-8">
-                Wholesale pricing, co-branding opportunities, and exclusive partner resources for studios, gyms,
+                Wholesale pricing, cobranding opportunities, and exclusive partner resources for studios, gyms,
                 and training facilities worldwide.
               </p>
               <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
