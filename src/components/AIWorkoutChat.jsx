@@ -138,9 +138,9 @@ export default function AIWorkoutChat({ inline = false }) {
   }
 
   const chatPanel = (
-    <div className={inline ? 'w-full' : 'w-[360px] md:w-[400px]'}>
+    <div className={inline ? 'w-full min-w-0' : 'w-[min(400px,calc(100vw-2rem))]'}>
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-star-border bg-star-card rounded-t-2xl">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-star-border bg-star-card rounded-t-2xl">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl bg-star-blue/20 border border-star-blue/30 flex items-center justify-center">
             <CompassStar size={18} color="#007AFF" />
@@ -158,24 +158,24 @@ export default function AIWorkoutChat({ inline = false }) {
       </div>
 
       {/* Messages */}
-      <div className={`overflow-y-auto px-4 py-4 space-y-3 bg-star-black ${inline ? 'h-72' : 'h-80'}`}>
+      <div className={`overflow-y-auto overflow-x-hidden px-4 py-4 space-y-3 bg-star-black ${inline ? 'h-64' : 'h-72'}`}>
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={i} className={`flex min-w-0 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
               <div className="w-6 h-6 rounded-lg bg-star-blue/20 border border-star-blue/30 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
                 <CompassStar size={12} color="#007AFF" />
               </div>
             )}
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+              className={`max-w-[80%] min-w-0 rounded-2xl px-3 py-2.5 ${
                 msg.role === 'user'
                   ? 'bg-star-blue text-white rounded-tr-sm'
                   : 'bg-star-card border border-star-border rounded-tl-sm'
               }`}
             >
               {msg.role === 'user'
-                ? <p className="text-sm">{msg.content}</p>
-                : <div>{formatMessage(msg.content)}</div>
+                ? <p className="text-sm break-words">{msg.content}</p>
+                : <div className="min-w-0">{formatMessage(msg.content)}</div>
               }
             </div>
           </div>
@@ -214,8 +214,8 @@ export default function AIWorkoutChat({ inline = false }) {
       )}
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-star-border bg-star-card rounded-b-2xl">
-        <div className="flex gap-2 items-center">
+      <div className="px-3 py-3 border-t border-star-border bg-star-card rounded-b-2xl">
+        <div className="flex gap-2 items-center min-w-0">
           <input
             ref={inputRef}
             type="text"
@@ -223,7 +223,7 @@ export default function AIWorkoutChat({ inline = false }) {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
             placeholder="Ask about a goal, sport, or body area…"
-            className="flex-1 bg-star-black border border-star-border rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none focus:border-star-blue/50 transition-colors"
+            className="flex-1 min-w-0 bg-star-black border border-star-border rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none focus:border-star-blue/50 transition-colors"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -241,7 +241,7 @@ export default function AIWorkoutChat({ inline = false }) {
 
   if (inline) {
     return (
-      <div className="rounded-2xl border border-star-border overflow-hidden shadow-xl">
+      <div className="w-full rounded-2xl border border-star-border overflow-hidden shadow-xl">
         {chatPanel}
       </div>
     )
@@ -252,7 +252,7 @@ export default function AIWorkoutChat({ inline = false }) {
       {/* Floating trigger button */}
       <motion.button
         onClick={() => setOpen(true)}
-        className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl transition-all ${open ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`fixed bottom-5 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl transition-all ${open ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         style={{ backgroundColor: '#007AFF', boxShadow: '0 8px 32px rgba(0,122,255,0.4)' }}
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.97 }}
@@ -260,8 +260,8 @@ export default function AIWorkoutChat({ inline = false }) {
         animate={{ opacity: open ? 0 : 1, y: open ? 20 : 0 }}
         transition={{ duration: 0.3 }}
       >
-        <CompassStar size={20} color="white" />
-        <span className="text-white font-bold text-sm">AI Coach</span>
+        <CompassStar size={18} color="white" />
+        <span className="text-white font-bold text-sm hidden sm:inline">AI Coach</span>
       </motion.button>
 
       {/* Chat Panel */}
@@ -272,7 +272,7 @@ export default function AIWorkoutChat({ inline = false }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="fixed bottom-6 right-6 z-50 rounded-2xl shadow-2xl border border-star-border overflow-hidden"
+            className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 rounded-2xl shadow-2xl border border-star-border overflow-hidden"
             style={{ boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)' }}
           >
             {chatPanel}

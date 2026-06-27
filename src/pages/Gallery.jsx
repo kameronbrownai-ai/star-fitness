@@ -104,7 +104,7 @@ export default function Gallery() {
 
       {/* Filters */}
       <div className="section-padding mb-8">
-        <div className="max-w-7xl mx-auto flex gap-2">
+        <div className="max-w-7xl mx-auto flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {filters.map((f) => (
             <motion.button
               key={f}

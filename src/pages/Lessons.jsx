@@ -459,15 +459,16 @@ export default function Lessons() {
       </div>
 
       {/* ── AI COACH PANEL ── */}
-      <section className="section-padding py-16 border-t border-star-border bg-gradient-to-b from-star-card/10 to-star-black relative overflow-hidden">
+      <section className="section-padding py-16 border-t border-star-border bg-gradient-to-b from-star-card/10 to-star-black relative overflow-x-clip">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-[40vw] h-[20vw] rounded-full opacity-10 blur-[80px]" style={{ backgroundColor: selectedSport.color }} />
         </div>
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              className="min-w-0"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
@@ -496,10 +497,11 @@ export default function Lessons() {
               </ul>
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              className="min-w-0"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
             >
               <AIWorkoutChat inline />
             </motion.div>

@@ -224,13 +224,13 @@ export default function Home() {
       </section>
 
       {/* ── STAR MAT FEATURE ── */}
-      <section className="section-padding py-28">
+      <section className="section-padding py-28 overflow-x-clip">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Visual */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.8 }}
               className="relative"
@@ -278,10 +278,10 @@ export default function Home() {
 
             {/* Text */}
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
             >
               <p className="text-star-blue text-sm font-semibold tracking-widest uppercase mb-4">The Star Mat</p>
               <h2 className="text-4xl md:text-5xl font-black leading-tight mb-6">
@@ -455,15 +455,16 @@ export default function Home() {
       </section>
 
       {/* ── AI COACH SECTION ── */}
-      <section className="section-padding py-24 border-t border-star-border bg-gradient-to-b from-star-card/20 to-star-black relative overflow-hidden">
+      <section className="section-padding py-24 border-t border-star-border bg-gradient-to-b from-star-card/20 to-star-black relative overflow-x-clip">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60vw] h-[30vw] rounded-full bg-star-blue/8 blur-[100px]" />
         </div>
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              className="min-w-0"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
             >
@@ -496,10 +497,11 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              className="min-w-0"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
             >
               <AIWorkoutChat inline />
             </motion.div>
