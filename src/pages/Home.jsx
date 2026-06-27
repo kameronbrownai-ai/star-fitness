@@ -80,15 +80,11 @@ export default function Home() {
           muted
           loop
           playsInline
+          src="/videos/star-mat-fv1.mov"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ filter: 'brightness(0.38) saturate(0.85)' }}
           onCanPlay={e => { e.target.playbackRate = 0.5 }}
-        >
-          <source
-            src="/videos/star-mat-fv1.mov"
-            type="video/mp4"
-          />
-        </video>
+        />
 
         {/* Colour-grade overlays — deep black vignette + brand tint */}
         <div className="absolute inset-0 bg-gradient-to-t from-star-black via-star-black/40 to-transparent" />

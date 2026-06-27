@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, X, Image, Video, Expand } from 'lucide-react'
+import { Play, X, Image, Video, Volume2, VolumeX } from 'lucide-react'
 import CompassStar from '../components/CompassStar'
 
 const filters = ['All', 'Videos', 'Photos', 'Training', 'Lifestyle', 'Product']
@@ -37,6 +37,8 @@ const galleryItems = [
 export default function Gallery() {
   const [filter, setFilter] = useState('All')
   const [lightbox, setLightbox] = useState(null)
+  const [isMuted, setIsMuted] = useState(true)
+  const featuredVideoRef = useRef(null)
 
   const filtered = filter === 'All' ? galleryItems
     : filter === 'Videos' ? galleryItems.filter(i => i.type === 'video')
@@ -44,6 +46,13 @@ export default function Gallery() {
     : galleryItems.filter(i => i.category === filter)
 
   const featured = galleryItems.find(i => i.featured)
+
+  function toggleMute() {
+    if (featuredVideoRef.current) {
+      featuredVideoRef.current.muted = !featuredVideoRef.current.muted
+      setIsMuted(featuredVideoRef.current.muted)
+    }
+  }
 
   return (
     <main className="pt-24 pb-20">
@@ -71,34 +80,59 @@ export default function Gallery() {
             className="max-w-7xl mx-auto"
           >
             <p className="text-star-grey text-sm font-semibold tracking-widest uppercase mb-4">Featured</p>
-            <motion.div
-              whileHover={{ scale: 1.005 }}
-              onClick={() => setLightbox(featured)}
-              className={`relative rounded-3xl overflow-hidden border border-star-border bg-gradient-to-br ${featured.thumb} cursor-pointer group`}
-              style={{ aspectRatio: '16/7' }}
-            >
-              {featured.poster && (
-                <img src={featured.poster} alt={featured.title} className="absolute inset-0 w-full h-full object-cover opacity-40" />
-              )}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+            <div className="relative rounded-3xl overflow-hidden border border-star-border" style={{ aspectRatio: '16/7' }}>
+              {featured.type === 'video' ? (
+                <>
+                  <video
+                    ref={featuredVideoRef}
+                    src={featured.src}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Title overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 px-6 py-5 bg-gradient-to-t from-black/80 to-transparent pointer-events-none">
+                    <p className="text-white font-black text-xl md:text-2xl">{featured.title}</p>
+                    <p className="text-star-grey text-sm">{featured.duration} · {featured.category}</p>
+                  </div>
+                  {/* Mute toggle */}
+                  <button
+                    onClick={toggleMute}
+                    className="absolute bottom-5 right-5 w-10 h-10 rounded-full bg-black/50 border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors backdrop-blur-sm"
+                  >
+                    {isMuted ? <VolumeX size={16} className="text-white" /> : <Volume2 size={16} className="text-white" />}
+                  </button>
+                  {/* Full screen / lightbox button */}
+                  <button
+                    onClick={() => setLightbox(featured)}
+                    className="absolute top-5 right-5 w-10 h-10 rounded-full bg-black/50 border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors backdrop-blur-sm"
+                  >
+                    <Play size={14} className="text-white ml-0.5" fill="white" />
+                  </button>
+                </>
+              ) : (
                 <motion.div
-                  className="w-20 h-20 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: `${featured.accent}30`, border: `2px solid ${featured.accent}60` }}
-                  whileHover={{ scale: 1.15 }}
+                  whileHover={{ scale: 1.005 }}
+                  onClick={() => setLightbox(featured)}
+                  className={`relative w-full h-full bg-gradient-to-br ${featured.thumb} cursor-pointer group`}
                 >
-                  <Play size={30} fill="white" className="text-white ml-1" />
+                  {featured.poster && (
+                    <img src={featured.poster} alt={featured.title} className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                  )}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+                    <motion.div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ backgroundColor: `${featured.accent}30`, border: `2px solid ${featured.accent}60` }} whileHover={{ scale: 1.15 }}>
+                      <Play size={30} fill="white" className="text-white ml-1" />
+                    </motion.div>
+                    <div className="text-center">
+                      <p className="text-white font-black text-2xl md:text-3xl mb-2">{featured.title}</p>
+                      <p className="text-star-grey">{featured.duration} · {featured.category}</p>
+                    </div>
+                  </div>
                 </motion.div>
-                <div className="text-center">
-                  <p className="text-white font-black text-2xl md:text-3xl mb-2">{featured.title}</p>
-                  <p className="text-star-grey">{featured.duration} · {featured.category}</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-              {/* Animated star bg */}
-              <motion.div animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }} className="absolute -bottom-10 -right-10 opacity-10">
-                <CompassStar size={200} color="#FFD700" />
-              </motion.div>
-            </motion.div>
+              )}
+            </div>
           </motion.div>
         </div>
       )}
