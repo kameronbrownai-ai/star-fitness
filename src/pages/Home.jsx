@@ -81,9 +81,10 @@ export default function Home() {
           loop
           playsInline
           src="/videos/star-mat-fv1.mp4"
+          poster="/images/thumbs/star-mat-fv1.mov.png"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ filter: 'brightness(0.38) saturate(0.85)' }}
-          onCanPlay={e => { e.target.playbackRate = 0.5 }}
+          onCanPlay={e => { e.target.playbackRate = 0.7 }}
         />
 
         {/* Colour-grade overlays — deep black vignette + brand tint */}
