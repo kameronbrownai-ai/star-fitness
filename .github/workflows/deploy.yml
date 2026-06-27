@@ -28,7 +28,7 @@ jobs:
       - name: Deploy to VPS via rsync
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avz --delete
+          switches: -avz --delete --exclude='videos/' --exclude='images/'
           path: dist/
           remote_path: /var/www/starfitness/
           remote_host: ${{ secrets.VPS_IP }}
