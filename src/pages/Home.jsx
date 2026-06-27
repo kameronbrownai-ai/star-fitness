@@ -82,9 +82,10 @@ export default function Home() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
           style={{ filter: 'brightness(0.38) saturate(0.85)' }}
+          onCanPlay={e => { e.target.playbackRate = 0.5 }}
         >
           <source
-            src="https://videos.pexels.com/video-files/12188774/12188774-uhd_2560_1440_25fps.mp4"
+            src="/videos/star-mat-fv1.mov"
             type="video/mp4"
           />
         </video>

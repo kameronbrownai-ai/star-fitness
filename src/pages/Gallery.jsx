@@ -7,7 +7,8 @@ const filters = ['All', 'Videos', 'Photos', 'Training', 'Lifestyle', 'Product']
 
 const galleryItems = [
   // Real videos
-  { id: 1, type: 'video', title: 'Star Mat — Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', featured: true, src: '/videos/star-mat-side-lunge.mov', poster: '/images/thumbs/star-mat-side-lunge.mov.png' },
+  { id: 0, type: 'video', title: 'Star Mat FV1', duration: '0:47', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', featured: true, src: '/videos/star-mat-fv1.mov', poster: '/images/thumbs/star-mat-fv1.mov.png' },
+  { id: 1, type: 'video', title: 'Star Mat — Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', src: '/videos/star-mat-side-lunge.mov', poster: '/images/thumbs/star-mat-side-lunge.mov.png' },
   { id: 2, type: 'video', title: 'Split Lunge Matrix', duration: '0:20', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', src: '/videos/star-mat-split-lunge.mov', poster: '/images/thumbs/star-mat-split-lunge.mov.png' },
   { id: 3, type: 'video', title: 'Apex Foot Fire Plus', duration: '0:18', category: 'Training', thumb: 'from-orange-900/70 to-star-black', accent: '#FF9F0A', src: '/videos/star-mat-apex-foot-fire.mov', poster: '/images/thumbs/star-mat-apex-foot-fire.mov.png' },
   { id: 4, type: 'video', title: 'Alternating Lunge Upright Row', duration: '0:22', category: 'Training', thumb: 'from-green-900/70 to-star-black', accent: '#30D158', src: '/videos/star-mat-alternating-lunge-row.mov', poster: '/images/thumbs/star-mat-alternating-lunge-row.mov.png' },
