@@ -157,7 +157,7 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.55 }}
             className="text-star-grey text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            There is no other workout that will improve your balance, core, speed, strength, and endurance — faster or better — than training in all planes of motion. The Star Mat is your direction.
+            There is no other workout that will improve your balance, core, speed, strength, and endurance faster or better than training in all planes of motion. The Star Mat is your direction.
           </motion.p>
 
           <motion.div
