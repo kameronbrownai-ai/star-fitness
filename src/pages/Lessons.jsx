@@ -172,7 +172,7 @@ export default function Lessons() {
             Dominate <span className="text-gradient-blue">Your Sport.</span>
           </h1>
           <p className="text-star-grey text-lg leading-relaxed mb-3">
-            There is no other training program out there to prepare you to dominate in your sport. Select your sport below and get targeted training for the body parts that matter most — plus recovery built around your most common injuries.
+            There is no other training program out there to prepare you to dominate in your sport. Select your sport below and get targeted training for the body parts that matter most, plus recovery built around your most common injuries.
           </p>
           <p className="text-white font-semibold">
             Train in all planes of motion. Become a king in your sport.
@@ -255,7 +255,7 @@ export default function Lessons() {
           {tab === 'train' && (
             <div className="mt-5">
               <p className="text-star-grey text-xs uppercase tracking-widest mb-2">
-                Key Areas for {selectedSport.name} — <span style={{ color: selectedSport.color }}>tap a body part to filter</span>
+                Key Areas for {selectedSport.name}: <span style={{ color: selectedSport.color }}>tap a body part to filter</span>
               </p>
               <div className="flex flex-wrap gap-2">
                 {/* All pill */}
@@ -302,7 +302,7 @@ export default function Lessons() {
           {tab === 'recover' && (
             <div className="mt-5">
               <p className="text-star-grey text-xs uppercase tracking-widest mb-2">
-                Common {selectedSport.name} Injuries — <span className="text-green-400">tap an injury to filter</span>
+                Common {selectedSport.name} Injuries: <span className="text-green-400">tap an injury to filter</span>
               </p>
               <div className="flex flex-wrap gap-2">
                 {/* All pill */}
@@ -480,7 +480,7 @@ export default function Lessons() {
                 <span className="text-gradient-blue block">Ask the AI Coach.</span>
               </h2>
               <p className="text-star-grey text-base leading-relaxed mb-5">
-                Tell us your position, a specific goal, or a body part you want to strengthen — and we'll generate a custom Star Mat workout in seconds. Built around your sport, your body, your next move.
+                Tell us your position, a specific goal, or a body part you want to strengthen, and we'll generate a custom Star Mat workout in seconds. Built around your sport, your body, your next move.
               </p>
               <ul className="space-y-2 text-sm text-star-grey">
                 {[

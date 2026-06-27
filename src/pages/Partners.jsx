@@ -71,7 +71,7 @@ export default function Partners() {
             Grow With <span className="text-gradient-yellow">Star Fitness.</span>
           </h1>
           <p className="text-star-grey text-lg leading-relaxed">
-            Join our partner network — whether you're a fitness studio, a brand looking for co-marketing,
+            Join our partner network. Whether you're a fitness studio, a brand looking for co-marketing,
             or an athlete ready to represent. We grow together.
           </p>
         </motion.div>

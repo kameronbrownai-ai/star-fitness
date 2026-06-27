@@ -103,7 +103,7 @@ export default function Community() {
             The Stars Who <span className="text-gradient-blue">Train With Us.</span>
           </h1>
           <p className="text-star-grey text-lg leading-relaxed">
-            250,000 members. 42 countries. One standard. Real athletes, real results — no filters.
+            250,000 members. 42 countries. One standard. Real athletes, real results, no filters.
           </p>
         </motion.div>
       </section>

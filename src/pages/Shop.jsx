@@ -66,7 +66,7 @@ export default function Shop() {
             Gear & <span className="text-gradient-blue">Apparel</span>
           </h1>
           <p className="text-star-grey text-lg max-w-xl mx-auto">
-            Premium mats, accessories, and performance apparel — all in one place.
+            Premium mats, accessories, and performance apparel, all in one place.
           </p>
         </motion.div>
       </section>

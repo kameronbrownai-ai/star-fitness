@@ -69,7 +69,7 @@ export default function AIWorkoutChat({ inline = false }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hey! I'm your Star Mat AI Coach. Tell me your goal, a sport you play, or a problem area — and I'll build you a custom workout on the mat. What are we training today?",
+      content: "Hey! I'm your Star Mat AI Coach. Tell me your goal, a sport you play, or a problem area and I'll build you a custom workout on the mat. What are we training today?",
     },
   ])
   const [input, setInput] = useState('')
