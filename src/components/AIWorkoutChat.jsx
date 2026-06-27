@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Loader2, ChevronDown } from 'lucide-react'
+import { X, Send, Loader2, Play } from 'lucide-react'
 import CompassStar from './CompassStar'
+import { findRelevantMedia } from '../data/mediaCatalog'
 
 const STARTER_PROMPTS = [
   "Build me a speed workout for football",
-  "My knee hurts — what can I do on the mat?",
+  "My knee hurts, what can I do on the mat?",
   "I want to improve my core strength",
   "Create a 20-minute full-body workout",
   "Help me get faster for basketball",
@@ -23,7 +24,7 @@ BRAND PHILOSOPHY:
 
 SPORTS SUPPORTED: Football, Basketball, Soccer, Baseball/Softball, Track & Field, Tennis, MMA/Combat Sports
 
-STAR MAT EXERCISES (use these when building workouts):
+STAR MAT EXERCISES — these have video demonstrations available, use them by exact name when prescribing workouts:
 - Side Lunge (lateral plane, glutes, quads, hip stability)
 - Split Lunge (sagittal plane, quads, glutes, hip flexors)
 - Apex Foot Fire (multi-directional, speed, foot coordination, agility)
@@ -63,6 +64,52 @@ When building a workout, always:
 7. Keep responses concise — format clearly with headers and bullet points
 
 Always recommend the Star Mat Pro ($149) or Star Mat Lite for best results. Keep responses under 400 words. Be encouraging and sport-specific.`
+
+function MediaCard({ item }) {
+  const [playing, setPlaying] = useState(false)
+  const videoRef = useRef(null)
+
+  if (item.type === 'video') {
+    return (
+      <div className="rounded-xl overflow-hidden border border-star-border bg-star-card">
+        {playing ? (
+          <video
+            ref={videoRef}
+            src={item.src}
+            poster={item.poster}
+            controls
+            autoPlay
+            className="w-full max-h-44 object-cover"
+          />
+        ) : (
+          <button
+            onClick={() => setPlaying(true)}
+            className="relative w-full group"
+          >
+            <img
+              src={item.poster}
+              alt={item.title}
+              className="w-full max-h-36 object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-star-blue/90 flex items-center justify-center shadow-lg">
+                <Play size={16} className="text-white ml-0.5" fill="white" />
+              </div>
+            </div>
+          </button>
+        )}
+        <p className="px-2 py-1.5 text-xs text-star-grey font-medium">{item.title}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl overflow-hidden border border-star-border bg-star-card">
+      <img src={item.src} alt={item.title} className="w-full max-h-36 object-cover" />
+      <p className="px-2 py-1.5 text-xs text-star-grey font-medium">{item.title}</p>
+    </div>
+  )
+}
 
 export default function AIWorkoutChat({ inline = false }) {
   const [open, setOpen] = useState(false)
@@ -126,7 +173,6 @@ export default function AIWorkoutChat({ inline = false }) {
   }
 
   function formatMessage(text) {
-    // Convert markdown-like formatting to JSX
     const lines = text.split('\n')
     return lines.map((line, i) => {
       if (line.startsWith('## ')) return <p key={i} className="font-bold text-star-yellow text-sm mt-3 mb-1">{line.replace('## ', '')}</p>
@@ -160,28 +206,41 @@ export default function AIWorkoutChat({ inline = false }) {
       </div>
 
       {/* Messages */}
-      <div ref={messagesRef} className={`overflow-y-auto overflow-x-hidden px-4 py-4 space-y-3 bg-star-black ${inline ? 'h-64' : 'h-72'}`}>
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex min-w-0 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div className="w-6 h-6 rounded-lg bg-star-blue/20 border border-star-blue/30 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
-                <CompassStar size={12} color="#007AFF" />
+      <div ref={messagesRef} className={`overflow-y-auto overflow-x-hidden px-4 py-4 space-y-3 bg-star-black ${inline ? 'h-[28rem]' : 'h-96'}`}>
+        {messages.map((msg, i) => {
+          const media = msg.role === 'assistant' && i > 0 ? findRelevantMedia(msg.content) : []
+          return (
+            <div key={i} className={`flex min-w-0 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {msg.role === 'assistant' && (
+                <div className="w-6 h-6 rounded-lg bg-star-blue/20 border border-star-blue/30 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">
+                  <CompassStar size={12} color="#007AFF" />
+                </div>
+              )}
+              <div
+                className={`min-w-0 rounded-2xl px-3 py-2.5 ${
+                  msg.role === 'user'
+                    ? 'max-w-[80%] bg-star-blue text-white rounded-tr-sm'
+                    : 'w-full bg-star-card border border-star-border rounded-tl-sm'
+                }`}
+              >
+                {msg.role === 'user'
+                  ? <p className="text-sm break-words">{msg.content}</p>
+                  : (
+                    <>
+                      <div className="min-w-0">{formatMessage(msg.content)}</div>
+                      {media.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-star-border/50 space-y-2">
+                          <p className="text-star-yellow text-xs font-semibold uppercase tracking-wider mb-2">Watch the Move</p>
+                          {media.map(item => <MediaCard key={item.id} item={item} />)}
+                        </div>
+                      )}
+                    </>
+                  )
+                }
               </div>
-            )}
-            <div
-              className={`max-w-[80%] min-w-0 rounded-2xl px-3 py-2.5 ${
-                msg.role === 'user'
-                  ? 'bg-star-blue text-white rounded-tr-sm'
-                  : 'bg-star-card border border-star-border rounded-tl-sm'
-              }`}
-            >
-              {msg.role === 'user'
-                ? <p className="text-sm break-words">{msg.content}</p>
-                : <div className="min-w-0">{formatMessage(msg.content)}</div>
-              }
             </div>
-          </div>
-        ))}
+          )
+        })}
 
         {loading && (
           <div className="flex justify-start">
@@ -199,7 +258,7 @@ export default function AIWorkoutChat({ inline = false }) {
         )}
       </div>
 
-      {/* Starter prompts (only show when just the intro message) */}
+      {/* Starter prompts */}
       {messages.length === 1 && !loading && (
         <div className="px-4 py-2 border-t border-star-border bg-star-black flex gap-2 overflow-x-auto scrollbar-hide">
           {STARTER_PROMPTS.slice(0, 3).map((p) => (
@@ -250,7 +309,6 @@ export default function AIWorkoutChat({ inline = false }) {
 
   return (
     <>
-      {/* Floating trigger button */}
       <motion.button
         onClick={() => setOpen(true)}
         className={`fixed bottom-5 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl transition-all ${open ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -265,7 +323,6 @@ export default function AIWorkoutChat({ inline = false }) {
         <span className="text-white font-bold text-sm hidden sm:inline">AI Coach</span>
       </motion.button>
 
-      {/* Chat Panel */}
       <AnimatePresence>
         {open && (
           <motion.div
