@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, X, Image, Video, Expand, Volume2, VolumeX } from 'lucide-react'
 import CompassStar from '../components/CompassStar'
@@ -46,6 +46,13 @@ export default function Gallery() {
     : galleryItems.filter(i => i.category === filter)
 
   const featured = galleryItems.find(i => i.featured)
+
+  useEffect(() => {
+    if (featuredVideoRef.current) {
+      featuredVideoRef.current.muted = true
+      featuredVideoRef.current.play().catch(() => {})
+    }
+  }, [])
 
   function toggleMute() {
     if (featuredVideoRef.current) {
