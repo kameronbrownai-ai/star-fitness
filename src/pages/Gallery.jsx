@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, X, Image, Video, Volume2, VolumeX } from 'lucide-react'
+import { Play, X, Image, Video, Expand, Volume2, VolumeX } from 'lucide-react'
 import CompassStar from '../components/CompassStar'
 
 const filters = ['All', 'Videos', 'Photos', 'Training', 'Lifestyle', 'Product']
