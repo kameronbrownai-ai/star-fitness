@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera, Video, UserCircle } from 'lucide-react'
+import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera, Video, UserCircle, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CompassStar from './CompassStar'
 import { findRelevantMedia } from '../data/mediaCatalog'
@@ -266,10 +266,12 @@ export default function AIWorkoutChat({ inline = false }) {
 
   const [pendingPhoto, setPendingPhoto] = useState(null)
   const [showPoseCamera, setShowPoseCamera] = useState(false)
+  const [showMediaMenu, setShowMediaMenu] = useState(false)
 
   const messagesRef = useRef(null)
   const inputRef = useRef(null)
   const fileInputRef = useRef(null)
+  const mediaMenuRef = useRef(null)
   const sessionStarted = useRef(false)
   const sessionMsgsRef = useRef(0)
 
@@ -317,6 +319,17 @@ export default function AIWorkoutChat({ inline = false }) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight
     }
   }, [messages, loading])
+
+  useEffect(() => {
+    if (!showMediaMenu) return
+    function handle(e) {
+      if (mediaMenuRef.current && !mediaMenuRef.current.contains(e.target)) {
+        setShowMediaMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [showMediaMenu])
 
   function handleSkipOnboarding() {
     setSkippedOnboarding()
@@ -477,14 +490,19 @@ export default function AIWorkoutChat({ inline = false }) {
             <p className="text-star-yellow text-xs font-medium">{headerSubtitle}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {phase === 'chat' && (
             <button
               onClick={() => setPhase('onboarding')}
               title="Set up profile"
-              className="text-star-grey hover:text-white transition-colors p-1"
+              className={`flex items-center gap-1.5 rounded-lg transition-all ${
+                profile
+                  ? 'text-star-grey hover:text-white p-1'
+                  : 'text-star-yellow bg-star-yellow/10 border border-star-yellow/20 hover:bg-star-yellow/20 px-2.5 py-1 text-xs font-semibold'
+              }`}
             >
-              <UserCircle size={18} />
+              <UserCircle size={profile ? 18 : 14} />
+              {!profile && <span>Set up profile</span>}
             </button>
           )}
           {!inline && (
@@ -633,7 +651,7 @@ export default function AIWorkoutChat({ inline = false }) {
                 className="flex-1 min-w-0 bg-star-black border border-star-border rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none focus:border-star-blue/50 transition-colors"
               />
 
-              {/* Photo form check */}
+              {/* Form check menu */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -642,30 +660,39 @@ export default function AIWorkoutChat({ inline = false }) {
                 onChange={handlePhotoSelect}
                 className="hidden"
               />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => fileInputRef.current?.click()}
-                title="Photo form check"
-                className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 transition-colors ${
-                  pendingPhoto
-                    ? 'border-star-blue bg-star-blue/20'
-                    : 'border-star-border bg-star-black hover:border-star-blue/50'
-                }`}
-              >
-                <Camera size={16} className={pendingPhoto ? 'text-star-blue' : 'text-star-grey'} />
-              </motion.button>
-
-              {/* Live pose detection */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowPoseCamera(true)}
-                title="Live form check"
-                className="w-10 h-10 rounded-xl border border-star-border bg-star-black hover:border-star-yellow/50 flex items-center justify-center flex-shrink-0 transition-colors"
-              >
-                <Video size={16} className="text-star-grey" />
-              </motion.button>
+              <div ref={mediaMenuRef} className="relative flex-shrink-0">
+                {showMediaMenu && (
+                  <div className="absolute bottom-12 right-0 bg-star-card border border-star-border rounded-xl shadow-xl p-1 flex flex-col gap-0.5 min-w-[168px] z-10">
+                    <button
+                      onClick={() => { fileInputRef.current?.click(); setShowMediaMenu(false) }}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-star-black text-sm text-white transition-colors text-left"
+                    >
+                      <Camera size={15} className="text-star-blue flex-shrink-0" />
+                      <span>Photo form check</span>
+                    </button>
+                    <button
+                      onClick={() => { setShowPoseCamera(true); setShowMediaMenu(false) }}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-star-black text-sm text-white transition-colors text-left"
+                    >
+                      <Video size={15} className="text-star-yellow flex-shrink-0" />
+                      <span>Live form check</span>
+                    </button>
+                  </div>
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowMediaMenu(m => !m)}
+                  title="Form check options"
+                  className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-colors ${
+                    showMediaMenu || pendingPhoto
+                      ? 'border-star-blue bg-star-blue/20'
+                      : 'border-star-border bg-star-black hover:border-star-blue/50'
+                  }`}
+                >
+                  <Plus size={18} className={showMediaMenu || pendingPhoto ? 'text-star-blue' : 'text-star-grey'} />
+                </motion.button>
+              </div>
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
