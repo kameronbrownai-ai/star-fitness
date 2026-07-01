@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera, Video } from 'lucide-react'
+import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera, Video, UserCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CompassStar from './CompassStar'
 import { findRelevantMedia } from '../data/mediaCatalog'
@@ -477,11 +477,22 @@ export default function AIWorkoutChat({ inline = false }) {
             <p className="text-star-yellow text-xs font-medium">{headerSubtitle}</p>
           </div>
         </div>
-        {!inline && (
-          <button onClick={() => setOpen(false)} className="text-star-grey hover:text-white transition-colors p-1">
-            <X size={18} />
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {phase === 'chat' && (
+            <button
+              onClick={() => setPhase('onboarding')}
+              title="Set up profile"
+              className="text-star-grey hover:text-white transition-colors p-1"
+            >
+              <UserCircle size={18} />
+            </button>
+          )}
+          {!inline && (
+            <button onClick={() => setOpen(false)} className="text-star-grey hover:text-white transition-colors p-1">
+              <X size={18} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Phase content */}
