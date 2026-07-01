@@ -71,7 +71,7 @@ function MultiSelect({ options, selected, onToggle }) {
   )
 }
 
-export default function AIOnboarding({ onComplete }) {
+export default function AIOnboarding({ onComplete, onSkip }) {
   const [step, setStep] = useState(0)
   const [profile, setProfile] = useState({
     sport: '', position: '', level: '', goal: '', injuries: '', equipment: [], metrics: {}
@@ -235,6 +235,14 @@ export default function AIOnboarding({ onComplete }) {
         >
           {getButtonLabel()} <ChevronRight size={16} />
         </button>
+        {onSkip && (
+          <button
+            onClick={onSkip}
+            className="w-full mt-2 py-2 text-star-grey text-xs text-center hover:text-white transition-colors"
+          >
+            Skip setup — chat without a profile
+          </button>
+        )}
       </div>
     </div>
   )

@@ -9,6 +9,7 @@ import PoseCamera from './PoseCamera'
 import {
   getProfile, saveProfile, getSessionCount, getSessionMsgCount,
   startSession, incrementSessionMsg, getSessionHistory, addSessionNote,
+  hasSkippedOnboarding, setSkippedOnboarding,
 } from '../data/userProfile'
 
 const FORM_CHECK_ADDITION = `
@@ -279,7 +280,12 @@ export default function AIWorkoutChat({ inline = false }) {
     const sessionMsgCount = getSessionMsgCount()
 
     if (!profile) {
-      setPhase('onboarding')
+      if (hasSkippedOnboarding()) {
+        setMessages([{ role: 'assistant', content: getGreeting(null, []) }])
+        setPhase('chat')
+      } else {
+        setPhase('onboarding')
+      }
       return
     }
 
@@ -311,6 +317,12 @@ export default function AIWorkoutChat({ inline = false }) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight
     }
   }, [messages, loading])
+
+  function handleSkipOnboarding() {
+    setSkippedOnboarding()
+    setMessages([{ role: 'assistant', content: getGreeting(null, []) }])
+    setPhase('chat')
+  }
 
   function handleOnboardingComplete(profile) {
     saveProfile(profile)
@@ -481,7 +493,7 @@ export default function AIWorkoutChat({ inline = false }) {
 
       {phase === 'onboarding' && (
         <div className={`bg-star-black ${inline ? 'h-[28rem]' : 'h-[26rem]'}`}>
-          <AIOnboarding onComplete={handleOnboardingComplete} />
+          <AIOnboarding onComplete={handleOnboardingComplete} onSkip={handleSkipOnboarding} />
         </div>
       )}
 

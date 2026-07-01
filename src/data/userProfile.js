@@ -42,6 +42,14 @@ export function getSessionHistory() {
   return load().sessionHistory || []
 }
 
+export function hasSkippedOnboarding() {
+  return !!load().skippedOnboarding
+}
+
+export function setSkippedOnboarding() {
+  persist({ ...load(), skippedOnboarding: true })
+}
+
 export function addSessionNote(note) {
   const data = load()
   const history = [
