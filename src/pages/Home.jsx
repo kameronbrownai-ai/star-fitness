@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, Play, Star, Zap, Shield, Award, ChevronDown } from 'lucide-react'
+import { ArrowRight, Play, Star, Zap, Shield, Award, ChevronDown, Camera, Video, UserCircle } from 'lucide-react'
 import CompassStar from '../components/CompassStar'
 import AIWorkoutChat from '../components/AIWorkoutChat'
 
@@ -491,6 +491,28 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
+
+              {/* Chat icon key */}
+              <div className="border-t border-star-border pt-5">
+                <p className="text-star-grey text-xs font-semibold uppercase tracking-wider mb-3">Chat Icons</p>
+                <div className="space-y-2.5">
+                  {[
+                    { icon: <UserCircle size={15} />, label: 'Set up my profile', desc: 'Personalize your coaching' },
+                    { icon: <Camera size={15} />, label: 'Photo form check', desc: 'Snap a photo for AI feedback' },
+                    { icon: <Video size={15} />, label: 'Live form check', desc: 'Real-time pose detection' },
+                  ].map(({ icon, label, desc }) => (
+                    <div key={label} className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded-lg bg-star-card border border-star-border flex items-center justify-center flex-shrink-0 text-star-grey">
+                        {icon}
+                      </div>
+                      <div>
+                        <p className="text-white text-xs font-semibold">{label}</p>
+                        <p className="text-star-grey text-xs">{desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </motion.div>
 
             <motion.div
