@@ -297,23 +297,25 @@ export default function About() {
                     >
                       <Globe size={50} className="text-green-400 opacity-80" />
                     </motion.div>
-                    <p className="text-green-400 font-bold mt-4">Eco-Certified Materials</p>
+                    <p className="text-green-400 font-bold mt-4">Thoughtfully Made</p>
                   </div>
                 </div>
               </motion.div>
               <motion.div {...fadeRight}>
-                <span className="inline-block text-green-400 text-sm font-semibold tracking-widest uppercase mb-4">03 — Sustainability</span>
+                <span className="inline-block text-green-400 text-sm font-semibold tracking-widest uppercase mb-4">03 — Materials</span>
                 <h3 className="text-3xl md:text-4xl font-black mb-5">
                   High Performance.
-                  <span className="text-green-400 block">Low Impact.</span>
+                  <span className="text-green-400 block">Thoughtfully Built.</span>
                 </h3>
                 <p className="text-star-grey text-lg leading-relaxed mb-5">
-                  The Star Mat is made from closed-cell TPE foam — the same material used in medical
-                  devices. No latex, no PVC, no toxic plasticizers. Safe for your skin, safe for the planet.
+                  The Star Mat is made from closed-cell TPE foam — no latex, no PVC, no harsh
+                  plasticizers. It's a cleaner material choice that's better for your skin and easier
+                  on the environment.
                 </p>
                 <p className="text-star-grey leading-relaxed">
-                  Every mat is produced in a certified-green facility. We offset 100% of our shipping
-                  carbon and plant one tree for every mat sold. Over 250,000 trees planted.
+                  We take material quality seriously at every step — from the surface weave to the
+                  foam core. The goal is a mat that performs at the highest level and lasts for years,
+                  not seasons.
                 </p>
               </motion.div>
             </div>
@@ -344,6 +346,62 @@ export default function About() {
                 </div>
                 <h3 className="text-white font-bold text-xl mb-3">{v.title}</h3>
                 <p className="text-star-grey leading-relaxed">{v.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section className="section-padding py-24 border-t border-star-border">
+        <div className="max-w-7xl mx-auto">
+          <motion.div {...fadeUp()} className="text-center mb-14">
+            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">From Athletes</p>
+            <h2 className="text-4xl font-black">What They're Saying</h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "I've tried every training tool out there. The Star Mat is the only one that actually changed how I move on the field. My lateral quickness improved noticeably within two weeks.",
+                name: 'Darius T.',
+                role: 'College Football, Wide Receiver',
+                initials: 'DT',
+                color: '#007AFF',
+              },
+              {
+                quote: "As a golf instructor, I've seen a lot of training aids. The Star Mat is the real deal for hip rotation and weight transfer. My students who use it see results faster than anything else I've tried.",
+                name: 'Lisa M.',
+                role: 'Golf Instructor, 12 Years',
+                initials: 'LM',
+                color: '#30D158',
+              },
+              {
+                quote: "I train MMA three times a week and I use the Star Mat every session for footwork. The compass markers make it easy to drill specific patterns. It's become a non-negotiable part of my prep.",
+                name: 'Jalen R.',
+                role: 'Amateur MMA Fighter',
+                initials: 'JR',
+                color: '#FF375F',
+              },
+            ].map((t, i) => (
+              <motion.div
+                key={t.name}
+                {...fadeUp(i * 0.12)}
+                className="glass rounded-2xl p-7 border border-star-border flex flex-col gap-5"
+              >
+                <p className="text-star-grey leading-relaxed text-sm flex-1">"{t.quote}"</p>
+                <div className="flex items-center gap-3 border-t border-star-border pt-5">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white flex-shrink-0"
+                    style={{ backgroundColor: `${t.color}40`, border: `1px solid ${t.color}50` }}
+                  >
+                    {t.initials}
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold text-sm">{t.name}</p>
+                    <p className="text-star-grey text-xs">{t.role}</p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>

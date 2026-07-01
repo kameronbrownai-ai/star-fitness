@@ -414,6 +414,76 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── WHO'S USING THE STAR MAT ── */}
+      <section className="section-padding py-24 border-t border-star-border">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-14"
+          >
+            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">Athletes</p>
+            <h2 className="text-4xl font-black">Who's Using The Star Mat</h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              {
+                sport: 'Football',
+                role: 'Speed & Explosiveness',
+                desc: 'Lateral cuts, first-step quickness, and direction changes that transfer directly from the mat to the field.',
+                accent: '#007AFF',
+                emoji: '🏈',
+              },
+              {
+                sport: 'Basketball',
+                role: 'Court Footwork & Agility',
+                desc: 'Multi-directional speed, defensive slides, and lateral quickness built for every possession.',
+                accent: '#FF9500',
+                emoji: '🏀',
+              },
+              {
+                sport: 'Golf',
+                role: 'Rotation & Balance',
+                desc: 'Hip rotation drills, balance at address, and rotational power training to add yards and control to every shot.',
+                accent: '#30D158',
+                emoji: '⛳',
+              },
+              {
+                sport: 'MMA & Combat',
+                role: 'Stance & Conditioning',
+                desc: 'Footwork patterns, explosive pivots, and full-body conditioning built for the demands of the ring.',
+                accent: '#FF375F',
+                emoji: '🥊',
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={card.sport}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.55 }}
+                className="rounded-2xl border border-star-border bg-star-card/40 p-6 flex flex-col gap-4"
+              >
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                  style={{ backgroundColor: `${card.accent}15`, border: `1px solid ${card.accent}30` }}
+                >
+                  {card.emoji}
+                </div>
+                <div>
+                  <p className="text-white font-black text-lg leading-tight">{card.sport}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider mt-0.5" style={{ color: card.accent }}>{card.role}</p>
+                </div>
+                <p className="text-star-grey text-sm leading-relaxed flex-1">{card.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── QUICK TESTIMONIAL ── */}
       <section className="section-padding py-20 border-t border-star-border">
         <div className="max-w-4xl mx-auto text-center">

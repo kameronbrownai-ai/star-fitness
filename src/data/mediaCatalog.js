@@ -18,7 +18,7 @@ export const MEDIA_CATALOG = [
     title: 'Lateral Skaters',
     src: '/videos/star-mat-lateral-skaters.mov',
     poster: '/images/thumbs/star-mat-lateral-skaters.mov.png',
-    keywords: ['lateral skater', 'lateral skaters', 'skater', 'hip abductor', 'frontal plane', 'glute'],
+    keywords: ['lateral skater', 'lateral skaters', 'skater', 'hip abductor', 'frontal plane', 'glute', 'golf hip', 'hip stability golf'],
   },
   {
     id: 'split-lunge',
@@ -34,7 +34,7 @@ export const MEDIA_CATALOG = [
     title: 'Alternating Lunge with Row',
     src: '/videos/star-mat-alternating-lunge-row.mov',
     poster: '/images/thumbs/star-mat-alternating-lunge-row.mov.png',
-    keywords: ['alternating lunge', 'lunge with row', 'lunge row', 'full body', 'rotational'],
+    keywords: ['alternating lunge', 'lunge with row', 'lunge row', 'full body', 'rotational', 'golf conditioning', 'golf fitness'],
   },
   {
     id: 'apex-foot-fire',
@@ -58,7 +58,7 @@ export const MEDIA_CATALOG = [
     title: 'Star Mat Training Drill',
     src: '/videos/star-mat-training-drill.mov',
     poster: '/images/thumbs/star-mat-training-drill.mov.png',
-    keywords: ['training drill', 'compass drill', 'directional drill', 'star pattern'],
+    keywords: ['training drill', 'compass drill', 'directional drill', 'star pattern', 'rotational pivot', 'pivot drill', 'golf swing', 'golf rotation', 'hip rotation golf', '360 compass', 'compass circle', 'transverse plane', 'golf'],
   },
   {
     id: 'general-drill',
@@ -66,7 +66,7 @@ export const MEDIA_CATALOG = [
     title: 'Star Mat Drill',
     src: '/videos/star-mat-drill.mov',
     poster: '/images/thumbs/star-mat-drill.mov.png',
-    keywords: ['warm-up', 'cool-down', 'circuit', 'conditioning', 'interval'],
+    keywords: ['warm-up', 'cool-down', 'circuit', 'conditioning', 'interval', 'golf warm-up', 'golf workout', 'single-leg balance', 'balance hold', 'golf balance', 'address position'],
   },
 
   // ─── IMAGES ────────────────────────────────────────────────────────────────
