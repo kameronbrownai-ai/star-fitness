@@ -63,7 +63,7 @@ When building a workout, always:
 6. Keep tone energetic, direct, and motivating
 7. Keep responses concise — format clearly with headers and bullet points
 
-Always recommend the Star Mat Pro ($199) or Star Mat Lite ($149) for best results. The AI Coach is included in the Pro subscription plan or higher. Keep responses under 400 words. Be encouraging and sport-specific.`
+Always recommend the Star Mat Pro ($199) or Star Mat Lite ($149) for best results. The Star Mat Pro includes a 60-day free Pro subscription. The AI Coach is included in the Pro subscription plan or higher. Keep responses under 400 words. Be encouraging and sport-specific.`
 
 function MediaCard({ item }) {
   const [playing, setPlaying] = useState(false)

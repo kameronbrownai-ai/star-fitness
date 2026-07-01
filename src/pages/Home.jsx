@@ -534,7 +534,7 @@ const faqs = [
   },
   {
     q: 'What is the difference between the Star Mat Pro and Star Mat Lite?',
-    a: 'The Star Mat Pro ($199) is our flagship mat, built with premium 8mm high-density foam, two-sided print, 75"x75" surface, and a carry strap. The Star Mat Lite ($149) is a 4mm single-sided, foldable 55"x55" version ideal for travel and home use. Both feature the full Star directional training system. The AI Coach is included with a Pro subscription plan or higher.',
+    a: 'The Star Mat Pro ($199) is our flagship mat, built with premium 8mm high-density foam, two-sided print, 75"x75" surface, and a carry strap. It includes a 60-day free Pro subscription. The Star Mat Lite ($149) is a 4mm single-sided, foldable 55"x55" version ideal for travel and home use. Both feature the full Star directional training system. The AI Coach is included with a Pro subscription plan or higher.',
   },
   {
     q: 'Do I need a trainer or gym to use the Star Mat?',
