@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Loader2, Play, Lock, ChevronRight, Check } from 'lucide-react'
+import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CompassStar from './CompassStar'
 import { findRelevantMedia } from '../data/mediaCatalog'
@@ -9,6 +9,49 @@ import {
   getProfile, saveProfile, getSessionCount, getSessionMsgCount,
   startSession, incrementSessionMsg, getSessionHistory, addSessionNote,
 } from '../data/userProfile'
+
+const FORM_CHECK_ADDITION = `
+
+FORM ANALYSIS MODE:
+The athlete has shared a photo of their exercise form. Analyze what you can see:
+1. Body alignment and posture
+2. Foot/stance positioning (relative to mat markers if visible)
+3. Knee tracking and joint angles
+4. Spine and head position
+5. Weight distribution and balance
+
+Format your response:
+- Start with one specific thing they're doing well
+- Give 2-3 clear, actionable corrections
+- End with a motivating note
+
+Keep it under 200 words. Be specific — reference actual body parts and positions.
+Note: This is visual feedback based on a still photo, not a medical assessment.`
+
+async function processPhoto(file) {
+  return new Promise(resolve => {
+    const img = new Image()
+    const objectUrl = URL.createObjectURL(file)
+    img.onload = () => {
+      const MAX = 1024
+      const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * ratio)
+      canvas.height = Math.round(img.height * ratio)
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+      URL.revokeObjectURL(objectUrl)
+      canvas.toBlob(blob => {
+        const reader = new FileReader()
+        reader.onload = e => {
+          const dataUrl = e.target.result
+          resolve({ url: dataUrl, base64: dataUrl.split(',')[1], mime: 'image/jpeg' })
+        }
+        reader.readAsDataURL(blob)
+      }, 'image/jpeg', 0.85)
+    }
+    img.src = objectUrl
+  })
+}
 
 const FREE_SESSIONS = 2
 const MSGS_PER_SESSION = 15
@@ -219,8 +262,11 @@ export default function AIWorkoutChat({ inline = false }) {
   const [error, setError] = useState(null)
   const [sessionMsgs, setSessionMsgs] = useState(0)
 
+  const [pendingPhoto, setPendingPhoto] = useState(null)
+
   const messagesRef = useRef(null)
   const inputRef = useRef(null)
+  const fileInputRef = useRef(null)
   const sessionStarted = useRef(false)
   const sessionMsgsRef = useRef(0)
 
@@ -271,6 +317,15 @@ export default function AIWorkoutChat({ inline = false }) {
     setPhase('chat')
   }
 
+  async function handlePhotoSelect(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const processed = await processPhoto(file)
+    setPendingPhoto(processed)
+    e.target.value = ''
+    inputRef.current?.focus()
+  }
+
   function handleNewSession() {
     sessionStarted.current = false
     sessionMsgsRef.current = 0
@@ -283,7 +338,7 @@ export default function AIWorkoutChat({ inline = false }) {
 
   async function sendMessage(text) {
     const userText = text || input.trim()
-    if (!userText || loading) return
+    if ((!userText && !pendingPhoto) || loading) return
 
     // Start session on first message
     if (!sessionStarted.current) {
@@ -301,24 +356,44 @@ export default function AIWorkoutChat({ inline = false }) {
     const msgCount = incrementSessionMsg()
     setSessionMsgs(msgCount)
 
+    const photo = pendingPhoto
     setInput('')
+    setPendingPhoto(null)
     setError(null)
 
-    const newMessages = [...messages, { role: 'user', content: userText }]
+    const userMsg = {
+      role: 'user',
+      content: userText || (photo ? 'Check my form on this exercise.' : ''),
+      ...(photo ? { imageUrl: photo.url, imageBase64: photo.base64, imageMime: photo.mime } : {}),
+    }
+    const newMessages = [...messages, userMsg]
     setMessages(newMessages)
     setLoading(true)
 
     try {
       const profile = getProfile()
       const history = getSessionHistory()
-      const systemPrompt = buildSystemPrompt(profile, history)
+      const hasVision = newMessages.some(m => m.imageBase64)
+      const systemPrompt = buildSystemPrompt(profile, history) + (hasVision ? FORM_CHECK_ADDITION : '')
 
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: newMessages.map(m => {
+            if (m.imageBase64) {
+              return {
+                role: m.role,
+                content: [
+                  { type: 'image', source: { type: 'base64', media_type: m.imageMime, data: m.imageBase64 } },
+                  { type: 'text', text: m.content },
+                ],
+              }
+            }
+            return { role: m.role, content: m.content }
+          }),
           system: systemPrompt,
+          hasVision,
         }),
       })
 
@@ -429,7 +504,14 @@ export default function AIWorkoutChat({ inline = false }) {
                       : 'w-full bg-star-card border border-star-border rounded-tl-sm'
                   }`}>
                     {msg.role === 'user'
-                      ? <p className="text-sm break-words">{msg.content}</p>
+                      ? (
+                        <div className="flex flex-col gap-1.5">
+                          {msg.imageUrl && (
+                            <img src={msg.imageUrl} alt="Form check" className="rounded-xl max-h-52 w-full object-cover" />
+                          )}
+                          {msg.content && <p className="text-sm break-words">{msg.content}</p>}
+                        </div>
+                      )
                       : (
                         <>
                           <div className="min-w-0">{formatMessage(msg.content)}</div>
@@ -485,6 +567,23 @@ export default function AIWorkoutChat({ inline = false }) {
                 <span className="text-star-yellow font-semibold">{msgsRemaining} message{msgsRemaining !== 1 ? 's' : ''}</span> remaining in this session
               </p>
             )}
+
+            {/* Photo preview */}
+            {pendingPhoto && (
+              <div className="flex items-center gap-2 mb-2">
+                <div className="relative flex-shrink-0">
+                  <img src={pendingPhoto.url} alt="Form check" className="w-12 h-12 rounded-lg object-cover border border-star-border" />
+                  <button
+                    onClick={() => setPendingPhoto(null)}
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-star-card border border-star-border flex items-center justify-center"
+                  >
+                    <X size={9} className="text-star-grey" />
+                  </button>
+                </div>
+                <p className="text-star-grey text-xs">Form check ready — add a note or just send.</p>
+              </div>
+            )}
+
             <div className="flex gap-2 items-center min-w-0">
               <input
                 ref={inputRef}
@@ -492,14 +591,37 @@ export default function AIWorkoutChat({ inline = false }) {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                placeholder="Ask about a goal, sport, or body area…"
+                placeholder={pendingPhoto ? 'Add a note (optional)…' : 'Ask about a goal, sport, or body area…'}
                 className="flex-1 min-w-0 bg-star-black border border-star-border rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none focus:border-star-blue/50 transition-colors"
+              />
+
+              {/* Camera button */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePhotoSelect}
+                className="hidden"
               />
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => fileInputRef.current?.click()}
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 transition-colors ${
+                  pendingPhoto
+                    ? 'border-star-blue bg-star-blue/20'
+                    : 'border-star-border bg-star-black hover:border-star-blue/50'
+                }`}
+              >
+                <Camera size={16} className={pendingPhoto ? 'text-star-blue' : 'text-star-grey'} />
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => sendMessage()}
-                disabled={!input.trim() || loading}
+                disabled={(!input.trim() && !pendingPhoto) || loading}
                 className="w-10 h-10 rounded-xl bg-star-blue flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
               >
                 {loading ? <Loader2 size={16} className="text-white animate-spin" /> : <Send size={16} className="text-white" />}

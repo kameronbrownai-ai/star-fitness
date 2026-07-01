@@ -7,18 +7,21 @@ const PORT = process.env.PORT || 3001
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }))
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 
 app.post('/chat', async (req, res) => {
   try {
-    const { messages, system } = req.body
+    const { messages, system, hasVision } = req.body
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'messages array required' })
     }
 
+    const model = hasVision ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+    const max_tokens = hasVision ? 1024 : 800
+
     const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 800,
+      model,
+      max_tokens,
       system: system || '',
       messages: messages.filter(m => m.role !== 'system'),
     })
