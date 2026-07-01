@@ -567,7 +567,15 @@ export default function AIWorkoutChat({ inline = false }) {
           {/* Starter prompts */}
           {messages.length === 1 && !loading && (
             <div className="px-4 py-2 border-t border-star-border bg-star-black flex gap-2 overflow-x-auto scrollbar-hide">
-              {STARTER_PROMPTS.slice(0, 3).map(p => (
+              {!profile && (
+                <button
+                  onClick={() => setPhase('onboarding')}
+                  className="flex-shrink-0 text-xs px-3 py-1.5 rounded-full border border-star-yellow/40 text-star-yellow hover:border-star-yellow hover:bg-star-yellow/10 transition-all whitespace-nowrap"
+                >
+                  Set up my profile
+                </button>
+              )}
+              {STARTER_PROMPTS.slice(0, profile ? 3 : 2).map(p => (
                 <button
                   key={p}
                   onClick={() => sendMessage(p)}
