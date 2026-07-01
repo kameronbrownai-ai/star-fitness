@@ -71,7 +71,7 @@ function MultiSelect({ options, selected, onToggle }) {
   )
 }
 
-export default function AIOnboarding({ onComplete, onSkip }) {
+export default function AIOnboarding({ onComplete, onSkip, onExit }) {
   const [step, setStep] = useState(0)
   const [profile, setProfile] = useState({
     sport: '', position: '', level: '', goal: '', injuries: '', equipment: [], metrics: {}
@@ -119,7 +119,14 @@ export default function AIOnboarding({ onComplete, onSkip }) {
       <div className="px-4 pt-3 pb-2 flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
           <p className="text-star-grey text-xs">Step {step + 1} of {TOTAL_STEPS}</p>
-          <p className="text-star-yellow text-xs font-semibold">Building your profile</p>
+          <div className="flex items-center gap-3">
+            <p className="text-star-yellow text-xs font-semibold">Building your profile</p>
+            {onExit && (
+              <button onClick={onExit} className="text-star-grey hover:text-white transition-colors text-xs underline underline-offset-2">
+                Exit
+              </button>
+            )}
+          </div>
         </div>
         <div className="h-1 w-full bg-star-card rounded-full overflow-hidden">
           <motion.div

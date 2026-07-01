@@ -493,7 +493,7 @@ export default function AIWorkoutChat({ inline = false }) {
 
       {phase === 'onboarding' && (
         <div className={`bg-star-black ${inline ? 'h-[28rem]' : 'h-[26rem]'}`}>
-          <AIOnboarding onComplete={handleOnboardingComplete} onSkip={handleSkipOnboarding} />
+          <AIOnboarding onComplete={handleOnboardingComplete} onSkip={handleSkipOnboarding} onExit={handleSkipOnboarding} />
         </div>
       )}
 
