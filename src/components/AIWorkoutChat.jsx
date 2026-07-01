@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera } from 'lucide-react'
+import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera, Video } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CompassStar from './CompassStar'
 import { findRelevantMedia } from '../data/mediaCatalog'
 import AIOnboarding from './AIOnboarding'
+import PoseCamera from './PoseCamera'
 import {
   getProfile, saveProfile, getSessionCount, getSessionMsgCount,
   startSession, incrementSessionMsg, getSessionHistory, addSessionNote,
@@ -263,6 +264,7 @@ export default function AIWorkoutChat({ inline = false }) {
   const [sessionMsgs, setSessionMsgs] = useState(0)
 
   const [pendingPhoto, setPendingPhoto] = useState(null)
+  const [showPoseCamera, setShowPoseCamera] = useState(false)
 
   const messagesRef = useRef(null)
   const inputRef = useRef(null)
@@ -317,6 +319,11 @@ export default function AIWorkoutChat({ inline = false }) {
     setPhase('chat')
   }
 
+  function handlePoseAnalyze({ imageUrl, imageBase64, imageMime, text }) {
+    setShowPoseCamera(false)
+    sendMessage(text, { url: imageUrl, base64: imageBase64, mime: imageMime })
+  }
+
   async function handlePhotoSelect(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -336,9 +343,10 @@ export default function AIWorkoutChat({ inline = false }) {
     setPhase('chat')
   }
 
-  async function sendMessage(text) {
+  async function sendMessage(text, photoOverride = null) {
     const userText = text || input.trim()
-    if ((!userText && !pendingPhoto) || loading) return
+    const photo = photoOverride || pendingPhoto
+    if ((!userText && !photo) || loading) return
 
     // Start session on first message
     if (!sessionStarted.current) {
@@ -356,9 +364,8 @@ export default function AIWorkoutChat({ inline = false }) {
     const msgCount = incrementSessionMsg()
     setSessionMsgs(msgCount)
 
-    const photo = pendingPhoto
     setInput('')
-    setPendingPhoto(null)
+    if (!photoOverride) setPendingPhoto(null)
     setError(null)
 
     const userMsg = {
@@ -595,7 +602,7 @@ export default function AIWorkoutChat({ inline = false }) {
                 className="flex-1 min-w-0 bg-star-black border border-star-border rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none focus:border-star-blue/50 transition-colors"
               />
 
-              {/* Camera button */}
+              {/* Photo form check */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -608,6 +615,7 @@ export default function AIWorkoutChat({ inline = false }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => fileInputRef.current?.click()}
+                title="Photo form check"
                 className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 transition-colors ${
                   pendingPhoto
                     ? 'border-star-blue bg-star-blue/20'
@@ -615,6 +623,17 @@ export default function AIWorkoutChat({ inline = false }) {
                 }`}
               >
                 <Camera size={16} className={pendingPhoto ? 'text-star-blue' : 'text-star-grey'} />
+              </motion.button>
+
+              {/* Live pose detection */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowPoseCamera(true)}
+                title="Live form check"
+                className="w-10 h-10 rounded-xl border border-star-border bg-star-black hover:border-star-yellow/50 flex items-center justify-center flex-shrink-0 transition-colors"
+              >
+                <Video size={16} className="text-star-grey" />
               </motion.button>
 
               <motion.button
@@ -635,14 +654,26 @@ export default function AIWorkoutChat({ inline = false }) {
 
   if (inline) {
     return (
-      <div className="w-full rounded-2xl border border-star-border overflow-hidden shadow-xl">
-        {chatPanel}
-      </div>
+      <>
+        <div className="w-full rounded-2xl border border-star-border overflow-hidden shadow-xl">
+          {chatPanel}
+        </div>
+        <AnimatePresence>
+          {showPoseCamera && (
+            <PoseCamera onAnalyze={handlePoseAnalyze} onClose={() => setShowPoseCamera(false)} />
+          )}
+        </AnimatePresence>
+      </>
     )
   }
 
   return (
     <>
+      <AnimatePresence>
+        {showPoseCamera && (
+          <PoseCamera onAnalyze={handlePoseAnalyze} onClose={() => setShowPoseCamera(false)} />
+        )}
+      </AnimatePresence>
       <motion.button
         onClick={() => setOpen(true)}
         className={`fixed bottom-5 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl transition-all ${open ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
