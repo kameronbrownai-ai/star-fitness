@@ -267,7 +267,7 @@ export default function Home() {
                   transition={{ duration: 3, repeat: Infinity }}
                   className="absolute -bottom-4 -right-4 glass rounded-2xl p-4 border border-star-yellow/20"
                 >
-                  <p className="text-star-yellow font-black text-2xl">$149</p>
+                  <p className="text-star-yellow font-black text-2xl">$199</p>
                   <p className="text-star-grey text-xs">Free Shipping</p>
                 </motion.div>
               </div>
@@ -534,7 +534,7 @@ const faqs = [
   },
   {
     q: 'What is the difference between the Star Mat Pro and Star Mat Lite?',
-    a: 'The Star Mat Pro ($149) is our flagship mat, built with premium 8mm high-density foam, a non-slip micro-suede surface, and full compass directional printing. The Star Mat Lite is a lighter weight version ideal for travel and home use. Both feature the full Star directional training system.',
+    a: 'The Star Mat Pro ($199) is our flagship mat, built with premium 8mm high-density foam, two-sided print, peg-hole anchoring, and a carry strap. The Star Mat Lite ($149) is a single-sided, foldable version ideal for travel and home use. Both feature the full Star directional training system.',
   },
   {
     q: 'Do I need a trainer or gym to use the Star Mat?',
