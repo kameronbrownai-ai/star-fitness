@@ -493,26 +493,7 @@ export default function Home() {
               </ul>
 
               {/* Chat icon key */}
-              <div className="border-t border-star-border pt-5">
-                <p className="text-star-grey text-xs font-semibold uppercase tracking-wider mb-3">Chat Icons</p>
-                <div className="space-y-2.5">
-                  {[
-                    { icon: <UserCircle size={15} />, label: 'Set up my profile', desc: 'Personalize your coaching' },
-                    { icon: <Camera size={15} />, label: 'Photo form check', desc: 'Snap a photo for AI feedback' },
-                    { icon: <Video size={15} />, label: 'Live form check', desc: 'Real-time pose detection' },
-                  ].map(({ icon, label, desc }) => (
-                    <div key={label} className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-lg bg-star-card border border-star-border flex items-center justify-center flex-shrink-0 text-star-grey">
-                        {icon}
-                      </div>
-                      <div>
-                        <p className="text-white text-xs font-semibold">{label}</p>
-                        <p className="text-star-grey text-xs">{desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <ChatIconsKey />
             </motion.div>
 
             <motion.div
@@ -534,6 +515,91 @@ export default function Home() {
       {/* Floating AI Chat widget */}
       <AIWorkoutChat />
     </main>
+  )
+}
+
+const CHAT_ICONS = [
+  {
+    icon: <UserCircle size={16} />,
+    label: 'Set up my profile',
+    desc: 'Personalize your coaching',
+    detail: 'Answer a few quick questions about your sport, position, fitness level, and training goals. Your AI Coach uses this profile to build workouts tailored specifically to you — not generic routines. You can update it at any time by tapping the "Set up profile" button in the top-right corner of the chat.',
+    iconClass: 'text-star-blue',
+    bgClass: 'bg-star-blue/10 border-star-blue/20',
+  },
+  {
+    icon: <Camera size={16} />,
+    label: 'Photo form check',
+    desc: 'Snap a photo for AI feedback',
+    detail: 'Tap the + button in the chat input bar and choose "Photo form check." Take a photo mid-exercise and the AI Coach will analyze your body positioning, alignment, and joint angles. You\'ll get specific corrections — what to fix and what you\'re doing right — in seconds. No personal trainer required.',
+    iconClass: 'text-star-grey',
+    bgClass: 'bg-star-card border-star-border',
+  },
+  {
+    icon: <Video size={16} />,
+    label: 'Live form check',
+    desc: 'Real-time pose detection',
+    detail: 'Tap the + button and choose "Live form check" to open your camera. The AI Coach tracks your skeleton in real time and displays your joint angles and body positioning live on screen. When you\'re ready, tap Analyze — it sends a snapshot with your movement data to the coach for personalized feedback.',
+    iconClass: 'text-star-yellow',
+    bgClass: 'bg-star-yellow/10 border-star-yellow/20',
+  },
+]
+
+function ChatIconsKey() {
+  const [activeIcon, setActiveIcon] = useState(null)
+  const [hoveredIcon, setHoveredIcon] = useState(null)
+
+  return (
+    <div className="border-t border-star-border pt-5">
+      <p className="text-star-grey text-xs font-semibold uppercase tracking-wider mb-2">Chat Icons</p>
+      <div className="space-y-1">
+        {CHAT_ICONS.map(({ icon, label, desc, detail, iconClass, bgClass }) => {
+          const isExpanded = activeIcon === label || hoveredIcon === label
+          return (
+            <div key={label}>
+              <button
+                onClick={() => setActiveIcon(a => a === label ? null : label)}
+                onMouseEnter={() => setHoveredIcon(label)}
+                onMouseLeave={() => setHoveredIcon(null)}
+                className={`w-full flex items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-all ${
+                  isExpanded ? 'bg-star-card/70' : 'hover:bg-star-card/40'
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-lg border flex items-center justify-center flex-shrink-0 ${iconClass} ${bgClass}`}>
+                  {icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-xs font-semibold">{label}</p>
+                  <p className="text-star-grey text-xs">{desc}</p>
+                </div>
+                <motion.div
+                  animate={{ rotate: isExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex-shrink-0"
+                >
+                  <ChevronDown size={13} className="text-star-grey/50" />
+                </motion.div>
+              </button>
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.22 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="text-star-grey text-xs leading-relaxed px-3 pt-1 pb-2.5 ml-10 border-l border-star-border/40">
+                      {detail}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
