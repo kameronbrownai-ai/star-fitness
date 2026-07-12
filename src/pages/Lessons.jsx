@@ -114,6 +114,42 @@ const sports = [
     ],
   },
   {
+    id: 'golf',
+    name: 'Golf',
+    emoji: '⛳',
+    color: '#34C759',
+    desc: 'Rotation, balance, and hip power',
+    train: [
+      { id: 50, title: 'Full Swing Rotation', targets: ['Hips', 'Core', 'Obliques'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Hip-to-shoulder rotation mechanics on the Star Mat grid — lock in the kinetic chain that generates clubhead speed.' },
+      { id: 51, title: 'Hip Hinge & Posture', targets: ['Hips', 'Glutes', 'Lower Back'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Build the athletic address position. Hip hinge mechanics and lumbar stability for consistent ball striking.' },
+      { id: 52, title: 'Balance & Weight Transfer', targets: ['Ankles', 'Knees', 'Core'], instructor: 'Sarah Chen', duration: '35 min', free: false, desc: 'Single-leg balance and dynamic weight shift drills on the Star Mat for a stable, powerful move through impact.' },
+      { id: 53, title: 'Shoulder Turn & Mobility', targets: ['Shoulders', 'Upper Back', 'Thoracic Spine'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Thoracic rotation and shoulder mobility work to maximize backswing depth without compensating in the lower back.' },
+    ],
+    recover: [
+      { id: 54, title: 'Lower Back Relief', injury: 'Lower Back Strain', targets: ['Lower Back', 'Core', 'Hips'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'The most common golf injury. Spinal decompression, hip flexor release, and lumbar stability for pain-free play.' },
+      { id: 55, title: 'Golfer\'s Elbow Recovery', injury: 'Medial Epicondylitis', targets: ['Elbow', 'Forearm', 'Wrist'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Eccentric forearm work and soft-tissue release for medial elbow pain caused by impact and grip stress.' },
+      { id: 56, title: 'Wrist & Grip Rehab', injury: 'Wrist Tendinitis', targets: ['Wrists', 'Hands', 'Forearms'], instructor: 'Sarah Chen', duration: '15 min', free: false, desc: 'Targeted wrist flexor/extensor work and nerve glides to restore pain-free grip and clubface control.' },
+    ],
+  },
+  {
+    id: 'hockey',
+    name: 'Hockey',
+    emoji: '🏒',
+    color: '#64D2FF',
+    desc: 'Edge work, power, and endurance',
+    train: [
+      { id: 57, title: 'Explosive Lateral Power', targets: ['Legs', 'Glutes', 'Groin'], instructor: 'Marcus Johnson', duration: '45 min', free: true, desc: 'Lateral push mechanics and single-leg power work on the Star Mat to simulate the skating stride and explosive edge push.' },
+      { id: 58, title: 'Hip & Groin Strength', targets: ['Groin', 'Hip Flexors', 'Glutes'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Adductor and hip flexor strength — the foundation of a powerful skating stride and injury prevention.' },
+      { id: 59, title: 'Core Stability on Ice', targets: ['Core', 'Obliques', 'Lower Back'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Anti-rotation core work for body contact, puck battles, and maintaining a strong, balanced skating position.' },
+      { id: 60, title: 'Upper Body & Shot Power', targets: ['Shoulders', 'Arms', 'Core'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Wrist shot and slap shot power starts with upper body strength and rotational transfer — build both here.' },
+    ],
+    recover: [
+      { id: 61, title: 'Groin Strain Protocol', injury: 'Groin Strain', targets: ['Groin', 'Hip Flexors', 'Inner Thigh'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'The most common hockey injury. Progressive adductor loading and hip mobility to safely return to skating.' },
+      { id: 62, title: 'Knee Sprain Recovery', injury: 'MCL Sprain', targets: ['Knee', 'Quads', 'Hamstrings'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Medial knee stability work for the lateral stress of edge work, board battles, and directional changes.' },
+      { id: 63, title: 'Shoulder Separation Rehab', injury: 'AC Joint Separation', targets: ['Shoulder', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Progressive shoulder stabilization after an AC joint separation from board or ice contact.' },
+    ],
+  },
+  {
     id: 'mma',
     name: 'MMA / Combat',
     emoji: '🥊',

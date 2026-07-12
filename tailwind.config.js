@@ -4,14 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        'star-black': '#0A0A0A',
+        'star-black': '#121212',
         'star-blue': '#007AFF',
         'star-yellow': '#FFD700',
+        'star-green': '#30D158',
         'star-white': '#FFFFFF',
         'star-grey': '#8E8E93',
-        'star-dark': '#111111',
-        'star-card': '#1A1A1A',
-        'star-border': '#2A2A2A',
+        'star-dark': '#0A0A0A',
+        'star-card': '#1C1C1E',
+        'star-border': '#2C2C2E',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],

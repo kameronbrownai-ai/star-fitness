@@ -28,10 +28,10 @@ const footerLinks = {
     { label: 'Press', to: '/about' },
   ],
   Support: [
-    { label: 'FAQ', to: '/' },
-    { label: 'Shipping', to: '/' },
-    { label: 'Returns', to: '/' },
-    { label: 'Contact', to: '/' },
+    { label: 'FAQ', to: '/faq' },
+    { label: 'Shipping', to: '/faq' },
+    { label: 'Returns', to: '/faq' },
+    { label: 'Contact', to: '/faq' },
   ],
 }
 

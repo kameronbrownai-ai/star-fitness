@@ -1,20 +1,53 @@
 User-agent: *
 Allow: /
 
-# AI crawlers — explicitly allow for AEO
+# ── AI crawler access (GEO / AEO) ──────────────────────────────────────────
+# OpenAI / ChatGPT
 User-agent: GPTBot
 Allow: /
 
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic / Claude
 User-agent: ClaudeBot
 Allow: /
 
 User-agent: anthropic-ai
 Allow: /
 
+# Perplexity
 User-agent: PerplexityBot
 Allow: /
 
+# Google (Gemini training + AI Overviews)
 User-agent: Googlebot
 Allow: /
 
-Sitemap: https://starfitness.com/sitemap.xml
+User-agent: Google-Extended
+Allow: /
+
+# Meta AI
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Apple (Siri / AI features)
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Microsoft / Bing Copilot
+User-agent: bingbot
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# Common-Crawl (used by many LLM training pipelines)
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://starfitnesssystem.com/sitemap.xml

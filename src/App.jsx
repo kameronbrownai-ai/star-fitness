@@ -13,6 +13,7 @@ import Booking from './pages/Booking'
 import Partners from './pages/Partners'
 import Community from './pages/Community'
 import About from './pages/About'
+import FAQ from './pages/FAQ'
 
 const pageVariants = {
   initial: { opacity: 0 },
@@ -40,6 +41,7 @@ function AnimatedRoutes() {
           <Route path="/partners" element={<Partners />} />
           <Route path="/community" element={<Community />} />
           <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<FAQ />} />
         </Routes>
         <Footer />
       </motion.div>

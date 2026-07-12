@@ -166,14 +166,27 @@ export default function PoseCamera({ onAnalyze, onClose }) {
       if (!isMountedRef.current) return
       const vision = await FilesetResolver.forVisionTasks(WASM_URL)
       if (!isMountedRef.current) return
-      const detector = await PoseLandmarker.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: MODEL_URL, delegate: 'GPU' },
-        runningMode: 'VIDEO',
-        numPoses: 1,
-        minPoseDetectionConfidence: 0.5,
-        minPosePresenceConfidence: 0.5,
-        minTrackingConfidence: 0.5,
-      })
+      let detector
+      try {
+        detector = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: { modelAssetPath: MODEL_URL, delegate: 'GPU' },
+          runningMode: 'VIDEO',
+          numPoses: 1,
+          minPoseDetectionConfidence: 0.5,
+          minPosePresenceConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+        })
+      } catch {
+        // GPU not available — fall back to CPU
+        detector = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: { modelAssetPath: MODEL_URL, delegate: 'CPU' },
+          runningMode: 'VIDEO',
+          numPoses: 1,
+          minPoseDetectionConfidence: 0.4,
+          minPosePresenceConfidence: 0.4,
+          minTrackingConfidence: 0.4,
+        })
+      }
       if (!isMountedRef.current) { detector.close(); return }
       detectorRef.current = detector
       if (isMountedRef.current) setLoadingMsg('Starting camera…')
