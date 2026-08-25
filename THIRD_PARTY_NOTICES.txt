@@ -1,0 +1,38 @@
+STAR FITNESS — THIRD-PARTY OPEN SOURCE NOTICES
+================================================
+
+This product includes third-party open-source software. Attribution and
+license notices are retained below in accordance with each license.
+
+------------------------------------------------------------------------
+Google MediaPipe (Tasks Vision)
+Copyright 2023 The MediaPipe Authors.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+Source: https://github.com/google-ai-edge/mediapipe
+------------------------------------------------------------------------
+React — MIT License — Copyright (c) Meta Platforms, Inc. and affiliates.
+React Router — MIT License — Copyright (c) Remix Software Inc.
+Framer Motion — MIT License — Copyright (c) Framer B.V.
+lucide-react — ISC License — Copyright (c) Lucide Contributors.
+@supabase/supabase-js — MIT License — Copyright (c) Supabase.
+Tailwind CSS — MIT License — Copyright (c) Tailwind Labs, Inc.
+Vite — MIT License — Copyright (c) Yuxi (Evan) You and Vite contributors.
+
+Full MIT/ISC license text:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files, to deal in the Software
+without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the
+Software, subject to the inclusion of the above copyright notice and this
+permission notice. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+------------------------------------------------------------------------
+
+Star Fitness's own source code, content, and branding are proprietary.
+Star Mat, Star Fitness, Star Mat AI Coach, Star Assessment, Star Score, and
+LOAD DECIDE are trademarks of Leroy Collins d/b/a Star Fitness.

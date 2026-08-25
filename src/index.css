@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* Expands a small icon control to a 44px touch target (Apple HIG / WCAG 2.5.8)
+     without changing its layout footprint, so nav spacing stays as designed. */
+  .tap-target {
+    position: relative;
+  }
+  .tap-target::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 44px;
+  }
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -66,6 +83,13 @@
 
   .text-gradient-white {
     background: linear-gradient(135deg, #FFFFFF, #8E8E93);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-purple {
+    background: linear-gradient(135deg, #BF5AF2, #DA8FFF);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Clock, Lock, Activity, Heart } from 'lucide-react'
 import AIWorkoutChat from '../components/AIWorkoutChat'
+import { useAuth } from '../context/AuthContext'
+import FitnessDisclaimer from '../components/FitnessDisclaimer'
 
 const sports = [
   {
@@ -55,7 +58,7 @@ const sports = [
     recover: [
       { id: 19, title: 'Groin Strain Protocol', injury: 'Groin Strain', targets: ['Groin', 'Hip Flexors', 'Inner Thigh'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'Progressive adductor loading and hip mobility to safely return from a groin pull.' },
       { id: 20, title: 'Shin Splint Relief', injury: 'Shin Splints', targets: ['Shins', 'Calves', 'Foot'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Calf stretching, tibial strengthening, and soft-tissue work to eliminate shin splint pain.' },
-      { id: 21, title: 'Hamstring Recovery', injury: 'Hamstring Strain', targets: ['Hamstrings', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'The most common soccer injury — a structured return-to-play hamstring program.' },
+      { id: 21, title: 'Hamstring Recovery', injury: 'Hamstring Strain', targets: ['Hamstrings', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'The most common soccer injury, a structured return-to-play hamstring program.' },
     ],
   },
   {
@@ -67,12 +70,12 @@ const sports = [
     desc: 'Rotation, shoulders, and arms',
     train: [
       { id: 22, title: 'Rotational Power', targets: ['Hips', 'Core', 'Obliques'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Hip-to-shoulder rotation mechanics for pitchers and hitters. Power starts at the ground.' },
-      { id: 23, title: 'Shoulder Stability', targets: ['Shoulders', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '35 min', free: false, desc: 'Pre-season shoulder health program used by pro pitchers to build durability and velocity.' },
+      { id: 23, title: 'Shoulder Stability', targets: ['Shoulders', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '35 min', free: false, desc: 'Pre-season shoulder health program to build durability and velocity.' },
       { id: 24, title: 'Forearm & Grip Strength', targets: ['Forearms', 'Wrists', 'Hands'], instructor: 'Marcus Johnson', duration: '25 min', free: false, desc: 'Grip, wrist stability, and forearm endurance for bat speed and throwing velocity.' },
-      { id: 25, title: 'Explosive Lower Half', targets: ['Legs', 'Glutes', 'Hip Flexors'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Lower-half drive for pitchers — leg power is where velocity is generated.' },
+      { id: 25, title: 'Explosive Lower Half', targets: ['Legs', 'Glutes', 'Hip Flexors'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Lower-half drive for pitchers, leg power is where velocity is generated.' },
     ],
     recover: [
-      { id: 26, title: 'Rotator Cuff Rehab', injury: 'Rotator Cuff Tear', targets: ['Rotator Cuff', 'Shoulders'], instructor: 'Elena Rodriguez', duration: '30 min', free: true, desc: 'The gold-standard shoulder rehab sequence for throwers — external rotation focus.' },
+      { id: 26, title: 'Rotator Cuff Rehab', injury: 'Rotator Cuff Tear', targets: ['Rotator Cuff', 'Shoulders'], instructor: 'Elena Rodriguez', duration: '30 min', free: true, desc: 'The gold-standard shoulder rehab sequence for throwers, external rotation focus.' },
       { id: 27, title: 'Elbow Recovery (UCL)', injury: 'Tommy John / UCL', targets: ['Elbow', 'Forearm', 'Wrist'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Conservative elbow rehab targeting the medial structures stressed in throwing athletes.' },
       { id: 28, title: 'Lower Back Relief', injury: 'Lower Back Strain', targets: ['Lower Back', 'Core', 'Hips'], instructor: 'Sarah Chen', duration: '20 min', free: false, desc: 'Spinal decompression and lumbar stability work for the rotational stress of batting and pitching.' },
     ],
@@ -90,7 +93,7 @@ const sports = [
       { id: 32, title: 'Glute Activation', targets: ['Glutes', 'Hamstrings', 'Hips'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Pre-workout glute firing sequence to maximize power output and protect the lower back.' },
     ],
     recover: [
-      { id: 33, title: 'Hamstring Protocol', injury: 'Hamstring Strain', targets: ['Hamstrings', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'The Nordic and eccentric hamstring program — the most evidence-backed sprint rehab method.' },
+      { id: 33, title: 'Hamstring Protocol', injury: 'Hamstring Strain', targets: ['Hamstrings', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'The Nordic and eccentric hamstring program, the most evidence-backed sprint rehab method.' },
       { id: 34, title: 'Shin Splint Recovery', injury: 'Shin Splints / MTSS', targets: ['Shins', 'Calves', 'Feet'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Load reduction, tissue work, and progressive calf strengthening for medial tibial stress syndrome.' },
       { id: 35, title: 'Stress Fracture Prevention', injury: 'Stress Fractures', targets: ['Feet', 'Shins', 'Hips'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Low-impact strength work targeting the bone stress areas most common in high-volume runners.' },
     ],
@@ -104,8 +107,8 @@ const sports = [
     train: [
       { id: 36, title: 'Shoulder Conditioning', targets: ['Shoulders', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '35 min', free: true, desc: 'Service arm durability and shoulder health for high-volume hitters and servers.' },
       { id: 37, title: 'Lateral Court Agility', targets: ['Legs', 'Ankles', 'Hips'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Split-step and lateral movement patterns on the Star Mat grid for court coverage.' },
-      { id: 38, title: 'Wrist & Forearm Strength', targets: ['Wrists', 'Forearms', 'Grip'], instructor: 'Marcus Johnson', duration: '25 min', free: false, desc: 'Racket control starts at the wrist — strength and stability training for groundstroke power.' },
-      { id: 39, title: 'Core Rotation for Power', targets: ['Core', 'Obliques', 'Hips'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Topspin and serve power generated from trunk rotation — the kinetic chain for tennis.' },
+      { id: 38, title: 'Wrist & Forearm Strength', targets: ['Wrists', 'Forearms', 'Grip'], instructor: 'Marcus Johnson', duration: '25 min', free: false, desc: 'Racket control starts at the wrist, strength and stability training for groundstroke power.' },
+      { id: 39, title: 'Core Rotation for Power', targets: ['Core', 'Obliques', 'Hips'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Topspin and serve power generated from trunk rotation, the kinetic chain for tennis.' },
     ],
     recover: [
       { id: 40, title: 'Tennis Elbow Relief', injury: 'Lateral Epicondylitis', targets: ['Elbow', 'Forearm', 'Wrist'], instructor: 'Sarah Chen', duration: '20 min', free: true, desc: 'Eccentric wrist extension and soft-tissue release for lateral elbow pain.' },
@@ -120,7 +123,7 @@ const sports = [
     color: '#34C759',
     desc: 'Rotation, balance, and hip power',
     train: [
-      { id: 50, title: 'Full Swing Rotation', targets: ['Hips', 'Core', 'Obliques'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Hip-to-shoulder rotation mechanics on the Star Mat grid — lock in the kinetic chain that generates clubhead speed.' },
+      { id: 50, title: 'Full Swing Rotation', targets: ['Hips', 'Core', 'Obliques'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Hip-to-shoulder rotation mechanics on the Star Mat grid, lock in the kinetic chain that generates clubhead speed.' },
       { id: 51, title: 'Hip Hinge & Posture', targets: ['Hips', 'Glutes', 'Lower Back'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Build the athletic address position. Hip hinge mechanics and lumbar stability for consistent ball striking.' },
       { id: 52, title: 'Balance & Weight Transfer', targets: ['Ankles', 'Knees', 'Core'], instructor: 'Sarah Chen', duration: '35 min', free: false, desc: 'Single-leg balance and dynamic weight shift drills on the Star Mat for a stable, powerful move through impact.' },
       { id: 53, title: 'Shoulder Turn & Mobility', targets: ['Shoulders', 'Upper Back', 'Thoracic Spine'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Thoracic rotation and shoulder mobility work to maximize backswing depth without compensating in the lower back.' },
@@ -139,14 +142,50 @@ const sports = [
     desc: 'Edge work, power, and endurance',
     train: [
       { id: 57, title: 'Explosive Lateral Power', targets: ['Legs', 'Glutes', 'Groin'], instructor: 'Marcus Johnson', duration: '45 min', free: true, desc: 'Lateral push mechanics and single-leg power work on the Star Mat to simulate the skating stride and explosive edge push.' },
-      { id: 58, title: 'Hip & Groin Strength', targets: ['Groin', 'Hip Flexors', 'Glutes'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Adductor and hip flexor strength — the foundation of a powerful skating stride and injury prevention.' },
+      { id: 58, title: 'Hip & Groin Strength', targets: ['Groin', 'Hip Flexors', 'Glutes'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Adductor and hip flexor strength, the foundation of a powerful skating stride and lower-body durability.' },
       { id: 59, title: 'Core Stability on Ice', targets: ['Core', 'Obliques', 'Lower Back'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Anti-rotation core work for body contact, puck battles, and maintaining a strong, balanced skating position.' },
-      { id: 60, title: 'Upper Body & Shot Power', targets: ['Shoulders', 'Arms', 'Core'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Wrist shot and slap shot power starts with upper body strength and rotational transfer — build both here.' },
+      { id: 60, title: 'Upper Body & Shot Power', targets: ['Shoulders', 'Arms', 'Core'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Wrist shot and slap shot power starts with upper body strength and rotational transfer, build both here.' },
     ],
     recover: [
       { id: 61, title: 'Groin Strain Protocol', injury: 'Groin Strain', targets: ['Groin', 'Hip Flexors', 'Inner Thigh'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'The most common hockey injury. Progressive adductor loading and hip mobility to safely return to skating.' },
       { id: 62, title: 'Knee Sprain Recovery', injury: 'MCL Sprain', targets: ['Knee', 'Quads', 'Hamstrings'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Medial knee stability work for the lateral stress of edge work, board battles, and directional changes.' },
       { id: 63, title: 'Shoulder Separation Rehab', injury: 'AC Joint Separation', targets: ['Shoulder', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Progressive shoulder stabilization after an AC joint separation from board or ice contact.' },
+    ],
+  },
+  {
+    id: 'lacrosse',
+    name: 'Lacrosse',
+    emoji: '🥍',
+    color: '#FF9F0A',
+    desc: 'Speed, rotation, and stick power',
+    train: [
+      { id: 71, title: 'Rotational Shot Power', targets: ['Hips', 'Core', 'Shoulders'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Hip-to-shoulder rotation mechanics on the Star Mat grid to build shot velocity and dodge power from the ground up.' },
+      { id: 72, title: 'Multi-Directional Speed', targets: ['Legs', 'Glutes', 'Hip Flexors'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Compass-driven cutting and change-of-direction drills to beat defenders and close ground in transition.' },
+      { id: 73, title: 'Core & Stick Control', targets: ['Core', 'Obliques', 'Forearms'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Rotational core stability and grip endurance for cradling, passing, and shooting under pressure.' },
+      { id: 74, title: 'Face-Off Explosiveness', targets: ['Hips', 'Forearms', 'Core'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'First-move power and hand speed for winning possession at the face-off X.' },
+    ],
+    recover: [
+      { id: 75, title: 'Shoulder Impact Recovery', injury: 'Shoulder Contusion', targets: ['Shoulder', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '25 min', free: true, desc: 'Progressive shoulder mobility and strength work after checks and stick contact common in lacrosse.' },
+      { id: 76, title: 'Wrist & Forearm Rehab', injury: 'Wrist Tendinitis', targets: ['Wrists', 'Forearms', 'Hands'], instructor: 'Sarah Chen', duration: '20 min', free: false, desc: 'Targeted forearm and wrist recovery for the repetitive stick motion behind cradling and shooting.' },
+      { id: 77, title: 'Groin & Hip Recovery', injury: 'Groin Strain', targets: ['Groin', 'Hip Flexors', 'Inner Thigh'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Progressive adductor loading and hip mobility to safely return to cutting and dodging.' },
+    ],
+  },
+  {
+    id: 'wellness',
+    name: 'Wellness & Rehab',
+    emoji: '🧘',
+    color: '#BF5AF2',
+    desc: 'Mobility, balance, and recovery',
+    train: [
+      { id: 64, title: 'Everyday Mobility Flow', targets: ['Hips', 'Spine', 'Shoulders'], instructor: 'Sarah Chen', duration: '25 min', free: true, desc: 'Gentle, full-body mobility on the Star Mat grid, improve range of motion and move better in daily life at any age.' },
+      { id: 65, title: 'Balance & Stability', targets: ['Ankles', 'Core', 'Hips'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Directional balance drills that build the stability needed to prevent falls and move with confidence.' },
+      { id: 66, title: 'Core & Posture Reset', targets: ['Core', 'Lower Back', 'Glutes'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Low-impact core activation and postural work to relieve back tension and support upright, pain-free movement.' },
+      { id: 67, title: 'Gentle Strength Builder', targets: ['Legs', 'Glutes', 'Full Body'], instructor: 'Marcus Johnson', duration: '30 min', free: false, desc: 'Controlled, bodyweight strength on the mat, rebuild functional strength safely without heavy loading.' },
+    ],
+    recover: [
+      { id: 68, title: 'Joint-Friendly Recovery', injury: 'General Stiffness', targets: ['Knees', 'Hips', 'Ankles'], instructor: 'Sarah Chen', duration: '20 min', free: true, desc: 'Low-impact, guided movement to ease joint stiffness and restore comfortable range of motion.' },
+      { id: 69, title: 'Post-Injury Mobility', injury: 'Return to Activity', targets: ['Full Body', 'Core', 'Balance'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'A safe, progressive return-to-movement protocol to rebuild confidence and stability after time off.' },
+      { id: 70, title: 'Chronic Back Relief', injury: 'Lower Back Pain', targets: ['Lower Back', 'Core', 'Hips'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Decompression, hip mobility, and core stability to manage and relieve everyday lower back pain.' },
     ],
   },
   {
@@ -160,7 +199,7 @@ const sports = [
       { id: 43, title: 'Full Body Power Circuit', targets: ['Full Body', 'Core', 'Legs'], instructor: 'Marcus Johnson', duration: '50 min', free: true, desc: 'High-intensity mat circuit combining striking power, wrestling strength, and conditioning.' },
       { id: 44, title: 'Core & Clinch Strength', targets: ['Core', 'Obliques', 'Grip'], instructor: 'Marcus Johnson', duration: '40 min', free: false, desc: 'Cage control, clinch work, and anti-rotation core strength for grappling situations.' },
       { id: 45, title: 'Explosive Hip Drive', targets: ['Hips', 'Glutes', 'Core'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Takedown power, striking drive, and guard passing all start at the hips.' },
-      { id: 46, title: 'Neck & Cervical Strength', targets: ['Neck', 'Traps', 'Shoulders'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Often neglected — neck strength for striking defense, wrestling, and submission resistance.' },
+      { id: 46, title: 'Neck & Cervical Strength', targets: ['Neck', 'Traps', 'Shoulders'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Often neglected, neck strength for striking defense, wrestling, and submission resistance.' },
     ],
     recover: [
       { id: 47, title: 'Shoulder Joint Recovery', injury: 'Shoulder Dislocation / Separation', targets: ['Shoulder', 'Rotator Cuff', 'Biceps'], instructor: 'Elena Rodriguez', duration: '30 min', free: true, desc: 'Progressive shoulder stabilization for the most common upper-body injury in combat sports.' },
@@ -187,6 +226,30 @@ export default function Lessons() {
   const [tab, setTab] = useState('train')
   const [playing, setPlaying] = useState(null)
   const [selectedTarget, setSelectedTarget] = useState(null)
+
+  const { user, hasFullLibrary, hasVision, openAuth, trialDaysOffer } = useAuth()
+  const navigate = useNavigate()
+
+  // Hand-picked free classes (one training + one recovery per sport) are open
+  // to everyone. Beyond that: remaining recovery is Elite-only, remaining
+  // training unlocks with Training or above.
+  const isUnlocked = (cls) => {
+    if (cls.free === true) return true
+    if (tab === 'recover') return hasVision
+    return hasFullLibrary
+  }
+
+  function handlePlay(cls) {
+    if (isUnlocked(cls)) {
+      setPlaying(playing === cls.id ? null : cls.id)
+      return
+    }
+    if (!user) {
+      openAuth({ mode: 'signup', reason: `Start your ${trialDaysOffer}-day free trial to unlock every class.` })
+      return
+    }
+    navigate('/pricing')
+  }
 
   const allClasses = tab === 'train' ? selectedSport.train : selectedSport.recover
   const classes = selectedTarget
@@ -337,8 +400,9 @@ export default function Lessons() {
 
           {tab === 'recover' && (
             <div className="mt-5">
+              <FitnessDisclaimer className="mb-4 max-w-2xl" />
               <p className="text-star-grey text-xs uppercase tracking-widest mb-2">
-                Common {selectedSport.name} Injuries: <span className="text-green-400">tap an injury to filter</span>
+                Common {selectedSport.name} Recovery Focus: <span className="text-green-400">tap an area to filter</span>
               </p>
               <div className="flex flex-wrap gap-2">
                 {/* All pill */}
@@ -413,16 +477,23 @@ export default function Lessons() {
                       <img src={selectedSport.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
                     )}
                     <motion.button
-                      onClick={() => setPlaying(playing === cls.id ? null : cls.id)}
+                      onClick={() => handlePlay(cls)}
+                      title={isUnlocked(cls) ? 'Play class' : 'Upgrade to unlock'}
                       className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
                       style={{
-                        backgroundColor: tab === 'recover' ? '#30D15825' : `${selectedSport.color}25`,
-                        border: `2px solid ${tab === 'recover' ? '#30D15860' : `${selectedSport.color}60`}`,
+                        backgroundColor: isUnlocked(cls)
+                          ? (tab === 'recover' ? '#30D15825' : `${selectedSport.color}25`)
+                          : 'rgba(255,255,255,0.06)',
+                        border: `2px solid ${isUnlocked(cls)
+                          ? (tab === 'recover' ? '#30D15860' : `${selectedSport.color}60`)
+                          : 'rgba(255,255,255,0.15)'}`,
                       }}
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      {playing === cls.id ? (
+                      {!isUnlocked(cls) ? (
+                        <Lock size={17} className="text-white/60" />
+                      ) : playing === cls.id ? (
                         <div className="flex gap-1">
                           <div className="w-1 h-4 rounded-full bg-white" />
                           <div className="w-1 h-4 rounded-full bg-white" />
@@ -432,11 +503,20 @@ export default function Lessons() {
                       )}
                     </motion.button>
 
-                    {/* Free badge */}
-                    {cls.free && (
+                    {/* Access badge */}
+                    {cls.free ? (
                       <div className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 rounded-full text-xs font-bold text-black">FREE</div>
-                    )}
-                    {!cls.free && (
+                    ) : tab === 'recover' ? (
+                      hasVision ? (
+                        <div className="absolute top-3 left-3 px-2 py-0.5 bg-star-yellow rounded-full text-xs font-bold text-black">UNLOCKED</div>
+                      ) : (
+                        <div className="absolute top-3 left-3 px-2 py-0.5 bg-star-yellow/20 border border-star-yellow/40 rounded-full text-[10px] font-bold text-star-yellow">ELITE</div>
+                      )
+                    ) : cls.free ? (
+                      <div className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 rounded-full text-xs font-bold text-black">FREE</div>
+                    ) : hasFullLibrary ? (
+                      <div className="absolute top-3 left-3 px-2 py-0.5 bg-star-yellow rounded-full text-xs font-bold text-black">UNLOCKED</div>
+                    ) : (
                       <div className="absolute top-3 left-3 w-7 h-7 rounded-full glass border border-white/10 flex items-center justify-center">
                         <Lock size={11} className="text-star-grey" />
                       </div>
@@ -521,7 +601,7 @@ export default function Lessons() {
               <ul className="space-y-2 text-sm text-star-grey">
                 {[
                   `Custom ${selectedSport.name} drills on the mat`,
-                  'Injury-safe modifications',
+                  'Lower-impact modifications',
                   'Sets, reps, and compass directions',
                   'Recovery workouts included',
                 ].map((item) => (

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera, Video, UserCircle, Plus } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { X, Send, Loader2, Play, Lock, ChevronRight, Check, Camera, Video, UserCircle, Plus, Volume2, VolumeX, Mic, MicOff, Headphones } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import CompassStar from './CompassStar'
 import { findRelevantMedia } from '../data/mediaCatalog'
 import AIOnboarding from './AIOnboarding'
@@ -27,7 +28,7 @@ Format your response:
 - Give 2-3 clear, actionable corrections
 - End with a motivating note
 
-Keep it under 200 words. Be specific — reference actual body parts and positions.
+Keep it under 200 words. Be specific, reference actual body parts and positions.
 Note: This is visual feedback based on a still photo, not a medical assessment.`
 
 async function processPhoto(file) {
@@ -67,19 +68,20 @@ const STARTER_PROMPTS = [
   "Help me get faster for basketball",
 ]
 
-const BASE_SYSTEM_PROMPT = `You are the Star Mat AI Coach — a smart, motivating fitness assistant powered by the Star Mat training system by Star Fitness.
+const BASE_SYSTEM_PROMPT = `You are the Star Mat AI Coach, a smart, motivating fitness assistant powered by the Star Mat training system by Star Fitness.
 
-The Star Mat is a premium directional training mat with compass-style markers (360°, 270°, 180°, 90°, 315°, 225°, 135°, 45°) and a center "LOAD DECIDE" badge. It trains athletes in all planes of motion — sagittal, frontal, and transverse — making it the most complete training tool for sport-specific performance.
+The Star Mat is a premium directional training mat with compass-style markers (360°, 270°, 180°, 90°, 315°, 225°, 135°, 45°) and a center "LOAD DECIDE" badge. It trains athletes in all planes of motion, sagittal, frontal, and transverse, making it the most complete training tool for sport-specific performance.
 
 BRAND PHILOSOPHY:
 - "Every step you take is an impact of improvement"
 - "The most important move you can make is the next move"
-- "There is no other workout that improves your balance, core, speed, strength, and endurance faster or better than training in all planes of motion"
+- "Balance, core, speed, strength, and endurance, trained in every plane of motion"
+- Never claim the Star Mat is better or faster than any other product, brand, or method. Describe what it does; do not rank it against alternatives.
 - "Train without limits. Become a king in your sport."
 
-SPORTS SUPPORTED: Football, Basketball, Soccer, Baseball/Softball, Track & Field, Tennis, MMA/Combat Sports, Golf
+SPORTS SUPPORTED: Football, Basketball, Soccer, Baseball/Softball, Track & Field, Tennis, MMA/Combat Sports, Golf, Hockey, Lacrosse
 
-STAR MAT EXERCISES — these have video demonstrations available, use them by exact name when prescribing workouts:
+STAR MAT EXERCISES, these have video demonstrations available, use them by exact name when prescribing workouts:
 - Side Lunge (lateral plane, glutes, quads, hip stability)
 - Split Lunge (sagittal plane, quads, glutes, hip flexors)
 - Apex Foot Fire (multi-directional, speed, foot coordination, agility)
@@ -116,9 +118,9 @@ When building a workout, always:
 4. End with a cool-down or stretch
 5. Reference specific mat compass markers (e.g., "step your right foot to the 90° arrow")
 6. Keep tone energetic, direct, and motivating
-7. Keep responses concise — format clearly with headers and bullet points
+7. Keep responses concise, format clearly with headers and bullet points
 
-Always recommend the Star Mat Pro ($199) or Star Mat Lite ($149) for best results. The Star Mat Pro includes a 60-day free Pro subscription. The AI Coach is included in the Pro subscription plan or higher. Keep responses under 400 words. Be encouraging and sport-specific.`
+Always recommend the Star Mat Pro ($249) or Star Mat Lite ($199) for best results. Either mat automatically starts a free trial account. The AI Coach is included in the Pro subscription plan or higher. Keep responses under 400 words. Be encouraging and sport-specific.`
 
 function buildSystemPrompt(profile, history) {
   if (!profile) return BASE_SYSTEM_PROMPT
@@ -147,8 +149,8 @@ ${historyLines.length ? `\nPRIOR SESSION NOTES (build progressively on these):\n
 PERSONALIZATION RULES:
 - This athlete trains ${profile.sport}${profile.position ? ` as a ${profile.position}` : ''}. Every workout must be sport-specific.
 - Their primary goal is ${profile.goal}. Prioritize this in all programming.
-- Fitness level is ${profile.level} — calibrate intensity and complexity accordingly.
-${profile.injuries ? `- They have reported: ${profile.injuries}. Always offer injury-safe modifications.` : ''}
+- Fitness level is ${profile.level}, calibrate intensity and complexity accordingly.
+${profile.injuries ? `- They have reported: ${profile.injuries}. Always offer lower-impact modifications.` : ''}
 - Reference prior sessions when relevant to show progression and avoid repetition.
 - When metrics are provided, use them to set realistic benchmarks and track improvement.`
 }
@@ -197,7 +199,7 @@ function MediaCard({ item }) {
 
 function SessionLimitScreen({ onNewSession }) {
   return (
-    <div className="flex flex-col items-center justify-center px-6 text-center bg-star-black gap-5 h-96">
+    <div className="flex flex-col items-center justify-center px-6 text-center bg-star-black gap-5 h-[min(24rem,50svh)] overflow-y-auto">
       <div className="w-14 h-14 rounded-2xl bg-star-yellow/10 border border-star-yellow/20 flex items-center justify-center">
         <CompassStar size={28} color="#FFD700" />
       </div>
@@ -225,7 +227,7 @@ function PaywallScreen() {
     'Priority support',
   ]
   return (
-    <div className="flex flex-col items-center justify-center px-6 text-center bg-star-black gap-4 h-96">
+    <div className="flex flex-col items-center justify-center px-6 text-center bg-star-black gap-4 h-[min(24rem,50svh)] overflow-y-auto">
       <div className="w-14 h-14 rounded-2xl bg-star-blue/10 border border-star-blue/20 flex items-center justify-center">
         <Lock size={24} className="text-star-blue" />
       </div>
@@ -249,7 +251,7 @@ function PaywallScreen() {
         to="/booking"
         className="w-full py-3 rounded-xl bg-star-blue text-white font-bold text-sm flex items-center justify-center gap-2 no-underline"
       >
-        Start Pro — $5/mo <ChevronRight size={16} />
+        Start Pro, $5/mo <ChevronRight size={16} />
       </Link>
     </div>
   )
@@ -268,12 +270,33 @@ export default function AIWorkoutChat({ inline = false }) {
   const [showPoseCamera, setShowPoseCamera] = useState(false)
   const [showMediaMenu, setShowMediaMenu] = useState(false)
 
+  const { user: authUser, hasVision, openAuth, requireConsent, hasAccepted } = useAuth()
+  const navigate = useNavigate()
+
+  // Voice + camera are Elite/trial features. Free & Training get text coaching.
+  function requireVision(action) {
+    if (!authUser) {
+      openAuth({ mode: 'signup', reason: 'Start your free trial to use voice and camera coaching.' })
+      return
+    }
+    if (!hasVision) { navigate('/pricing'); return }
+    action()
+  }
+
+  const [speakingIdx, setSpeakingIdx] = useState(null)
+  const [listening, setListening] = useState(false)
+  const [voiceMode, setVoiceMode] = useState(false)
+  const recognitionRef = useRef(null)
+  const voiceModeRef = useRef(false)
+  const transcriptRef = useRef('')
+
   const messagesRef = useRef(null)
   const inputRef = useRef(null)
   const fileInputRef = useRef(null)
   const mediaMenuRef = useRef(null)
   const sessionStarted = useRef(false)
   const sessionMsgsRef = useRef(0)
+  const synthRef = useRef(window.speechSynthesis)
 
   // Determine initial phase on mount
   useEffect(() => {
@@ -373,6 +396,13 @@ export default function AIWorkoutChat({ inline = false }) {
     const photo = photoOverride || pendingPhoto
     if ((!userText && !photo) || loading) return
 
+    // Liability waiver gate, required before generating any workout (physical
+    // use). Once accepted, this passes through with no modal on every later send.
+    if (!hasAccepted('liability')) {
+      requireConsent('liability', () => sendMessage(text, photoOverride))
+      return
+    }
+
     // Start session on first message
     if (!sessionStarted.current) {
       const count = startSession()
@@ -435,15 +465,20 @@ export default function AIWorkoutChat({ inline = false }) {
       const finalMessages = [...newMessages, { role: 'assistant', content: reply }]
       setMessages(finalMessages)
 
+      // Voice conversation: read the reply aloud, then reopen the mic
+      if (voiceModeRef.current) speakConversational(reply)
+
       // Check session limit
       if (msgCount >= MSGS_PER_SESSION) {
+        voiceModeRef.current = false
+        setVoiceMode(false)
         const firstUserMsg = finalMessages.find(m => m.role === 'user')
         if (firstUserMsg) addSessionNote(firstUserMsg.content.slice(0, 120))
         const sessionCount = getSessionCount()
         setPhase(sessionCount >= FREE_SESSIONS ? 'paywall' : 'session-limit')
       }
     } catch {
-      setError('Connection issue — make sure the server is running.')
+      setError('Connection issue, make sure the server is running.')
       setMessages([...newMessages, {
         role: 'assistant',
         content: "I'm having trouble connecting right now. Try again in a moment!",
@@ -452,6 +487,109 @@ export default function AIWorkoutChat({ inline = false }) {
       setLoading(false)
     }
   }
+
+  function speak(text, idx) {
+    const synth = synthRef.current
+    if (!synth) return
+    if (speakingIdx === idx) {
+      synth.cancel()
+      setSpeakingIdx(null)
+      return
+    }
+    synth.cancel()
+    const plain = text.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim()
+    const utt = new SpeechSynthesisUtterance(plain)
+    utt.rate = 0.95
+    utt.pitch = 1
+    utt.onend = () => setSpeakingIdx(null)
+    utt.onerror = () => setSpeakingIdx(null)
+    setSpeakingIdx(idx)
+    synth.speak(utt)
+  }
+
+  // Cancel speech on unmount
+  useEffect(() => () => synthRef.current?.cancel(), [])
+
+  // Voice input via Web Speech API (Chrome, Safari, Edge)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  const micSupported = !!SpeechRecognition
+
+  function startListening() {
+    if (!micSupported) return
+    const rec = new SpeechRecognition()
+    rec.lang = 'en-US'
+    rec.interimResults = true
+    rec.continuous = false
+    transcriptRef.current = ''
+    rec.onresult = (e) => {
+      const transcript = Array.from(e.results).map(r => r[0].transcript).join('')
+      transcriptRef.current = transcript
+      setInput(transcript)
+    }
+    rec.onend = () => {
+      setListening(false)
+      const heard = transcriptRef.current.trim()
+      if (voiceModeRef.current && heard) {
+        // Conversation mode: auto-send what was heard
+        sendMessage(heard)
+      } else {
+        inputRef.current?.focus()
+      }
+    }
+    rec.onerror = () => setListening(false)
+    recognitionRef.current = rec
+    setListening(true)
+    rec.start()
+  }
+
+  function toggleMic() {
+    if (listening) {
+      voiceModeRef.current = false
+      setVoiceMode(false)
+      recognitionRef.current?.stop()
+      return
+    }
+    startListening()
+  }
+
+  // Hands-free conversation mode: talk → auto-send → coach speaks → mic reopens
+  function toggleVoiceMode() {
+    if (voiceMode) {
+      voiceModeRef.current = false
+      setVoiceMode(false)
+      recognitionRef.current?.stop()
+      synthRef.current?.cancel()
+      setSpeakingIdx(null)
+      return
+    }
+    voiceModeRef.current = true
+    setVoiceMode(true)
+    synthRef.current?.cancel()
+    startListening()
+  }
+
+  // Speak an AI reply aloud, then reopen the mic for the user's next turn
+  function speakConversational(text) {
+    const synth = synthRef.current
+    if (!synth) return
+    synth.cancel()
+    const plain = text.replace(/[#*`]/g, '').replace(/\n+/g, ' ').trim()
+    const utt = new SpeechSynthesisUtterance(plain)
+    utt.rate = 0.95
+    utt.onend = () => {
+      setSpeakingIdx(null)
+      if (voiceModeRef.current) startListening()
+    }
+    utt.onerror = () => setSpeakingIdx(null)
+    setSpeakingIdx('voice')
+    synth.speak(utt)
+  }
+
+  // Stop recognition + speech on unmount
+  useEffect(() => () => {
+    voiceModeRef.current = false
+    recognitionRef.current?.stop()
+  }, [])
 
   function formatMessage(text) {
     return text.split('\n').map((line, i) => {
@@ -478,19 +616,19 @@ export default function AIWorkoutChat({ inline = false }) {
   })()
 
   const chatPanel = (
-    <div className={inline ? 'w-full min-w-0' : 'w-[min(400px,calc(100vw-2rem))]'}>
+    <div className={`flex flex-col min-h-0 ${inline ? 'w-full min-w-0' : 'w-[min(400px,calc(100vw-2rem))] max-h-full'}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-star-border bg-star-card rounded-t-2xl flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-star-blue/20 border border-star-blue/30 flex items-center justify-center">
+      <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2.5 sm:py-3 border-b border-star-border bg-star-card rounded-t-2xl flex-shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-star-blue/20 border border-star-blue/30 flex items-center justify-center flex-shrink-0">
             <CompassStar size={18} color="#007AFF" />
           </div>
-          <div>
-            <p className="text-white font-bold text-sm">Star Mat AI Coach</p>
-            <p className="text-star-yellow text-xs font-medium">{headerSubtitle}</p>
+          <div className="min-w-0">
+            <p className="text-white font-bold text-sm whitespace-nowrap">Star Mat AI Coach™</p>
+            <p className="text-star-yellow text-xs font-medium truncate">{headerSubtitle}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {phase === 'chat' && (
             <button
               onClick={() => setPhase('onboarding')}
@@ -498,11 +636,11 @@ export default function AIWorkoutChat({ inline = false }) {
               className={`flex items-center gap-1.5 rounded-lg transition-all ${
                 profile
                   ? 'text-star-grey hover:text-white p-1'
-                  : 'text-star-yellow bg-star-yellow/10 border border-star-yellow/20 hover:bg-star-yellow/20 px-2.5 py-1 text-xs font-semibold'
+                  : 'text-star-yellow bg-star-yellow/10 border border-star-yellow/20 hover:bg-star-yellow/20 px-2 py-1 text-xs font-semibold whitespace-nowrap flex-shrink-0'
               }`}
             >
               <UserCircle size={profile ? 18 : 14} />
-              {!profile && <span>Set up profile</span>}
+              {!profile && <span><span className="sm:hidden">Profile</span><span className="hidden sm:inline">Set up profile</span></span>}
             </button>
           )}
           {!inline && (
@@ -515,13 +653,13 @@ export default function AIWorkoutChat({ inline = false }) {
 
       {/* Phase content */}
       {phase === 'loading' && (
-        <div className={`flex items-center justify-center bg-star-black ${inline ? 'h-[28rem]' : 'h-96'}`}>
+        <div className={`flex items-center justify-center bg-star-black min-h-0 ${inline ? 'h-[28rem]' : 'h-[min(24rem,42svh)]'}`}>
           <Loader2 size={20} className="text-star-blue animate-spin" />
         </div>
       )}
 
       {phase === 'onboarding' && (
-        <div className={`bg-star-black ${inline ? 'h-[28rem]' : 'h-[26rem]'}`}>
+        <div className={`bg-star-black min-h-0 overflow-y-auto ${inline ? 'h-[28rem]' : 'h-[min(26rem,46svh)]'}`}>
           <AIOnboarding onComplete={handleOnboardingComplete} onSkip={handleSkipOnboarding} onExit={handleSkipOnboarding} />
         </div>
       )}
@@ -535,7 +673,7 @@ export default function AIWorkoutChat({ inline = false }) {
           {/* Messages */}
           <div
             ref={messagesRef}
-            className={`overflow-y-auto overflow-x-hidden px-4 py-4 space-y-3 bg-star-black ${inline ? 'h-[28rem]' : 'h-96'}`}
+            className={`overflow-y-auto overflow-x-hidden px-4 py-4 space-y-3 bg-star-black min-h-0 ${inline ? 'h-[28rem]' : 'h-[min(24rem,42svh)]'}`}
           >
             {messages.map((msg, i) => {
               const media = msg.role === 'assistant' && i > 0 ? findRelevantMedia(msg.content) : []
@@ -569,6 +707,18 @@ export default function AIWorkoutChat({ inline = false }) {
                               {media.map(item => <MediaCard key={item.id} item={item} />)}
                             </div>
                           )}
+                          <div className="flex justify-end mt-1.5">
+                            <button
+                              onClick={() => speak(msg.content, i)}
+                              title={speakingIdx === i ? 'Stop audio' : 'Listen'}
+                              className="flex items-center gap-1 text-star-grey/50 hover:text-star-blue transition-colors p-0.5 rounded"
+                            >
+                              {speakingIdx === i
+                                ? <VolumeX size={13} className="text-star-blue" />
+                                : <Volume2 size={13} />
+                              }
+                            </button>
+                          </div>
                         </>
                       )
                     }
@@ -636,20 +786,70 @@ export default function AIWorkoutChat({ inline = false }) {
                     <X size={9} className="text-star-grey" />
                   </button>
                 </div>
-                <p className="text-star-grey text-xs">Form check ready — add a note or just send.</p>
+                <p className="text-star-grey text-xs">Form check ready, add a note or just send.</p>
               </div>
             )}
 
-            <div className="flex gap-2 items-center min-w-0">
+            <div className="flex gap-1.5 sm:gap-2 items-center min-w-0">
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                placeholder={pendingPhoto ? 'Add a note (optional)…' : 'Ask about a goal, sport, or body area…'}
-                className="flex-1 min-w-0 bg-star-black border border-star-border rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none focus:border-star-blue/50 transition-colors"
+                placeholder={listening ? 'Listening…' : speakingIdx === 'voice' ? 'Coach is speaking…' : voiceMode ? 'Voice conversation on' : pendingPhoto ? 'Add a note (optional)…' : 'Ask about a goal, sport, or body area…'}
+                className={`flex-1 min-w-0 bg-star-black border rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-star-grey/60 focus:outline-none transition-colors ${
+                  listening ? 'border-red-500/60' : 'border-star-border focus:border-star-blue/50'
+                }`}
               />
+
+              {/* Voice input (one-shot dictation) */}
+              {micSupported && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => requireVision(toggleMic)}
+                  title={listening ? 'Stop listening' : 'Speak your question'}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition-colors flex-shrink-0 ${
+                    listening
+                      ? 'border-red-500 bg-red-500/20'
+                      : 'border-star-border bg-star-black hover:border-star-blue/50'
+                  }`}
+                >
+                  {listening
+                    ? (
+                      <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }}>
+                        <Mic size={17} className="text-red-400" />
+                      </motion.div>
+                    )
+                    : <Mic size={17} className="text-star-grey" />
+                  }
+                </motion.button>
+              )}
+
+              {/* Voice conversation mode (hands-free talk ↔ listen loop) */}
+              {micSupported && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => requireVision(toggleVoiceMode)}
+                  title={voiceMode ? 'End voice conversation' : 'Start voice conversation'}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition-colors flex-shrink-0 ${
+                    voiceMode
+                      ? 'border-star-blue bg-star-blue/20'
+                      : 'border-star-border bg-star-black hover:border-star-blue/50'
+                  }`}
+                >
+                  {voiceMode
+                    ? (
+                      <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.4, repeat: Infinity }}>
+                        <Headphones size={17} className="text-star-blue" />
+                      </motion.div>
+                    )
+                    : <Headphones size={17} className="text-star-grey" />
+                  }
+                </motion.button>
+              )}
 
               {/* Form check menu */}
               <input
@@ -664,14 +864,14 @@ export default function AIWorkoutChat({ inline = false }) {
                 {showMediaMenu && (
                   <div className="absolute bottom-12 right-0 bg-star-card border border-star-border rounded-xl shadow-xl p-1 flex flex-col gap-0.5 min-w-[168px] z-10">
                     <button
-                      onClick={() => { fileInputRef.current?.click(); setShowMediaMenu(false) }}
+                      onClick={() => requireVision(() => requireConsent('biometric', () => { fileInputRef.current?.click(); setShowMediaMenu(false) }))}
                       className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-star-black text-sm text-white transition-colors text-left"
                     >
                       <Camera size={15} className="text-star-blue flex-shrink-0" />
                       <span>Photo form check</span>
                     </button>
                     <button
-                      onClick={() => { setShowPoseCamera(true); setShowMediaMenu(false) }}
+                      onClick={() => requireVision(() => requireConsent('biometric', () => { setShowPoseCamera(true); setShowMediaMenu(false) }))}
                       className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-star-black text-sm text-white transition-colors text-left"
                     >
                       <Video size={15} className="text-star-yellow flex-shrink-0" />
@@ -684,7 +884,7 @@ export default function AIWorkoutChat({ inline = false }) {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowMediaMenu(m => !m)}
                   title="Form check options"
-                  className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-colors ${
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition-colors ${
                     showMediaMenu || pendingPhoto
                       ? 'border-star-blue bg-star-blue/20'
                       : 'border-star-border bg-star-black hover:border-star-blue/50'
@@ -699,7 +899,7 @@ export default function AIWorkoutChat({ inline = false }) {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => sendMessage()}
                 disabled={(!input.trim() && !pendingPhoto) || loading}
-                className="w-10 h-10 rounded-xl bg-star-blue flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-star-blue flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
               >
                 {loading ? <Loader2 size={16} className="text-white animate-spin" /> : <Send size={16} className="text-white" />}
               </motion.button>
@@ -734,7 +934,9 @@ export default function AIWorkoutChat({ inline = false }) {
       </AnimatePresence>
       <motion.button
         onClick={() => setOpen(true)}
-        className={`fixed bottom-5 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl transition-all ${open ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        aria-label="Open the Star Mat AI Coach"
+        aria-expanded={open}
+        className={`fixed bottom-5 right-4 z-50 flex items-center justify-center gap-2 min-h-[48px] min-w-[48px] px-4 py-3 rounded-2xl shadow-2xl transition-all ${open ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         style={{ backgroundColor: '#007AFF', boxShadow: '0 8px 32px rgba(0,122,255,0.4)' }}
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.97 }}
@@ -753,7 +955,7 @@ export default function AIWorkoutChat({ inline = false }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 rounded-2xl shadow-2xl border border-star-border overflow-hidden"
+            className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 rounded-2xl shadow-2xl border border-star-border overflow-hidden max-h-[88svh] flex flex-col"
             style={{ boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)' }}
           >
             {chatPanel}

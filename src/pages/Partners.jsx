@@ -66,13 +66,17 @@ export default function Partners() {
           <div className="absolute top-0 right-0 w-[50vw] h-[30vw] rounded-full bg-star-yellow/5 blur-[100px]" />
         </div>
         <motion.div {...fadeUp()} className="relative z-10 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-star-yellow/30 bg-star-yellow/10 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-star-yellow animate-pulse" />
+            <span className="text-star-yellow text-xs font-bold tracking-wider uppercase">Partner Program, Launching Soon</span>
+          </div>
           <p className="text-star-yellow text-sm font-semibold tracking-widest uppercase mb-3">Partnerships & Sponsorships</p>
           <h1 className="text-5xl md:text-6xl font-black mb-5">
             Grow With <span className="text-gradient-yellow">Star Fitness.</span>
           </h1>
           <p className="text-star-grey text-lg leading-relaxed">
-            Join our partner network. Whether you're a fitness studio, a brand looking for co-marketing,
-            or an athlete ready to represent. We grow together.
+            Our partner network is launching soon. Whether you're a fitness studio, a brand looking for co-marketing,
+            or an athlete ready to represent, add your info below and we'll reach out the moment we open applications.
           </p>
         </motion.div>
       </section>

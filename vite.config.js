@@ -8,10 +8,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // Dev proxies to the live API so local testing exercises the real backend.
+      // In production nginx maps /api/ -> localhost:3001 directly.
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://starmat.app',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: true,
       },
     },
   },

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Clock, User, MapPin, Check, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { saveSubmission } from '../utils/dataStore'
+import ComingSoonOverlay from '../components/ComingSoonOverlay'
 
 const instructors = [
   { id: 'sarah', name: 'Sarah Chen', specialty: 'Yoga & Mindfulness', initials: 'SC', color: '#007AFF', classes: ['Yoga Flow', 'Morning Stretch', 'Restorative Yoga'] },
@@ -86,6 +87,10 @@ export default function Booking() {
 
   return (
     <main className="pt-24 pb-20">
+      <ComingSoonOverlay
+        title="Booking Is Almost Here"
+        message="In-person and live class booking launches soon. Check back shortly, or grab your Star Mat and start training today."
+      />
       {/* Header */}
       <section className="section-padding py-14 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -251,7 +256,7 @@ export default function Booking() {
                     <p className="text-white font-bold mb-3">Booking Summary</p>
                     {[
                       [Calendar, `${monthNames[calMonth]} ${selectedDay}, ${calYear} at ${selectedTime}`],
-                      [User, `${selectedInstructor?.name} — ${selectedClass}`],
+                      [User, `${selectedInstructor?.name}, ${selectedClass}`],
                       [MapPin, selectedLocation?.name],
                     ].map(([Icon, val]) => (
                       <div key={val} className="flex items-center gap-2.5 text-sm">

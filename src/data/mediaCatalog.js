@@ -117,7 +117,7 @@ export const MEDIA_CATALOG = [
 /**
  * Given an AI response string, returns the most relevant media items (max 3).
  * Scored by number of keyword matches; videos ranked above images.
- * Add new catalog entries above — this function needs no changes.
+ * Add new catalog entries above, this function needs no changes.
  */
 export function findRelevantMedia(text) {
   const lower = text.toLowerCase()

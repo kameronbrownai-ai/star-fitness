@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://starfitnesssystem.com/</loc>
+    <loc>https://starmat.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://starfitnesssystem.com/shop</loc>
+    <loc>https://starmat.app/shop</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://starfitnesssystem.com/lessons</loc>
+    <loc>https://starmat.app/lessons</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://starfitnesssystem.com/faq</loc>
+    <loc>https://starmat.app/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://starfitnesssystem.com/gallery</loc>
+    <loc>https://starmat.app/gallery</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://starfitnesssystem.com/community</loc>
+    <loc>https://starmat.app/community</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://starfitnesssystem.com/about</loc>
+    <loc>https://starmat.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://starfitnesssystem.com/booking</loc>
+    <loc>https://starmat.app/booking</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

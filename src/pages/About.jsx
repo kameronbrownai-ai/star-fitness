@@ -33,13 +33,13 @@ const values = [
   {
     icon: Target,
     title: 'Relentless Precision',
-    desc: 'Every millimeter of the Star Mat was tested obsessively. We ran 300+ prototypes before shipping a single unit. Precision is not a feature — it is the foundation.',
+    desc: 'Eight calibrated angles, printed permanently into the surface, identical on every mat. Precision is not a feature, it is the foundation the whole system is built on.',
     color: '#007AFF',
   },
   {
     icon: Heart,
     title: 'Built Around Athletes',
-    desc: 'We don\'t guess what athletes need. We partnered with Olympic coaches, physical therapists, and everyday trainers to build a mat that serves every body.',
+    desc: 'The Star Mat is designed for real training, not a showroom. Sport-specific programming, a recovery track, and modifications that let every body work at its own level.',
     color: '#FF375F',
   },
   {
@@ -51,40 +51,40 @@ const values = [
   {
     icon: Globe,
     title: 'Global Community',
-    desc: 'We built the Star Mat for everyone — from yoga practitioners in Bali to HIIT coaches in Chicago. 42 countries. One standard of excellence.',
+    desc: 'Built for every kind of athlete, from competitive players to people rebuilding their movement. Ten sports, a wellness track, and one standard of precision.',
     color: '#30D158',
   },
 ]
 
 const timeline = [
   {
-    year: '2018',
-    title: 'The Frustration Begins',
-    desc: 'Our founder, Marcus Lin, kept slipping on mats mid-session. Six brands, six disappointments. He decided to build the mat he\'d always wanted.',
+    year: '2020',
+    title: 'The Problem',
+    desc: 'Training came down to guesswork. Tape on the floor, cones that got kicked out of place, and cues like "step over there." Nothing was repeatable, and nothing could be measured. There had to be a better way to train direction.',
     align: 'right',
   },
   {
-    year: '2019',
-    title: 'Prototype Lab',
-    desc: '300+ prototypes tested with athletes across 12 cities. Every surface texture, every foam density, every seam placement was evaluated and re-evaluated.',
+    year: '2022',
+    title: 'The Geometry',
+    desc: 'The answer was to give every position a number. Eight calibrated angles, 45° through 360°, printed permanently into the surface, with a LOAD DECIDE center. Once the floor had coordinates, a drill could be prescribed exactly and repeated the same way every session.',
     align: 'left',
   },
   {
-    year: '2021',
-    title: 'Star Mat 1.0 Launches',
-    desc: 'The first Star Mat shipped to 400 founding members. Sold out in 48 hours. Every review mentioned the same thing: finally, a mat that doesn\'t move.',
+    year: '2024',
+    title: 'The S.T.A.R. Method',
+    desc: 'The geometry became a system. Speed, Technique, Agility, and Reactivity, the four qualities every session trains. Sport-specific programming was built around it for football, basketball, soccer, baseball, track, tennis, golf, hockey, lacrosse, and combat sports, plus a wellness and recovery track.',
     align: 'right',
-  },
-  {
-    year: '2023',
-    title: '100K Members',
-    desc: 'The Star community hit 100,000 members across 30 countries. We launched digital classes and the first certified Star Training Program.',
-    align: 'left',
   },
   {
     year: '2025',
-    title: 'Star Mat Pro 2.0',
-    desc: 'The most refined mat ever made. Upgraded surface, improved eco-foam, and the same obsessive precision — now backed by 250,000 members.',
+    title: 'The AI Coach',
+    desc: 'Because the mat had coordinates, software could finally speak its language. The Star Mat AI Coach was built to prescribe workouts using exact mat positions, with voice conversation and live camera form feedback so the coaching happens while you move.',
+    align: 'left',
+  },
+  {
+    year: '2026',
+    title: 'Star Mat Pro 2.0 & Launch',
+    desc: 'The Star Mat Pro 2.0 and Star Mat Lite launched alongside starmat.app, bringing the mat, the training library, and the AI Coach together in one system. The Star Assessment turns a 60-second camera scan into your Star Score, so progress is something you can measure instead of guess.',
     align: 'right',
   },
 ]
@@ -104,7 +104,7 @@ export default function About() {
               Existed.
             </h1>
             <p className="text-star-grey text-lg leading-relaxed mb-6">
-              There is no other training program out there to help you prepare and dominate in your sport — until now. Star Fitness was built for athletes who know that every step they take is an impact of improvement.
+              There is no other training program out there to help you prepare and dominate in your sport, until now. Star Fitness was built for athletes who know that every step they take is an impact of improvement.
             </p>
             <p className="text-star-grey text-lg leading-relaxed mb-10">
               You don't need big bulky equipment or expensive trainers. You just need to know what direction to go in. Train in all planes of motion and become a king in your sport.
@@ -149,7 +149,7 @@ export default function About() {
                 </motion.div>
                 <div>
                   <p className="text-white font-black text-2xl tracking-tight">STAR FITNESS</p>
-                  <p className="text-star-grey text-sm">Est. 2018</p>
+                  <p className="text-star-grey text-sm">Est. 2020</p>
                 </div>
               </div>
 
@@ -160,8 +160,8 @@ export default function About() {
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute -top-4 -right-4 glass rounded-2xl p-4 border border-star-blue/20"
               >
-                <p className="text-star-blue font-black text-2xl">250K</p>
-                <p className="text-star-grey text-xs">Members</p>
+                <p className="text-star-blue font-black text-2xl">8</p>
+                <p className="text-star-grey text-xs">Calibrated Angles</p>
               </motion.div>
 
               <motion.div
@@ -170,8 +170,8 @@ export default function About() {
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute -bottom-4 -left-4 glass rounded-2xl p-4 border border-star-yellow/20"
               >
-                <p className="text-star-yellow font-black text-2xl">300+</p>
-                <p className="text-star-grey text-xs">Prototypes</p>
+                <p className="text-star-yellow font-black text-2xl">10</p>
+                <p className="text-star-grey text-xs">Sports Covered</p>
               </motion.div>
             </div>
           </motion.div>
@@ -184,10 +184,10 @@ export default function About() {
           <motion.div {...fadeUp()}>
             <p className="text-star-blue text-sm font-semibold tracking-widest uppercase mb-5">Our Mission</p>
             <blockquote className="text-3xl md:text-4xl font-black leading-snug text-white mb-6">
-              "There is no other workout that will improve your balance, core, speed, strength, and endurance — faster or better — than training in all planes of motion."
+              "Balance, core, speed, strength, and endurance. Trained in every plane of motion, on a surface where every position has a number."
             </blockquote>
             <p className="text-star-yellow font-bold text-lg mt-4">Become a king in your sport.</p>
-            <p className="text-star-grey text-lg mt-2">— The Star Fitness Mission</p>
+            <p className="text-star-grey text-lg mt-2">The Star Fitness Mission</p>
           </motion.div>
         </div>
       </section>
@@ -223,7 +223,7 @@ export default function About() {
                 </div>
               </motion.div>
               <motion.div {...fadeRight}>
-                <span className="inline-block text-star-blue text-sm font-semibold tracking-widest uppercase mb-4">01 — Grip</span>
+                <span className="inline-block text-star-blue text-sm font-semibold tracking-widest uppercase mb-4">01, Grip</span>
                 <h3 className="text-3xl md:text-4xl font-black mb-5">
                   Engineered to Hold<br />
                   <span className="text-star-yellow">Every Position.</span>
@@ -234,16 +234,15 @@ export default function About() {
                 </p>
                 <p className="text-star-grey leading-relaxed">
                   Traditional mats use flat rubber surfaces that compress and slide. We changed the
-                  physics. Our surface creates directional friction that locks in place when loaded —
-                  releasing freely when you unweight.
+                  physics. Our surface creates directional friction that locks in place when loaded, releasing freely when you unweight.
                 </p>
               </motion.div>
             </div>
 
-            {/* Split 2 — reversed */}
+            {/* Split 2, reversed */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <motion.div {...fadeLeft} className="order-2 lg:order-1">
-                <span className="inline-block text-star-yellow text-sm font-semibold tracking-widest uppercase mb-4">02 — Cushion</span>
+                <span className="inline-block text-star-yellow text-sm font-semibold tracking-widest uppercase mb-4">02, Cushion</span>
                 <h3 className="text-3xl md:text-4xl font-black mb-5">
                   Protect Your Body.
                   <span className="text-gradient-blue block">Amplify Your Power.</span>
@@ -254,7 +253,7 @@ export default function About() {
                   premium orthopedic padding specifications.
                 </p>
                 <p className="text-star-grey leading-relaxed">
-                  Dense enough to maintain ground contact cues — soft enough to absorb the repetitive
+                  Dense enough to maintain ground contact cues, soft enough to absorb the repetitive
                   impact that accumulates over a lifetime of training.
                 </p>
               </motion.div>
@@ -302,18 +301,18 @@ export default function About() {
                 </div>
               </motion.div>
               <motion.div {...fadeRight}>
-                <span className="inline-block text-green-400 text-sm font-semibold tracking-widest uppercase mb-4">03 — Materials</span>
+                <span className="inline-block text-green-400 text-sm font-semibold tracking-widest uppercase mb-4">03, Materials</span>
                 <h3 className="text-3xl md:text-4xl font-black mb-5">
                   High Performance.
                   <span className="text-green-400 block">Thoughtfully Built.</span>
                 </h3>
                 <p className="text-star-grey text-lg leading-relaxed mb-5">
-                  The Star Mat is made from closed-cell TPE foam — no latex, no PVC, no harsh
+                  The Star Mat is made from closed-cell TPE foam, no latex, no PVC, no harsh
                   plasticizers. It's a cleaner material choice that's better for your skin and easier
                   on the environment.
                 </p>
                 <p className="text-star-grey leading-relaxed">
-                  We take material quality seriously at every step — from the surface weave to the
+                  We take material quality seriously at every step, from the surface weave to the
                   foam core. The goal is a mat that performs at the highest level and lasts for years,
                   not seasons.
                 </p>
@@ -346,62 +345,6 @@ export default function About() {
                 </div>
                 <h3 className="text-white font-bold text-xl mb-3">{v.title}</h3>
                 <p className="text-star-grey leading-relaxed">{v.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section className="section-padding py-24 border-t border-star-border">
-        <div className="max-w-7xl mx-auto">
-          <motion.div {...fadeUp()} className="text-center mb-14">
-            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">From Athletes</p>
-            <h2 className="text-4xl font-black">What They're Saying</h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                quote: "I've tried every training tool out there. The Star Mat is the only one that actually changed how I move on the field. My lateral quickness improved noticeably within two weeks.",
-                name: 'Darius T.',
-                role: 'College Football, Wide Receiver',
-                initials: 'DT',
-                color: '#007AFF',
-              },
-              {
-                quote: "As a golf instructor, I've seen a lot of training aids. The Star Mat is the real deal for hip rotation and weight transfer. My students who use it see results faster than anything else I've tried.",
-                name: 'Lisa M.',
-                role: 'Golf Instructor, 12 Years',
-                initials: 'LM',
-                color: '#30D158',
-              },
-              {
-                quote: "I train MMA three times a week and I use the Star Mat every session for footwork. The compass markers make it easy to drill specific patterns. It's become a non-negotiable part of my prep.",
-                name: 'Jalen R.',
-                role: 'Amateur MMA Fighter',
-                initials: 'JR',
-                color: '#FF375F',
-              },
-            ].map((t, i) => (
-              <motion.div
-                key={t.name}
-                {...fadeUp(i * 0.12)}
-                className="glass rounded-2xl p-7 border border-star-border flex flex-col gap-5"
-              >
-                <p className="text-star-grey leading-relaxed text-sm flex-1">"{t.quote}"</p>
-                <div className="flex items-center gap-3 border-t border-star-border pt-5">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white flex-shrink-0"
-                    style={{ backgroundColor: `${t.color}40`, border: `1px solid ${t.color}50` }}
-                  >
-                    {t.initials}
-                  </div>
-                  <div>
-                    <p className="text-white font-semibold text-sm">{t.name}</p>
-                    <p className="text-star-grey text-xs">{t.role}</p>
-                  </div>
-                </div>
               </motion.div>
             ))}
           </div>
@@ -455,35 +398,40 @@ export default function About() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div {...fadeLeft}>
-              <div className="aspect-square max-w-sm mx-auto relative">
-                <div className="absolute inset-0 rounded-3xl bg-star-blue/10 blur-3xl" />
-                <div className="relative glass rounded-3xl p-12 flex flex-col items-center justify-center text-center border border-star-border h-full">
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-star-blue to-star-yellow flex items-center justify-center text-3xl font-black text-white mb-5">
-                    ML
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-lg mx-auto">
+                {/* Leroy Collins */}
+                <div className="relative glass rounded-3xl p-8 flex flex-col items-center justify-center text-center border border-star-border">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-star-blue to-star-yellow flex items-center justify-center text-2xl font-black text-white mb-4">
+                    LC
                   </div>
-                  <p className="text-white font-black text-2xl">Marcus Lin</p>
-                  <p className="text-star-grey mb-4">Founder & CEO</p>
-                  <div className="star-divider mx-auto mb-4" />
-                  <p className="text-star-grey text-sm">Former professional triathlete. Product obsessive. Slipped on one mat too many.</p>
+                  <p className="text-white font-black text-xl">Leroy Collins</p>
+                  <p className="text-star-yellow text-sm font-semibold">Founder &amp; CEO</p>
+                </div>
+                {/* Kameron Brown */}
+                <div className="relative glass rounded-3xl p-8 flex flex-col items-center justify-center text-center border border-star-border">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-star-yellow to-star-blue flex items-center justify-center text-2xl font-black text-white mb-4">
+                    KB
+                  </div>
+                  <p className="text-white font-black text-xl">Kameron Brown</p>
+                  <p className="text-star-blue text-sm font-semibold">Co-Founder</p>
                 </div>
               </div>
             </motion.div>
 
             <motion.div {...fadeRight}>
-              <p className="text-star-blue text-sm font-semibold tracking-widest uppercase mb-5">The Founder</p>
+              <p className="text-star-blue text-sm font-semibold tracking-widest uppercase mb-5">The Founders</p>
               <h2 className="text-4xl font-black mb-6">
-                Built by an Athlete,
+                Built by Athletes,
                 <span className="text-gradient-yellow block">For Athletes.</span>
               </h2>
               <p className="text-star-grey text-lg leading-relaxed mb-5">
-                Marcus Lin spent 12 years as a professional triathlete before founding Star Fitness.
-                Every decision he makes comes from lived experience on the training floor — not from
-                a boardroom.
+                Star Fitness was founded by Leroy Collins and co-founded by Kameron Brown, built on a
+                simple belief: training should be precise, measurable, and available to everyone, not just
+                elite athletes with elite budgets.
               </p>
               <p className="text-star-grey leading-relaxed mb-10">
-                "I built Star Fitness because I was tired of compromising. The mat I wanted didn't
-                exist. So I built it, and I made sure it would never let you down — the same way
-                a great training partner never does."
+                Every decision comes from time on the training floor, not a boardroom. The Star Mat is the
+                tool they always wanted, and made sure it would never let you down.
               </p>
               <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
                 <Link to="/shop" className="btn-primary">

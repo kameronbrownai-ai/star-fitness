@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Check } from 'lucide-react'
 
-const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Tennis', 'MMA / Combat', 'Golf', 'General Fitness']
+// Keep in sync with the sports advertised on Home, Lessons, and the FAQ.
+const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Tennis', 'Golf', 'Hockey', 'Lacrosse', 'MMA / Combat', 'General Fitness']
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Pro Level']
 const GOALS = ['Speed', 'Strength', 'Agility', 'Flexibility', 'Recovery', 'Endurance']
 const EQUIPMENT_OPTIONS = ['Open Field / Court', 'Full Gym', 'Resistance Bands', 'Free Weights', 'Home / Bodyweight Only']
@@ -23,6 +24,8 @@ const POSITION_HINT = {
   'MMA / Combat': 'e.g. Striker, Grappler, BJJ',
   'Track & Field': 'e.g. Sprinter, Long Jump, Throws',
   'Baseball / Softball': 'e.g. Outfielder, Pitcher',
+  Hockey: 'e.g. Forward, Defense, Goalie',
+  Lacrosse: 'e.g. Attack, Midfield, Defense',
 }
 const TOTAL_STEPS = 7
 
@@ -247,7 +250,7 @@ export default function AIOnboarding({ onComplete, onSkip, onExit }) {
             onClick={onSkip}
             className="w-full mt-2 py-2 text-star-grey text-xs text-center hover:text-white transition-colors"
           >
-            Skip setup — chat without a profile
+            Skip setup, chat without a profile
           </button>
         )}
       </div>

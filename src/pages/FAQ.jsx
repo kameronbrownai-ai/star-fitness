@@ -12,7 +12,7 @@ const faqs = [
       },
       {
         q: 'What\'s the difference between the Pro and Lite?',
-        a: 'The Star Mat Pro 2.0 ($249) is our flagship — 8mm premium TPE foam, two-sided print (train on either side), 75"×75" for full-body movement, and includes a carry strap and 60-day free Pro subscription. The Star Mat Lite ($199) is our travel-friendly option — 4mm foam, single-sided print, 55"×55", and foldable for easy storage and portability.',
+        a: 'The Star Mat Pro 2.0 ($249) is our flagship, 8mm premium TPE foam, two-sided print (train on either side), 75"×75" for full-body movement, and includes a carry strap and a free trial account. The Star Mat Lite ($199) is our travel-friendly option, 4mm foam, single-sided print, 55"×55", and foldable for easy storage and portability, and also comes with a free trial account.',
       },
       {
         q: 'What surfaces does the Star Mat work on?',
@@ -20,7 +20,7 @@ const faqs = [
       },
       {
         q: 'How do I clean and care for the mat?',
-        a: 'Wipe down with a damp cloth and mild soap after each session. Avoid harsh chemicals or solvents — they can degrade the TPE foam and fade the print. Allow it to air dry before rolling or storing. Store rolled, not folded, to prevent creasing.',
+        a: 'Wipe down with a damp cloth and mild soap after each session. Avoid harsh chemicals or solvents, they can degrade the TPE foam and fade the print. Allow it to air dry before rolling or storing. Store rolled, not folded, to prevent creasing.',
       },
       {
         q: 'What\'s the weight capacity?',
@@ -33,11 +33,11 @@ const faqs = [
     items: [
       {
         q: 'What sports does Star Fitness support?',
-        a: 'Our lesson library covers Football, Basketball, Soccer, Baseball/Softball, Track & Field, Tennis, Golf, Hockey, and MMA/Combat. Each sport has dedicated training classes and sport-specific injury recovery protocols.',
+        a: 'Our lesson library covers Football, Basketball, Soccer, Baseball/Softball, Track & Field, Tennis, Golf, Hockey, Lacrosse, and MMA/Combat. Each sport has dedicated training classes and sport-specific injury recovery protocols.',
       },
       {
         q: 'How does the AI Coach work?',
-        a: 'The AI Coach uses Claude (Anthropic\'s AI) to generate custom Star Mat workouts based on your sport, position, goals, and any injuries. Tell it what you want — it returns a full workout with exercises, sets, reps, rest periods, and which compass direction to face for each movement.',
+        a: 'The AI Coach uses Claude (Anthropic\'s AI) to generate custom Star Mat workouts based on your sport, position, goals, and any injuries. Tell it what you want, it returns a full workout with exercises, sets, reps, rest periods, and which compass direction to face for each movement.',
       },
       {
         q: 'Can I use the camera/form check feature?',
@@ -45,11 +45,11 @@ const faqs = [
       },
       {
         q: 'Which classes are free vs. paid?',
-        a: 'Every sport has at least one free class in both the Training and Recovery tracks — no account required. The full library (4 training + 3 recovery classes per sport) requires a Star Fitness subscription, which comes with your Star Mat Pro purchase.',
+        a: 'Every sport has at least one free class in both the Training and Recovery tracks, no account required. The full library (4 training + 3 recovery classes per sport) requires a Star Fitness subscription, which comes with your Star Mat Pro purchase.',
       },
       {
         q: 'What is "training in all planes of motion"?',
-        a: 'Most gym equipment only allows you to move forward and backward (one plane). The Star Mat\'s 8-directional compass guides you to train in every direction — front, back, left, right, and all diagonals. This builds the functional strength, balance, and coordination that actually transfers to sport performance.',
+        a: 'Most gym equipment only allows you to move forward and backward (one plane). The Star Mat\'s 8-directional compass guides you to train in every direction, front, back, left, right, and all diagonals. This builds the functional strength, balance, and coordination that actually transfers to sport performance.',
       },
     ],
   },
@@ -62,15 +62,15 @@ const faqs = [
       },
       {
         q: 'Do you ship internationally?',
-        a: 'Yes — we ship to Canada, the UK, Australia, and select EU countries. International shipping rates are calculated at checkout. Import duties and taxes are the responsibility of the recipient.',
+        a: 'Yes, we ship to Canada, the UK, Australia, and select EU countries. International shipping rates are calculated at checkout. Import duties and taxes are the responsibility of the recipient.',
       },
       {
         q: 'What is your return policy?',
-        a: 'We offer a 30-day Star Guarantee. If you\'re not satisfied for any reason, return your mat within 30 days of delivery for a full refund. The mat must be clean and undamaged. Contact support@starfitness.com to start a return.',
+        a: 'We offer a 30-day Star Guarantee. If you\'re not satisfied for any reason, return your mat within 30 days of delivery for a full refund. The mat must be clean and undamaged. Contact Info@starmatapp.com to start a return.',
       },
       {
         q: 'Can I order for my gym or team?',
-        a: 'Yes — B2B and team orders are available with volume pricing. We work with gyms, athletic programs, and corporate wellness centers. Contact us at partnerships@starfitness.com with your quantity and use case for a custom quote.',
+        a: 'Yes, B2B and team orders are available with volume pricing. We work with gyms, athletic programs, and corporate wellness centers. Contact us at Info@starmatapp.com with your quantity and use case for a custom quote.',
       },
     ],
   },
@@ -79,7 +79,7 @@ const faqs = [
     items: [
       {
         q: 'How do I access my subscription content?',
-        a: 'After purchase, you\'ll receive an email with account activation instructions. Log in at starfitness.com/lessons to access the full class library for your sport(s). Your subscription is tied to your account and works on any device.',
+        a: 'After purchase, you\'ll receive an email with account activation instructions. Log in at starmat.app/lessons to access the full class library for your sport(s). Your subscription is tied to your account and works on any device.',
       },
       {
         q: 'Can I cancel my subscription anytime?',
@@ -87,7 +87,7 @@ const faqs = [
       },
       {
         q: 'Is there a free trial?',
-        a: 'The Star Mat Pro 2.0 comes with a 60-day free Pro subscription — the most complete free trial we offer. Individual sport pages also have free classes you can access without an account.',
+        a: 'Yes, every new account gets a free trial with full access, no card required: 30 days for our first 5,000 members, 14 days after that. Buying a Star Mat (Pro or Lite) automatically creates your account and starts the trial. Individual sport pages also have free classes you can access without an account.',
       },
     ],
   },
@@ -186,7 +186,7 @@ export default function FAQ() {
           <h3 className="text-white font-black text-xl mb-2">Still have a question?</h3>
           <p className="text-star-grey text-sm mb-5">Our team responds within 24 hours, usually faster.</p>
           <a
-            href="mailto:support@starfitness.com"
+            href="mailto:Info@starmatapp.com"
             className="inline-flex items-center gap-2 px-6 py-3 bg-star-blue text-white rounded-full font-bold text-sm hover:bg-blue-500 transition-colors"
           >
             Email Support

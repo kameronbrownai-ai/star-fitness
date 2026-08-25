@@ -173,7 +173,7 @@ export default function Apparel() {
           </h1>
           <p className="text-star-grey text-lg leading-relaxed">
             Premium performance apparel engineered for every rep, stretch, and sprint.
-            Designed to move with you — not against you.
+            Designed to move with you, not against you.
           </p>
         </motion.div>
       </section>

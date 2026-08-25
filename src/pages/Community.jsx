@@ -2,91 +2,36 @@ import { motion } from 'framer-motion'
 import { Star, Quote, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CompassStar from '../components/CompassStar'
+import ComingSoonOverlay from '../components/ComingSoonOverlay'
 
-const testimonials = [
-  {
-    id: 1,
-    name: 'Jessica M.',
-    role: 'Yoga Instructor',
-    location: 'New York, NY',
-    initials: 'JM',
-    color: '#007AFF',
-    rating: 5,
-    text: "\"The Star Mat is the single best investment I've made in my fitness journey. I've gone through 6 mats from other brands. This is the last mat I'll ever buy. The grip is unreal and the cushion is perfect for my knees.\"",
-  },
-  {
-    id: 2,
-    name: 'David K.',
-    role: 'CrossFit Athlete',
-    location: 'Austin, TX',
-    initials: 'DK',
-    color: '#FF375F',
-    rating: 5,
-    text: '"I do box jumps, burpees, and HIIT on this mat every morning. It has never slipped once. The surface texture is incredible, it actually gets more grip when wet. 100% worth every dollar."',
-  },
-  {
-    id: 3,
-    name: 'Priya S.',
-    role: 'Physical Therapist',
-    location: 'Los Angeles, CA',
-    initials: 'PS',
-    color: '#BF5AF2',
-    rating: 5,
-    text: '"I recommend the Star Mat to all my patients doing at-home rehab. The 8mm cushion protects joints without sacrificing stability. It\'s the only mat I trust for therapeutic use."',
-  },
-  {
-    id: 4,
-    name: 'Marcus T.',
-    role: 'Personal Trainer',
-    location: 'Chicago, IL',
-    initials: 'MT',
-    color: '#30D158',
-    rating: 5,
-    text: '"My clients ask about the Star Mat every single session. I\'ve now outfitted my entire studio with them. The build quality is unmatched and Star Fitness support is genuinely world-class."',
-  },
-  {
-    id: 5,
-    name: 'Sarah L.',
-    role: 'Marathon Runner',
-    location: 'Seattle, WA',
-    initials: 'SL',
-    color: '#FFD700',
-    rating: 5,
-    text: '"I use the Star Mat for recovery stretching and strength work between long runs. The surface is easy to clean and it rolls up tight for easy travel. Takes up zero space in my bag."',
-  },
-  {
-    id: 6,
-    name: 'James O.',
-    role: 'Pilates Instructor',
-    location: 'Miami, FL',
-    initials: 'JO',
-    color: '#FF9F0A',
-    rating: 5,
-    text: '"Pilates demands precision. The Star Mat delivers it. Every pose is stable, every transition is controlled. My students perform better on this mat, and they notice it immediately."',
-  },
-]
-
+// The kinds of organizations the partner program is built for. These are
+// categories we serve, not claimed relationships. Named partners go here only
+// once an agreement is signed.
 const partners = [
-  { name: 'FitLife Studios', initials: 'FL', color: '#007AFF', type: 'Studio Partner' },
-  { name: 'Apex Athletics', initials: 'AA', color: '#FF375F', type: 'Official Sponsor' },
-  { name: 'ZenMovement Co.', initials: 'ZM', color: '#BF5AF2', type: 'Wellness Partner' },
-  { name: 'CoreX Academy', initials: 'CX', color: '#30D158', type: 'Training Partner' },
-  { name: 'PeakPerform Pro', initials: 'PP', color: '#FFD700', type: 'Studio Partner' },
-  { name: 'Equilibrium Gym', initials: 'EG', color: '#FF9F0A', type: 'Wellness Partner' },
-  { name: 'LiftLab NYC', initials: 'LL', color: '#64D2FF', type: 'Official Sponsor' },
-  { name: 'Studio Flow', initials: 'SF', color: '#FF6B9D', type: 'Studio Partner' },
+  { name: 'Training Facilities', initials: 'TF', color: '#007AFF', type: 'Partner Program' },
+  { name: 'Sports Academies', initials: 'SA', color: '#FF375F', type: 'Partner Program' },
+  { name: 'Golf Simulators', initials: 'GS', color: '#30D158', type: 'Partner Program' },
+  { name: 'Wellness Studios', initials: 'WS', color: '#BF5AF2', type: 'Partner Program' },
+  { name: 'School Athletics', initials: 'SC', color: '#FFD700', type: 'Partner Program' },
+  { name: 'Personal Trainers', initials: 'PT', color: '#FF9F0A', type: 'Partner Program' },
+  { name: 'Rehab Clinics', initials: 'RC', color: '#64D2FF', type: 'Partner Program' },
+  { name: 'Team Programs', initials: 'TP', color: '#FF6B9D', type: 'Partner Program' },
 ]
 
 const communityStats = [
-  { value: '250K+', label: 'Active Members', color: '#007AFF' },
-  { value: '98%', label: 'Would Recommend', color: '#30D158' },
-  { value: '4.9', label: 'Average Rating', color: '#FFD700', starIcon: true },
-  { value: '42', label: 'Countries', color: '#BF5AF2' },
+  { value: '8', label: 'Calibrated Angles', color: '#007AFF' },
+  { value: '10', label: 'Sports Covered', color: '#30D158' },
+  { value: '2', label: 'Mat Editions', color: '#FFD700' },
+  { value: 'AI', label: 'Coach Included', color: '#BF5AF2' },
 ]
 
 export default function Community() {
   return (
     <main className="pt-24 pb-20">
+      <ComingSoonOverlay
+        title="The Community Is Coming"
+        message="We're building a space for Star Mat athletes to share progress, wins, and results. Launching soon."
+      />
       {/* Header */}
       <section className="section-padding py-16 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -103,7 +48,7 @@ export default function Community() {
             The Stars Who <span className="text-gradient-blue">Train With Us.</span>
           </h1>
           <p className="text-star-grey text-lg leading-relaxed">
-            250,000 members. 42 countries. One standard. Real athletes, real results, no filters.
+            One standard of precision, ten sports, and a training system built for athletes at every level.
           </p>
         </motion.div>
       </section>
@@ -140,53 +85,34 @@ export default function Community() {
             transition={{ duration: 0.6 }}
             className="mb-12"
           >
-            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">Real Reviews</p>
-            <h2 className="text-4xl font-black">What Our Members Say</h2>
+            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">Member Reviews</p>
+            <h2 className="text-4xl font-black">Be Among the First.</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="card-hover"
-              >
-                <div className="glass rounded-2xl p-7 border border-star-border h-full flex flex-col">
-                  {/* Quote icon */}
-                  <div className="mb-4">
-                    <Quote size={24} className="text-star-blue opacity-60" />
-                  </div>
-
-                  {/* Stars */}
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(t.rating)].map((_, idx) => (
-                      <Star key={idx} size={14} fill="#FFD700" className="text-star-yellow" />
-                    ))}
-                  </div>
-
-                  {/* Text */}
-                  <p className="text-white text-sm leading-relaxed flex-1 mb-6">{t.text}</p>
-
-                  {/* Author */}
-                  <div className="flex items-center gap-3 pt-4 border-t border-white/8">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black text-white flex-shrink-0"
-                      style={{ backgroundColor: t.color }}
-                    >
-                      {t.initials}
-                    </div>
-                    <div>
-                      <p className="text-white font-semibold text-sm">{t.name}</p>
-                      <p className="text-star-grey text-xs">{t.role} · {t.location}</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {/* Reviews are published here only once verified members submit them.
+              Nothing is placed in this section that did not come from a real customer. */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.55 }}
+            className="glass rounded-2xl border border-star-border p-8 md:p-12 max-w-3xl"
+          >
+            <Quote size={26} className="text-star-blue opacity-60 mb-5" />
+            <p className="text-white text-lg md:text-xl leading-relaxed mb-4">
+              Star Mat reviews will be published here as soon as real members start sending them in.
+            </p>
+            <p className="text-star-grey text-sm leading-relaxed mb-7 max-w-xl">
+              We would rather show you nothing than show you something we made up. Every review on this
+              page will come from a verified customer, with their own words and their own name.
+            </p>
+            <a
+              href="mailto:Info@starmatapp.com?subject=My%20Star%20Mat%20Review"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-star-blue text-white font-bold text-sm"
+            >
+              Share your experience
+            </a>
+          </motion.div>
         </div>
       </section>
 
@@ -200,10 +126,10 @@ export default function Community() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">Trusted By</p>
+            <p className="text-star-grey text-sm tracking-widest uppercase mb-3">Built For</p>
             <h2 className="text-4xl font-black mb-4">Our Partners</h2>
             <p className="text-star-grey text-lg max-w-xl mx-auto">
-              From boutique studios to elite training facilities, the Star Mat is the professional standard.
+              From home training to high-level programs, the Star Mat brings a measured, coordinate-based approach to every session.
             </p>
           </motion.div>
 

@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, X, Image, Video, Expand, Volume2, VolumeX } from 'lucide-react'
+import { Play, X, Image, Video, Expand, Volume2, VolumeX, Share2, Check, Link as LinkIcon } from 'lucide-react'
 import CompassStar from '../components/CompassStar'
 
 const filters = ['All', 'Videos', 'Photos', 'Training', 'Lifestyle', 'Product']
 
 const galleryItems = [
   // Real videos
-  { id: 0, type: 'video', title: 'The Star Mat', duration: '0:47', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', featured: true, src: '/videos/star-mat-fv1.mp4', poster: '/images/thumbs/star-mat-fv1.mov.png' },
-  { id: 1, type: 'video', title: 'Star Mat — Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', src: '/videos/star-mat-side-lunge.mov', poster: '/images/thumbs/star-mat-side-lunge.mov.png' },
+  { id: 0, type: 'video', title: 'The Star Mat', duration: '0:47', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', featured: true, src: '/videos/star-mat-fv1.mp4', poster: '/images/thumbs/star-mat-fv1.jpg' },
+  { id: 1, type: 'video', title: 'Star Mat, Side Lunge Drill', duration: '0:15', category: 'Training', thumb: 'from-yellow-900/70 to-star-black', accent: '#FFD700', src: '/videos/star-mat-side-lunge.mov', poster: '/images/thumbs/star-mat-side-lunge.mov.png' },
   { id: 2, type: 'video', title: 'Split Lunge Matrix', duration: '0:20', category: 'Training', thumb: 'from-blue-900/70 to-star-black', accent: '#007AFF', src: '/videos/star-mat-split-lunge.mov', poster: '/images/thumbs/star-mat-split-lunge.mov.png' },
   { id: 3, type: 'video', title: 'Apex Foot Fire Plus', duration: '0:18', category: 'Training', thumb: 'from-orange-900/70 to-star-black', accent: '#FF9F0A', src: '/videos/star-mat-apex-foot-fire.mov', poster: '/images/thumbs/star-mat-apex-foot-fire.mov.png' },
   { id: 4, type: 'video', title: 'Alternating Lunge Upright Row', duration: '0:22', category: 'Training', thumb: 'from-green-900/70 to-star-black', accent: '#30D158', src: '/videos/star-mat-alternating-lunge-row.mov', poster: '/images/thumbs/star-mat-alternating-lunge-row.mov.png' },
@@ -16,22 +16,22 @@ const galleryItems = [
   { id: 6, type: 'video', title: 'Speed Lateral Skaters', duration: '0:20', category: 'Training', thumb: 'from-cyan-900/70 to-star-black', accent: '#64D2FF', src: '/videos/star-mat-lateral-skaters.mov', poster: '/images/thumbs/star-mat-lateral-skaters.mov.png' },
   { id: 7, type: 'video', title: 'Star Mat Training Drill', duration: '0:22', category: 'Training', thumb: 'from-purple-900/70 to-star-black', accent: '#BF5AF2', src: '/videos/star-mat-drill.mov', poster: '/images/thumbs/star-mat-drill.mov.png' },
   { id: 8, type: 'video', title: 'Star Mat Full Session', duration: '0:25', category: 'Training', thumb: 'from-teal-900/70 to-star-black', accent: '#32D4B9', src: '/videos/star-mat-training-drill.mov', poster: '/images/thumbs/star-mat-training-drill.mov.png' },
-  // Commercial shots — action first
+  // Commercial shots, action first
   { id: 16, type: 'photo', title: 'Athlete Holds the Star Mat',          category: 'Product',   image: '/images/commercial/hold-mat.jpeg',            thumb: 'from-slate-800/60 to-star-black',  accent: '#FFD700' },
-  { id: 17, type: 'photo', title: 'Rolling Up — Built to Go',            category: 'Product',   image: '/images/commercial/rolling-mat.jpeg',         thumb: 'from-slate-800/60 to-star-black',  accent: '#8E8E93' },
+  { id: 17, type: 'photo', title: 'Rolling Up, Built to Go',            category: 'Product',   image: '/images/commercial/rolling-mat.jpeg',         thumb: 'from-slate-800/60 to-star-black',  accent: '#8E8E93' },
   { id: 18, type: 'photo', title: 'Unrolling in the Gym',                category: 'Training',  image: '/images/commercial/unrolling-mat.jpeg',       thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
-  { id: 19, type: 'photo', title: 'Train at Home — Every Day',           category: 'Lifestyle', image: '/images/commercial/home-lifestyle.jpeg',      thumb: 'from-amber-900/40 to-star-black',  accent: '#FF9F0A' },
-  { id: 20, type: 'photo', title: 'Woman Athlete — Lateral Speed',       category: 'Training',  image: '/images/commercial/woman-athlete.png',        thumb: 'from-pink-900/50 to-star-black',   accent: '#FF375F' },
-  { id: 21, type: 'photo', title: 'MMA — Stance & Control',              category: 'Training',  image: '/images/commercial/mma-fighter.png',          thumb: 'from-yellow-900/50 to-star-black', accent: '#FFD700' },
-  { id: 22, type: 'photo', title: 'Boxing — Power on the Mat',           category: 'Training',  image: '/images/commercial/boxing.png',               thumb: 'from-red-900/60 to-star-black',    accent: '#FF375F' },
-  { id: 23, type: 'photo', title: 'Baseball — Explosive Footwork',       category: 'Training',  image: '/images/commercial/baseball-1.png',           thumb: 'from-blue-900/50 to-star-black',   accent: '#007AFF' },
-  { id: 24, type: 'photo', title: 'Baseball — Rotational Drive',         category: 'Training',  image: '/images/commercial/baseball-2.png',           thumb: 'from-blue-900/50 to-star-black',   accent: '#64D2FF' },
-  { id: 25, type: 'photo', title: 'Veteran Athlete — Still Dominating',  category: 'Lifestyle', image: '/images/commercial/veteran-athlete.png',      thumb: 'from-green-900/40 to-star-black',  accent: '#30D158' },
+  { id: 19, type: 'photo', title: 'Train at Home, Every Day',           category: 'Lifestyle', image: '/images/commercial/home-lifestyle.jpeg',      thumb: 'from-amber-900/40 to-star-black',  accent: '#FF9F0A' },
+  { id: 20, type: 'photo', title: 'Woman Athlete, Lateral Speed',       category: 'Training',  image: '/images/commercial/woman-athlete.png',        thumb: 'from-pink-900/50 to-star-black',   accent: '#FF375F' },
+  { id: 21, type: 'photo', title: 'MMA, Stance & Control',              category: 'Training',  image: '/images/commercial/mma-fighter.png',          thumb: 'from-yellow-900/50 to-star-black', accent: '#FFD700' },
+  { id: 22, type: 'photo', title: 'Boxing, Power on the Mat',           category: 'Training',  image: '/images/commercial/boxing.png',               thumb: 'from-red-900/60 to-star-black',    accent: '#FF375F' },
+  { id: 23, type: 'photo', title: 'Baseball, Explosive Footwork',       category: 'Training',  image: '/images/commercial/baseball-1.png',           thumb: 'from-blue-900/50 to-star-black',   accent: '#007AFF' },
+  { id: 24, type: 'photo', title: 'Baseball, Rotational Drive',         category: 'Training',  image: '/images/commercial/baseball-2.png',           thumb: 'from-blue-900/50 to-star-black',   accent: '#64D2FF' },
+  { id: 25, type: 'photo', title: 'Veteran Athlete, Still Dominating',  category: 'Lifestyle', image: '/images/commercial/veteran-athlete.png',      thumb: 'from-green-900/40 to-star-black',  accent: '#30D158' },
   // Product / spec shots at the bottom
-  { id: 9,  type: 'photo', title: 'Star Mat Pro — In the Gym',           category: 'Product',   image: '/images/mat-product.jpeg',                    thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
-  { id: 10, type: 'photo', title: 'Star Mat — Clean Design',             category: 'Product',   image: '/images/mat-clean.jpeg',                      thumb: 'from-slate-700/60 to-star-black',  accent: '#8E8E93' },
-  { id: 14, type: 'photo', title: 'Star Mat — All Angles & Specs',       category: 'Product',   image: '/images/mat-onesheet-specs.png',               thumb: 'from-slate-700/60 to-star-black',  accent: '#FFD700' },
-  { id: 15, type: 'photo', title: 'Star Mat — Size & Scale Reference',   category: 'Product',   image: '/images/mat-onesheet-scale.png',               thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
+  { id: 9,  type: 'photo', title: 'Star Mat Pro, In the Gym',           category: 'Product',   image: '/images/mat-product.jpeg',                    thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
+  { id: 10, type: 'photo', title: 'Star Mat, Clean Design',             category: 'Product',   image: '/images/mat-clean.jpeg',                      thumb: 'from-slate-700/60 to-star-black',  accent: '#8E8E93' },
+  { id: 14, type: 'photo', title: 'Star Mat, All Angles & Specs',       category: 'Product',   image: '/images/mat-onesheet-specs.png',               thumb: 'from-slate-700/60 to-star-black',  accent: '#FFD700' },
+  { id: 15, type: 'photo', title: 'Star Mat, Size & Scale Reference',   category: 'Product',   image: '/images/mat-onesheet-scale.png',               thumb: 'from-blue-900/60 to-star-black',   accent: '#007AFF' },
 ]
 
 export default function Gallery() {
@@ -39,6 +39,47 @@ export default function Gallery() {
   const [lightbox, setLightbox] = useState(null)
   const [isMuted, setIsMuted] = useState(true)
   const featuredVideoRef = useRef(null)
+  const [shared, setShared] = useState(false)
+
+  // Copy text without the async Clipboard API, which browsers block in
+  // insecure contexts and some in-app browsers. Works everywhere.
+  function legacyCopy(text) {
+    try {
+      const ta = document.createElement('textarea')
+      ta.value = text
+      ta.setAttribute('readonly', '')
+      ta.style.cssText = 'position:absolute;left:-9999px;top:0'
+      document.body.appendChild(ta)
+      ta.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(ta)
+      return ok
+    } catch { return false }
+  }
+
+  // Share the featured video. Uses the native share sheet on phones
+  // (Instagram, Messages, etc.) and falls back to copying the link.
+  async function shareVideo(item) {
+    const url = `${window.location.origin}/gallery`
+    const data = {
+      title: `${item.title} | Star Fitness`,
+      text: 'Watch the Star Mat in action, train in all planes of motion.',
+      url,
+    }
+    // Native share sheet (phones)
+    if (navigator.share) {
+      try { await navigator.share(data); return } catch (e) {
+        // User cancelled, do nothing further
+        if (e && e.name === 'AbortError') return
+      }
+    }
+    // Clipboard API, then legacy fallback. Always give feedback.
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url)
+      else legacyCopy(url)
+    } catch { legacyCopy(url) }
+    setShared(true); setTimeout(() => setShared(false), 2200)
+  }
 
   const filtered = filter === 'All' ? galleryItems
     : filter === 'Videos' ? galleryItems.filter(i => i.type === 'video')
@@ -110,6 +151,15 @@ export default function Gallery() {
                     className="absolute bottom-5 right-5 w-10 h-10 rounded-full bg-black/50 border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors backdrop-blur-sm"
                   >
                     {isMuted ? <VolumeX size={16} className="text-white" /> : <Volume2 size={16} className="text-white" />}
+                  </button>
+                  {/* Share */}
+                  <button
+                    onClick={() => shareVideo(featured)}
+                    title="Share this video"
+                    className="absolute bottom-5 right-[4.25rem] h-10 w-10 sm:w-auto sm:px-3.5 rounded-full bg-star-yellow text-black font-bold text-sm flex items-center justify-center sm:gap-1.5 hover:brightness-110 transition-all"
+                  >
+                    {shared ? <Check size={15} strokeWidth={3} /> : <Share2 size={15} />}
+                    <span className="hidden sm:inline">{shared ? 'Link copied' : 'Share'}</span>
                   </button>
                   {/* Full screen / lightbox button */}
                   <button
@@ -194,7 +244,7 @@ export default function Gallery() {
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300" />
 
-                    {/* Play / expand icon — shown on hover */}
+                    {/* Play / expand icon, shown on hover */}
                     <div className="relative z-10 flex flex-col items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <motion.div
                         className="w-12 h-12 rounded-full flex items-center justify-center"

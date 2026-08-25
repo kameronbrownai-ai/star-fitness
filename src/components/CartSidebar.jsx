@@ -3,9 +3,27 @@ import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { Link } from 'react-router-dom'
 import CompassStar from './CompassStar'
+import { STRIPE_LINKS } from '../config/stripe'
+import { supabase } from '../lib/supabase'
 
 export default function CartSidebar() {
   const { items, open, setOpen, total, count, removeItem, increment, decrement, clearCart } = useCart()
+
+  // Items with a live Stripe Payment Link (currently the two mats)
+  const payable = items.filter((i) => STRIPE_LINKS[i.id])
+
+  // Logged-in buyers pass their identity through so the purchase attaches to
+  // their existing account instead of triggering a new-account invite email.
+  const goToStripe = async (id) => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const params = new URLSearchParams()
+    if (session?.user) {
+      params.set('client_reference_id', session.user.id)
+      params.set('prefilled_email', session.user.email)
+    }
+    const qs = params.toString()
+    window.location.href = STRIPE_LINKS[id] + (qs ? `?${qs}` : '')
+  }
 
   return (
     <AnimatePresence>
@@ -132,15 +150,35 @@ export default function CartSidebar() {
                   <span className="text-star-grey">Subtotal</span>
                   <span className="text-white font-black text-xl">${total.toFixed(2)}</span>
                 </div>
-                <p className="text-star-grey text-xs text-center">Shipping & taxes calculated at checkout</p>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="w-full btn-primary justify-center py-4"
-                >
-                  Checkout
-                  <ArrowRight size={18} />
-                </motion.button>
+                <p className="text-star-grey text-xs text-center">Secure checkout powered by Stripe · Free shipping</p>
+                {payable.length <= 1 ? (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    disabled={payable.length === 0}
+                    onClick={() => payable[0] && goToStripe(payable[0].id)}
+                    className="w-full btn-primary justify-center py-4 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Checkout
+                    <ArrowRight size={18} />
+                  </motion.button>
+                ) : (
+                  <div className="space-y-2">
+                    {payable.map((i) => (
+                      <motion.button
+                        key={i.id}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => goToStripe(i.id)}
+                        className="w-full btn-primary justify-center py-3.5 text-sm"
+                      >
+                        Check out {i.name}
+                        <ArrowRight size={16} />
+                      </motion.button>
+                    ))}
+                    <p className="text-star-grey text-[11px] text-center">Mats check out separately for now.</p>
+                  </div>
+                )}
                 <button
                   onClick={() => setOpen(false)}
                   className="w-full text-center text-star-grey hover:text-white text-sm transition-colors py-1"
