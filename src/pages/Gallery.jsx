@@ -134,10 +134,12 @@ export default function Gallery() {
                   <video
                     ref={featuredVideoRef}
                     src={featured.src}
+                    poster={featured.poster}
                     autoPlay
                     muted
                     loop
                     playsInline
+                    preload="metadata"
                     className="w-full h-full object-cover"
                   />
                   {/* Title overlay */}
