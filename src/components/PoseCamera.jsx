@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, FlipHorizontal, Zap, Loader2, Radio } from 'lucide-react'
+import { buildUtterance, LIVE_CUE_RATE } from '../lib/speech'
 
 const LIVE_CHECK_INTERVAL = 9000 // ms between live AI form checks
 
@@ -314,9 +315,7 @@ export default function PoseCamera({ onAnalyze, onClose }) {
         const synth = window.speechSynthesis
         if (synth) {
           synth.cancel()
-          const utt = new SpeechSynthesisUtterance(feedback)
-          utt.rate = 1
-          synth.speak(utt)
+          synth.speak(buildUtterance(feedback, { rate: LIVE_CUE_RATE }))
         }
       }
     } catch {
