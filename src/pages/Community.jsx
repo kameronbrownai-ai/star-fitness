@@ -20,7 +20,7 @@ const partners = [
 
 const communityStats = [
   { value: '8', label: 'Calibrated Angles', color: '#007AFF' },
-  { value: '10', label: 'Sports Covered', color: '#30D158' },
+  { value: '11', label: 'Sports Covered', color: '#30D158' },
   { value: '2', label: 'Mat Editions', color: '#FFD700' },
   { value: 'AI', label: 'Coach Included', color: '#BF5AF2' },
 ]
@@ -48,7 +48,7 @@ export default function Community() {
             The Stars Who <span className="text-gradient-blue">Train With Us.</span>
           </h1>
           <p className="text-star-grey text-lg leading-relaxed">
-            One standard of precision, ten sports, and a training system built for athletes at every level.
+            One standard of precision, eleven sports, and a training system built for athletes at every level.
           </p>
         </motion.div>
       </section>

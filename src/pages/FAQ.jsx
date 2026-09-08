@@ -33,7 +33,7 @@ const faqs = [
     items: [
       {
         q: 'What sports does Star Fitness support?',
-        a: 'Our lesson library covers Football, Basketball, Soccer, Baseball/Softball, Track & Field, Tennis, Golf, Hockey, Lacrosse, and MMA/Combat. Each sport has dedicated training classes and sport-specific injury recovery protocols.',
+        a: 'Our lesson library covers Football, Basketball, Soccer, Baseball/Softball, Track & Field, Pickleball, Tennis, Golf, Hockey, Lacrosse, and MMA/Combat. Each sport has dedicated training classes and sport-specific injury recovery protocols.',
       },
       {
         q: 'How does the AI Coach work?',

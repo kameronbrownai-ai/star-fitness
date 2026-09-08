@@ -21,7 +21,7 @@ export const ROUTE_META = {
   '/lessons': {
     title: 'Training Classes by Sport | Star Fitness',
     description:
-      'Guided Star Mat classes for football, basketball, soccer, baseball, track, tennis, golf, hockey, lacrosse, and MMA, plus a wellness and rehab track.',
+      'Guided Star Mat classes for football, basketball, soccer, baseball, track, pickleball, tennis, golf, hockey, lacrosse, and MMA, plus a wellness and rehab track.',
   },
   '/gallery': {
     title: 'Star Mat Videos & Gallery | Star Fitness',
@@ -41,7 +41,7 @@ export const ROUTE_META = {
   '/community': {
     title: 'Star Mat Community & Partners | Star Fitness',
     description:
-      'One standard of precision across ten sports. Meet the Star Mat community and the partner program built for facilities and coaches.',
+      'One standard of precision across eleven sports. Meet the Star Mat community and the partner program built for facilities and coaches.',
   },
   '/about': {
     title: 'Our Story & the S.T.A.R. Method | Star Fitness',

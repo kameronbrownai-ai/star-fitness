@@ -51,7 +51,7 @@ const values = [
   {
     icon: Globe,
     title: 'Global Community',
-    desc: 'Built for every kind of athlete, from competitive players to people rebuilding their movement. Ten sports, a wellness track, and one standard of precision.',
+    desc: 'Built for every kind of athlete, from competitive players to people rebuilding their movement. Eleven sports, a wellness track, and one standard of precision.',
     color: '#30D158',
   },
 ]
@@ -170,7 +170,7 @@ export default function About() {
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute -bottom-4 -left-4 glass rounded-2xl p-4 border border-star-yellow/20"
               >
-                <p className="text-star-yellow font-black text-2xl">10</p>
+                <p className="text-star-yellow font-black text-2xl">11</p>
                 <p className="text-star-grey text-xs">Sports Covered</p>
               </motion.div>
             </div>

@@ -99,6 +99,24 @@ const sports = [
     ],
   },
   {
+    id: 'pickleball',
+    name: 'Pickleball',
+    emoji: '🏓',
+    color: '#32D4B9',
+    desc: 'Footwork, paddle control, and reaction',
+    train: [
+      { id: 100, title: 'Kitchen Line Footwork', targets: ['Legs', 'Ankles', 'Hips'], instructor: 'Marcus Johnson', duration: '30 min', free: true, desc: 'Split-step timing and short lateral steps for holding position at the non-volley zone.' },
+      { id: 101, title: 'Lateral Court Coverage', targets: ['Legs', 'Glutes', 'Hip Flexors'], instructor: 'Marcus Johnson', duration: '35 min', free: false, desc: 'Side-to-side movement between the 90 and 270 arrows for covering the width of the court.' },
+      { id: 102, title: 'Paddle Control & Wrist Stability', targets: ['Wrists', 'Forearms', 'Grip'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Wrist and forearm strength for dinking touch and steady hands at the net.' },
+      { id: 103, title: 'Reaction & Hand Speed', targets: ['Shoulders', 'Core', 'Forearms'], instructor: 'Marcus Johnson', duration: '30 min', free: false, desc: 'Load and Decide reaction work for fast hands in net exchanges.' },
+    ],
+    recover: [
+      { id: 104, title: 'Pickleball Elbow Relief', injury: 'Lateral Epicondylitis', targets: ['Elbow', 'Forearm', 'Wrist'], instructor: 'Sarah Chen', duration: '20 min', free: true, desc: 'Slow wrist extension work and soft-tissue release for pain on the outside of the elbow.' },
+      { id: 105, title: 'Achilles & Calf Recovery', injury: 'Achilles Tendinitis', targets: ['Achilles', 'Calves', 'Ankles'], instructor: 'Sarah Chen', duration: '20 min', free: false, desc: 'Controlled calf loading and ankle mobility for the quick starts and stops the game demands.' },
+      { id: 106, title: 'Lower Back Relief', injury: 'Lumbar Strain', targets: ['Lower Back', 'Core', 'Hips'], instructor: 'Elena Rodriguez', duration: '20 min', free: false, desc: 'Gentle rotation on the compass points and core stability for a back sore from bending low.' },
+    ],
+  },
+  {
     id: 'tennis',
     name: 'Tennis',
     emoji: '🎾',
