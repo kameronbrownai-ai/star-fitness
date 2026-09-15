@@ -9,6 +9,7 @@ const navLinks = [
   { label: 'Home', to: '/' },
   { label: 'Shop', to: '/shop' },
   { label: 'Lessons', to: '/lessons' },
+  { label: 'Teams', to: '/teams' },
   { label: 'Membership', to: '/pricing' },
   { label: 'Gallery', to: '/gallery' },
   { label: 'Booking', to: '/booking' },

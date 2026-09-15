@@ -58,6 +58,10 @@ export const ROUTE_META = {
     description:
       'Free starter library, Training at $5/month, or Elite at $14.99/month with voice and live camera coaching. Free trial, no card required.',
   },
+  '/teams': {
+    title: 'Teams & Leaderboards | Star Fitness',
+    description: 'Create a team, share a code, and see every teammate\'s Star Score, streak, and progress on one board.',
+  },
   '/account': {
     title: 'Your Account | Star Fitness',
     description: 'Manage your Star Fitness membership, billing, Star Score history, and account settings.',
@@ -89,6 +93,7 @@ const FALLBACK = ROUTE_META['/']
 // Dynamic routes: match by prefix. ScoreShare sets its own title once the
 // score loads; this is the placeholder until then.
 const PREFIX_META = [
+  ['/teams/', { title: 'Team Leaderboard | Star Fitness', description: 'Star Score, streak, and most-improved rankings for a Star Mat team.' }],
   ['/score/', { title: 'Star Score | Star Fitness', description: 'A shared Star Score from the Star Assessment. Five moves, sixty seconds, one number.' }],
 ]
 

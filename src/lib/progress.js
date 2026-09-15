@@ -68,3 +68,44 @@ export async function getSharedScore(id) {
   if (!res.ok) return null
   return res.json()
 }
+
+// ── Teams ────────────────────────────────────────────────────────────────────
+
+export function createTeam(name, sport) {
+  return api('/teams', { method: 'POST', body: JSON.stringify({ name, sport }) })
+}
+
+export function joinTeam(code) {
+  return api('/teams/join', { method: 'POST', body: JSON.stringify({ code }) })
+}
+
+export function myTeams() {
+  return api('/teams/mine')
+}
+
+/** Works signed out too, for public teams; sends the token when one exists. */
+export async function getTeam(id) {
+  const t = await token()
+  const res = await fetch(`/api/teams/${id}?today=${localToday()}`, {
+    headers: t ? { Authorization: `Bearer ${t}` } : {},
+  })
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`)
+  return body
+}
+
+export function updateTeam(id, patch) {
+  return api(`/teams/${id}`, { method: 'PUT', body: JSON.stringify(patch) })
+}
+
+export function leaveTeam(id) {
+  return api(`/teams/${id}/leave`, { method: 'POST' })
+}
+
+export function deleteTeam(id) {
+  return api(`/teams/${id}`, { method: 'DELETE' })
+}
+
+export function removeMember(teamId, userId) {
+  return api(`/teams/${teamId}/members/${userId}`, { method: 'DELETE' })
+}

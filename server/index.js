@@ -486,6 +486,192 @@ app.get('/share/:id', async (req, res) => {
   })
 })
 
+// ── TEAMS (Phase 2) ──────────────────────────────────────────────────────────
+
+// Unambiguous alphabet: no 0/O, 1/I/L, so a code read aloud or typed from a
+// photo does not get mistaken.
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
+function makeInviteCode() {
+  let out = ''
+  for (let i = 0; i < 8; i++) out += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)]
+  return out.slice(0, 4) + '-' + out.slice(4)
+}
+
+async function membershipOf(teamId, userId) {
+  const { data } = await supabase.from('team_members').select('role').eq('team_id', teamId).eq('user_id', userId).single()
+  return data?.role || null
+}
+
+// Builds the three rankings for a set of members in one pass. Returns rows
+// with display name, current score, streak, and 30-day improvement, plus the
+// row's rank under each ordering so the client can flip between boards
+// without another round trip.
+async function buildLeaderboard(userIds, todayStr) {
+  if (!userIds.length) return []
+  const monthAgo = new Date(todayStr + 'T00:00:00Z'); monthAgo.setUTCDate(monthAgo.getUTCDate() - 30)
+
+  const [{ data: profiles }, { data: workouts }, { data: scores }] = await Promise.all([
+    supabase.from('profiles').select('user_id, display_name, sport, position').in('user_id', userIds),
+    supabase.from('workouts').select('user_id, workout_date').in('user_id', userIds),
+    supabase.from('assessments').select('user_id, overall, level, created_at').in('user_id', userIds).order('created_at', { ascending: false }),
+  ])
+
+  const byUser = {}
+  for (const id of userIds) byUser[id] = { user_id: id, name: null, sport: null, position: null, score: null, level: null, streak: 0, improvement: 0, days30: 0 }
+  for (const p of profiles || []) Object.assign(byUser[p.user_id], { name: p.display_name, sport: p.sport, position: p.position })
+
+  const datesBy = {}
+  for (const w of workouts || []) (datesBy[w.user_id] ||= []).push(w.workout_date)
+  for (const id of userIds) {
+    const ds = datesBy[id] || []
+    byUser[id].streak = computeStreaks(ds, todayStr).current
+    byUser[id].days30 = new Set(ds.filter(d => d >= monthAgo.toISOString().slice(0, 10))).size
+  }
+
+  const scoresBy = {}
+  for (const s of scores || []) (scoresBy[s.user_id] ||= []).push(s)
+  for (const id of userIds) {
+    const list = scoresBy[id] || []
+    if (!list.length) continue
+    const latest = list[0]
+    byUser[id].score = latest.overall
+    byUser[id].level = latest.level
+    // Improvement = latest minus the most recent score from 30+ days ago, or
+    // the earliest score if none is that old yet.
+    const baseline = list.find(s => new Date(s.created_at) <= monthAgo) || list[list.length - 1]
+    byUser[id].improvement = baseline === latest ? 0 : latest.overall - baseline.overall
+  }
+
+  const rows = Object.values(byUser).map(r => ({ ...r, name: r.name || 'Anonymous athlete' }))
+  const rank = (key) => {
+    const sorted = [...rows].sort((a, b) => (b[key] ?? -1) - (a[key] ?? -1))
+    const m = {}; sorted.forEach((r, i) => { m[r.user_id] = i + 1 }); return m
+  }
+  const rScore = rank('score'), rStreak = rank('streak'), rImproved = rank('improvement')
+  return rows.map(r => ({ ...r, rank: { score: rScore[r.user_id], streak: rStreak[r.user_id], improved: rImproved[r.user_id] } }))
+}
+
+app.post('/teams', requireAuth, async (req, res) => {
+  const name = String(req.body?.name || '').trim().slice(0, 40)
+  const sport = String(req.body?.sport || '').trim().slice(0, 40) || null
+  if (name.length < 2) return res.status(400).json({ error: 'Team name needs at least 2 characters.' })
+
+  // Retry on the vanishingly rare code collision rather than fail the request.
+  let team = null
+  for (let i = 0; i < 4 && !team; i++) {
+    const { data, error } = await supabase.from('teams')
+      .insert({ name, sport, owner_id: req.user.id, invite_code: makeInviteCode() })
+      .select().single()
+    if (!error) team = data
+    else if (error.code !== '23505') return res.status(500).json({ error: 'Could not create team' })
+  }
+  if (!team) return res.status(500).json({ error: 'Could not create team' })
+
+  await supabase.from('team_members').insert({ team_id: team.id, user_id: req.user.id, role: 'owner' })
+  res.json({ team })
+})
+
+app.post('/teams/join', requireAuth, async (req, res) => {
+  const code = String(req.body?.code || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '')
+  if (code.length !== 8) return res.status(400).json({ error: 'That doesn\'t look like a team code.' })
+  const formatted = code.slice(0, 4) + '-' + code.slice(4)
+
+  const { data: team } = await supabase.from('teams').select('id, name').eq('invite_code', formatted).single()
+  if (!team) return res.status(404).json({ error: 'No team with that code.' })
+
+  const { error } = await supabase.from('team_members')
+    .upsert({ team_id: team.id, user_id: req.user.id, role: 'member' }, { onConflict: 'team_id,user_id', ignoreDuplicates: true })
+  if (error) return res.status(500).json({ error: 'Could not join team' })
+  res.json({ team })
+})
+
+app.get('/teams/mine', requireAuth, async (req, res) => {
+  const { data: rows } = await supabase.from('team_members').select('role, teams(id, name, sport, visibility, owner_id, created_at)').eq('user_id', req.user.id)
+  const teams = (rows || []).filter(r => r.teams).map(r => ({ ...r.teams, role: r.role }))
+  // Member counts in one query rather than one per team.
+  const ids = teams.map(t => t.id)
+  if (ids.length) {
+    const { data: counts } = await supabase.from('team_members').select('team_id').in('team_id', ids)
+    const c = {}; for (const r of counts || []) c[r.team_id] = (c[r.team_id] || 0) + 1
+    for (const t of teams) t.member_count = c[t.id] || 0
+  }
+  res.json({ teams })
+})
+
+// Team page. Members always see it; outsiders only if visibility is public.
+// The invite code is only ever returned to members.
+app.get('/teams/:id', async (req, res) => {
+  const { data: team } = await supabase.from('teams').select('*').eq('id', req.params.id).single()
+  if (!team) return res.status(404).json({ error: 'Team not found' })
+
+  let viewer = null
+  const h = req.headers.authorization
+  if (h?.startsWith('Bearer ')) {
+    const { data: { user } } = await supabase.auth.getUser(h.split(' ')[1])
+    viewer = user || null
+  }
+  const role = viewer ? await membershipOf(team.id, viewer.id) : null
+  if (!role && team.visibility !== 'public') return res.status(403).json({ error: 'This team is private.' })
+
+  const { data: members } = await supabase.from('team_members').select('user_id, role, joined_at').eq('team_id', team.id)
+  const today = /^\d{4}-\d{2}-\d{2}$/.test(req.query.today || '') ? req.query.today : new Date().toISOString().slice(0, 10)
+  const board = await buildLeaderboard((members || []).map(m => m.user_id), today)
+
+  res.json({
+    team: {
+      id: team.id, name: team.name, sport: team.sport, visibility: team.visibility,
+      owner_id: team.owner_id, created_at: team.created_at,
+      invite_code: role ? team.invite_code : undefined,
+    },
+    role,
+    member_count: (members || []).length,
+    leaderboard: board,
+  })
+})
+
+app.put('/teams/:id', requireAuth, async (req, res) => {
+  const role = await membershipOf(req.params.id, req.user.id)
+  if (role !== 'owner') return res.status(403).json({ error: 'Only the team owner can change settings.' })
+
+  const patch = {}
+  if (typeof req.body?.name === 'string') {
+    const n = req.body.name.trim().slice(0, 40)
+    if (n.length < 2) return res.status(400).json({ error: 'Team name needs at least 2 characters.' })
+    patch.name = n
+  }
+  if (['members', 'public'].includes(req.body?.visibility)) patch.visibility = req.body.visibility
+  if (req.body?.rotate_code === true) patch.invite_code = makeInviteCode()
+  if (!Object.keys(patch).length) return res.status(400).json({ error: 'Nothing to update' })
+
+  const { data, error } = await supabase.from('teams').update(patch).eq('id', req.params.id).select().single()
+  if (error) return res.status(500).json({ error: 'Could not update team' })
+  res.json({ team: data })
+})
+
+app.post('/teams/:id/leave', requireAuth, async (req, res) => {
+  const role = await membershipOf(req.params.id, req.user.id)
+  if (!role) return res.status(404).json({ error: 'You are not on this team.' })
+  if (role === 'owner') return res.status(400).json({ error: 'Owners cannot leave. Delete the team, or it stays with you.' })
+  await supabase.from('team_members').delete().eq('team_id', req.params.id).eq('user_id', req.user.id)
+  res.json({ success: true })
+})
+
+app.delete('/teams/:id', requireAuth, async (req, res) => {
+  const role = await membershipOf(req.params.id, req.user.id)
+  if (role !== 'owner') return res.status(403).json({ error: 'Only the team owner can delete it.' })
+  await supabase.from('teams').delete().eq('id', req.params.id)
+  res.json({ success: true })
+})
+
+// Owner can remove a member.
+app.delete('/teams/:id/members/:userId', requireAuth, async (req, res) => {
+  const role = await membershipOf(req.params.id, req.user.id)
+  if (role !== 'owner') return res.status(403).json({ error: 'Only the team owner can remove members.' })
+  if (req.params.userId === req.user.id) return res.status(400).json({ error: 'Use delete team instead.' })
+  await supabase.from('team_members').delete().eq('team_id', req.params.id).eq('user_id', req.params.userId)
+  res.json({ success: true })
+})
+
 // ── AI CHAT (kept open for now so the live site keeps working;
 //    will be gated by entitlement when the new frontend ships) ─────────────────
 app.post('/chat', chatLimiter, async (req, res) => {
