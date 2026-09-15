@@ -22,6 +22,7 @@ import Legal from './pages/Legal'
 import Pricing from './pages/Pricing'
 import Account from './pages/Account'
 import Licenses from './pages/Licenses'
+import ScoreShare from './pages/ScoreShare'
 
 const pageVariants = {
   initial: { opacity: 0 },
@@ -82,6 +83,7 @@ function AnimatedRoutes() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/account" element={<Account />} />
           <Route path="/licenses" element={<Licenses />} />
+          <Route path="/score/:id" element={<ScoreShare />} />
           <Route path="/privacy" element={<Legal doc="privacy" />} />
           <Route path="/terms" element={<Legal doc="terms" />} />
           <Route path="/returns" element={<Legal doc="returns" />} />

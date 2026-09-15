@@ -5,6 +5,7 @@ import { Play, Clock, Lock, Activity, Heart } from 'lucide-react'
 import AIWorkoutChat from '../components/AIWorkoutChat'
 import { useAuth } from '../context/AuthContext'
 import FitnessDisclaimer from '../components/FitnessDisclaimer'
+import { logWorkout } from '../lib/progress'
 
 const sports = [
   {
@@ -259,7 +260,11 @@ export default function Lessons() {
 
   function handlePlay(cls) {
     if (isUnlocked(cls)) {
-      setPlaying(playing === cls.id ? null : cls.id)
+      const starting = playing !== cls.id
+      setPlaying(starting ? cls.id : null)
+      // Counts as a training day the moment a class starts. When real video
+      // lands, move this to the player's `ended` event so it means finished.
+      if (starting) logWorkout('class', String(cls.id))
       return
     }
     if (!user) {

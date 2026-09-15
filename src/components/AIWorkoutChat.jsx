@@ -8,6 +8,7 @@ import { findRelevantMedia } from '../data/mediaCatalog'
 import AIOnboarding from './AIOnboarding'
 import PoseCamera from './PoseCamera'
 import { buildUtterance } from '../lib/speech'
+import { logWorkout } from '../lib/progress'
 import {
   getProfile, saveProfile, getSessionCount, getSessionMsgCount,
   startSession, incrementSessionMsg, getSessionHistory, addSessionNote,
@@ -314,6 +315,7 @@ export default function AIWorkoutChat({ inline = false }) {
   }
 
   const [speakingIdx, setSpeakingIdx] = useState(null)
+  const [doneIdx, setDoneIdx] = useState(new Set())
   const [listening, setListening] = useState(false)
   const [voiceMode, setVoiceMode] = useState(false)
   const recognitionRef = useRef(null)
@@ -732,7 +734,24 @@ export default function AIWorkoutChat({ inline = false }) {
                               {media.map(item => <MediaCard key={item.id} item={item} />)}
                             </div>
                           )}
-                          <div className="flex justify-end mt-1.5">
+                          <div className="flex justify-end items-center gap-3 mt-1.5">
+                            {/sets?\b|reps\b|warm.?up/i.test(msg.content) && (
+                              <button
+                                onClick={async () => {
+                                  if (doneIdx.has(i)) return
+                                  setDoneIdx(prev => new Set(prev).add(i))
+                                  await logWorkout('coach', `msg-${i}`)
+                                }}
+                                className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-md transition-colors ${
+                                  doneIdx.has(i)
+                                    ? 'text-star-green bg-star-green/10'
+                                    : 'text-star-grey/70 hover:text-star-yellow hover:bg-star-yellow/10'
+                                }`}
+                                title="Log this as today's workout"
+                              >
+                                <Check size={12} strokeWidth={3} /> {doneIdx.has(i) ? 'Logged' : 'Mark as done'}
+                              </button>
+                            )}
                             <button
                               onClick={() => speak(msg.content, i)}
                               title={speakingIdx === i ? 'Stop audio' : 'Listen'}

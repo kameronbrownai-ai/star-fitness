@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import rateLimit from 'express-rate-limit'
 import ws from 'ws'
 
 // Node 20 has no native WebSocket; Supabase's realtime client expects one.
@@ -23,7 +24,32 @@ if (process.env.STRIPE_SECRET_KEY) {
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 }
 
+// Behind nginx, so the real client IP arrives in X-Forwarded-For. Without
+// this every request looks like 127.0.0.1 and rate limiting would throttle
+// every user as if they were one person.
+app.set('trust proxy', 1)
+
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }))
+
+// The AI Coach spends real money per request and the endpoint is reachable by
+// anyone, so cap how fast a single IP can run up the bill.
+const chatLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 40,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many coaching requests. Please try again in a little while.' },
+})
+
+// A wider net over everything else, to blunt scripted abuse. /health is
+// exempt so uptime monitoring never trips it.
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  skip: (req) => req.path === '/health',
+})
 
 // ── STRIPE WEBHOOK (raw body, must precede express.json) ──────────────────────
 app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -311,9 +337,158 @@ app.post('/subscribe/checkout', requireAuth, async (req, res) => {
   res.json({ url: `${url}?client_reference_id=${req.user.id}&prefilled_email=${encodeURIComponent(req.user.email)}` })
 })
 
+// ── PROGRESS: profile, workouts, streaks, sharing (Phase 1) ──────────────────
+
+// Turns a list of workout dates into streak numbers. Dates arrive as
+// 'YYYY-MM-DD' strings in the athlete's own local calendar, which is the only
+// honest way to do this: a 11pm session should count for today, not tomorrow
+// because the server happens to be in a different timezone.
+function computeStreaks(dateStrings, todayStr) {
+  const days = [...new Set(dateStrings)].sort().reverse()
+  if (!days.length) return { current: 0, longest: 0 }
+
+  const toDate = (s) => new Date(s + 'T00:00:00Z')
+  const dayDiff = (a, b) => Math.round((toDate(a) - toDate(b)) / 86400000)
+
+  // Current streak: must include today or yesterday, otherwise it has lapsed.
+  let current = 0
+  if (dayDiff(todayStr, days[0]) <= 1) {
+    current = 1
+    for (let i = 1; i < days.length; i++) {
+      if (dayDiff(days[i - 1], days[i]) === 1) current++
+      else break
+    }
+  }
+
+  let longest = 1, run = 1
+  for (let i = 1; i < days.length; i++) {
+    if (dayDiff(days[i - 1], days[i]) === 1) { run++; longest = Math.max(longest, run) }
+    else run = 1
+  }
+  return { current, longest }
+}
+
+app.get('/profile', requireAuth, async (req, res) => {
+  const { data } = await supabase.from('profiles').select('*').eq('user_id', req.user.id).single()
+  res.json({ profile: data || { user_id: req.user.id, leaderboard_opt_in: false } })
+})
+
+app.put('/profile', requireAuth, async (req, res) => {
+  const allowed = ['display_name', 'sport', 'position', 'sex', 'area', 'leaderboard_opt_in']
+  const patch = {}
+  for (const k of allowed) if (k in (req.body || {})) patch[k] = req.body[k]
+
+  if (typeof patch.display_name === 'string') {
+    patch.display_name = patch.display_name.trim().slice(0, 24)
+    if (patch.display_name.length < 2) return res.status(400).json({ error: 'Display name needs at least 2 characters.' })
+  }
+  for (const k of ['sport', 'position', 'sex', 'area']) {
+    if (typeof patch[k] === 'string') patch[k] = patch[k].trim().slice(0, 40) || null
+  }
+  // Opting into the board requires a display name, so real names never leak.
+  if (patch.leaderboard_opt_in === true) {
+    const { data: cur } = await supabase.from('profiles').select('display_name').eq('user_id', req.user.id).single()
+    const name = patch.display_name ?? cur?.display_name
+    if (!name) return res.status(400).json({ error: 'Set a display name before joining the leaderboard.' })
+  }
+
+  const { data, error } = await supabase.from('profiles')
+    .upsert({ user_id: req.user.id, ...patch, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+    .select().single()
+  if (error) return res.status(500).json({ error: 'Could not save profile' })
+  res.json({ profile: data })
+})
+
+// Log a training day. Client sends its local date so the streak respects the
+// athlete's own midnight, not the server's.
+app.post('/workouts', requireAuth, async (req, res) => {
+  const { date, source, ref } = req.body || {}
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return res.status(400).json({ error: 'date must be YYYY-MM-DD' })
+  if (!['class', 'coach', 'manual', 'assessment'].includes(source)) return res.status(400).json({ error: 'Invalid source' })
+
+  const { error } = await supabase.from('workouts').upsert(
+    { user_id: req.user.id, workout_date: date, source, ref: String(ref || '').slice(0, 80) },
+    { onConflict: 'user_id,workout_date,source,ref', ignoreDuplicates: true }
+  )
+  if (error) return res.status(500).json({ error: 'Could not log workout' })
+  res.json({ success: true })
+})
+
+// Everything the progress card needs in one call.
+app.get('/stats', requireAuth, async (req, res) => {
+  const today = /^\d{4}-\d{2}-\d{2}$/.test(req.query.today || '') ? req.query.today : new Date().toISOString().slice(0, 10)
+
+  const [{ data: workouts }, { data: scores }] = await Promise.all([
+    supabase.from('workouts').select('workout_date, source').eq('user_id', req.user.id).order('workout_date', { ascending: false }).limit(400),
+    supabase.from('assessments').select('id, overall, level, created_at, shared').eq('user_id', req.user.id).order('created_at', { ascending: false }),
+  ])
+
+  const dates = (workouts || []).map(w => w.workout_date)
+  const { current, longest } = computeStreaks(dates, today)
+
+  const t = new Date(today + 'T00:00:00Z')
+  const weekAgo = new Date(t); weekAgo.setUTCDate(t.getUTCDate() - 6)
+  const monthAgo = new Date(t); monthAgo.setUTCDate(t.getUTCDate() - 29)
+  const iso = d => d.toISOString().slice(0, 10)
+  const distinct = [...new Set(dates)]
+
+  const latest = scores?.[0] || null
+  const first = scores?.length ? scores[scores.length - 1] : null
+
+  res.json({
+    streak: current,
+    longestStreak: longest,
+    totalDays: distinct.length,
+    thisWeek: distinct.filter(d => d >= iso(weekAgo) && d <= today).length,
+    last30: distinct.filter(d => d >= iso(monthAgo) && d <= today),
+    trainedToday: distinct.includes(today),
+    latestScore: latest,
+    improvement: latest && first && latest.id !== first.id ? latest.overall - first.overall : 0,
+    assessments: scores?.length || 0,
+  })
+})
+
+// Owner flips a score to shareable and gets the public URL back.
+app.post('/assessment/:id/share', requireAuth, async (req, res) => {
+  const { data, error } = await supabase.from('assessments')
+    .update({ shared: true })
+    .eq('id', req.params.id).eq('user_id', req.user.id)
+    .select('id').single()
+  if (error || !data) return res.status(404).json({ error: 'Assessment not found' })
+  res.json({ url: `${process.env.ALLOWED_ORIGIN || 'https://starmat.app'}/score/${data.id}` })
+})
+
+app.post('/assessment/:id/unshare', requireAuth, async (req, res) => {
+  await supabase.from('assessments').update({ shared: false }).eq('id', req.params.id).eq('user_id', req.user.id)
+  res.json({ success: true })
+})
+
+// Public. Returns a score only if its owner shared it, and only the display
+// name, never the email or real name.
+app.get('/share/:id', async (req, res) => {
+  const { data: a } = await supabase.from('assessments')
+    .select('id, user_id, overall, level, mobility, balance, control, symmetry, created_at, shared')
+    .eq('id', req.params.id).single()
+  if (!a || !a.shared) return res.status(404).json({ error: 'This score is not shared.' })
+
+  const { data: p } = await supabase.from('profiles').select('display_name, sport').eq('user_id', a.user_id).single()
+  const { data: w } = await supabase.from('workouts').select('workout_date').eq('user_id', a.user_id)
+  const { current } = computeStreaks((w || []).map(x => x.workout_date), new Date().toISOString().slice(0, 10))
+
+  res.json({
+    id: a.id,
+    overall: a.overall, level: a.level,
+    categories: { mobility: a.mobility, balance: a.balance, control: a.control, symmetry: a.symmetry },
+    date: a.created_at,
+    name: p?.display_name || 'A Star Mat athlete',
+    sport: p?.sport || null,
+    streak: current,
+  })
+})
+
 // ── AI CHAT (kept open for now so the live site keeps working;
 //    will be gated by entitlement when the new frontend ships) ─────────────────
-app.post('/chat', async (req, res) => {
+app.post('/chat', chatLimiter, async (req, res) => {
   try {
     const { messages, system, hasVision } = req.body
     if (!messages || !Array.isArray(messages)) return res.status(400).json({ error: 'messages array required' })
@@ -329,4 +504,6 @@ app.post('/chat', async (req, res) => {
   }
 })
 
-app.listen(PORT, () => console.log(`Star Fitness API running on port ${PORT}`))
+// Loopback only. nginx proxies /api/ to here, so this port must not be
+// reachable from the internet directly.
+app.listen(PORT, '127.0.0.1', () => console.log(`Star Fitness API running on 127.0.0.1:${PORT}`))

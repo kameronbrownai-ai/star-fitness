@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
-import { Loader2, Check, Ticket, LogOut, ArrowRight, Crown, ShieldCheck, Trash2, Activity, TrendingUp } from 'lucide-react'
+import { Loader2, Check, Ticket, LogOut, ArrowRight, Crown, ShieldCheck, Trash2, Activity, TrendingUp, Share2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import StarAssessment from '../components/StarAssessment'
 import { LEVEL_COLOR } from '../lib/starScore'
+import ConsistencyCard from '../components/ConsistencyCard'
+import { shareAssessment, logWorkout } from '../lib/progress'
 
 const PLAN_LABEL = {
   comp: { name: 'Complimentary, Full Access', color: '#FFD700' },
@@ -27,6 +29,28 @@ export default function Account() {
   const [msg, setMsg] = useState(null)
   const [err, setErr] = useState(null)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [shareState, setShareState] = useState(null) // null | 'busy' | 'copied' | 'shared'
+
+  // Flip the latest score public, then hand it to the OS share sheet where one
+  // exists (phones), falling back to the clipboard on desktop.
+  async function shareLatest(a) {
+    if (!a || shareState === 'busy') return
+    setShareState('busy')
+    try {
+      const { url } = await shareAssessment(a.id)
+      const text = `I scored ${a.overall} (${a.level}) on the Star Assessment. Every position has a number.`
+      if (navigator.share) {
+        try { await navigator.share({ title: 'My Star Score', text, url }); setShareState('shared'); return }
+        catch { /* user dismissed the sheet; fall through to copy */ }
+      }
+      await navigator.clipboard.writeText(url)
+      setShareState('copied')
+    } catch {
+      setShareState(null)
+      return
+    }
+    setTimeout(() => setShareState(null), 2500)
+  }
   const [deleting, setDeleting] = useState(false)
   const [deleteErr, setDeleteErr] = useState(null)
   const [showAssessment, setShowAssessment] = useState(false)
@@ -207,9 +231,19 @@ export default function Account() {
                   </div>
                 )}
 
+                <button
+                  onClick={() => shareLatest(history[0])}
+                  disabled={shareState === 'busy'}
+                  className="px-5 py-2.5 rounded-xl border border-white/15 text-white font-bold text-sm inline-flex items-center gap-2 mr-2 mb-2 hover:bg-white/5 transition-colors"
+                >
+                  {shareState === 'busy' ? <Loader2 size={15} className="animate-spin" />
+                    : shareState === 'copied' ? <><Check size={15} strokeWidth={3} /> Link copied</>
+                    : shareState === 'shared' ? <><Check size={15} strokeWidth={3} /> Shared</>
+                    : <><Share2 size={15} /> Share score</>}
+                </button>
                 {hasVision ? (
                   <button onClick={startAssessment}
-                    className="px-5 py-2.5 rounded-xl border border-star-yellow/40 bg-star-yellow/10 text-star-yellow font-bold text-sm inline-flex items-center gap-2">
+                    className="px-5 py-2.5 rounded-xl border border-star-yellow/40 bg-star-yellow/10 text-star-yellow font-bold text-sm inline-flex items-center gap-2 mb-2">
                     <Activity size={15} /> Retake assessment
                   </button>
                 ) : (
@@ -220,6 +254,9 @@ export default function Account() {
               </>
             )}
           </div>
+
+          {/* Consistency + streak */}
+          <div className="mb-5"><ConsistencyCard /></div>
 
           {/* Redeem a code */}
           <div className="rounded-2xl border border-star-border bg-star-card p-6 mb-5">
@@ -304,7 +341,7 @@ export default function Account() {
 
       <AnimatePresence>
         {showAssessment && (
-          <StarAssessment onClose={() => { setShowAssessment(false); loadHistory() }} />
+          <StarAssessment onClose={() => { setShowAssessment(false); loadHistory(); logWorkout('assessment', 'star-assessment') }} />
         )}
       </AnimatePresence>
     </main>

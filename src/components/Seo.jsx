@@ -86,6 +86,12 @@ export const ROUTE_META = {
 
 const FALLBACK = ROUTE_META['/']
 
+// Dynamic routes: match by prefix. ScoreShare sets its own title once the
+// score loads; this is the placeholder until then.
+const PREFIX_META = [
+  ['/score/', { title: 'Star Score | Star Fitness', description: 'A shared Star Score from the Star Assessment. Five moves, sixty seconds, one number.' }],
+]
+
 function setMeta(selector, attr, key, value) {
   let el = document.head.querySelector(selector)
   if (!el) {
@@ -105,7 +111,7 @@ export default function Seo() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    const meta = ROUTE_META[pathname] || FALLBACK
+    const meta = ROUTE_META[pathname] || PREFIX_META.find(([p]) => pathname.startsWith(p))?.[1] || FALLBACK
 
     document.title = meta.title
     setMeta('meta[name="description"]', 'name', 'description', meta.description)
