@@ -263,6 +263,17 @@ export default function Account() {
 
           <div className="mb-5"><ConsistencyCard /></div>
 
+          {/* Coach mode */}
+          <Link to="/coach" className="block rounded-2xl border border-star-border bg-star-card p-5 mb-5 hover:border-star-yellow/40 transition-colors group">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-white font-bold group-hover:text-star-yellow transition-colors">Coach mode</p>
+                <p className="text-star-grey text-sm mt-0.5">Test a whole squad in one session and export the results.</p>
+              </div>
+              <ArrowRight size={18} className="text-star-grey group-hover:text-star-yellow flex-shrink-0 transition-colors" />
+            </div>
+          </Link>
+
           {/* Teams */}
           <Link to="/teams" className="block rounded-2xl border border-star-border bg-star-card p-5 mb-5 hover:border-star-yellow/40 transition-colors group">
             <div className="flex items-center justify-between gap-3">

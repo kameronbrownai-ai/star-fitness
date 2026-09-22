@@ -24,10 +24,12 @@ if (process.env.STRIPE_SECRET_KEY) {
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 }
 
-// Behind nginx, so the real client IP arrives in X-Forwarded-For. Without
-// this every request looks like 127.0.0.1 and rate limiting would throttle
-// every user as if they were one person.
-app.set('trust proxy', 1)
+// The real client IP arrives in X-Forwarded-For. Without this every request
+// looks like it comes from the proxy and rate limiting throttles every user as
+// one person. The hop count depends on where this runs: 1 behind nginx on the
+// VPS, 2 when Vercel rewrites /api to the API host. Wrong in either direction
+// means shared buckets or spoofable IPs, so it is set per environment.
+app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS || 1))
 
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }))
 
@@ -150,7 +152,7 @@ async function findOrCreateUserByEmail(email) {
   if (existingId) return existingId
 
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${process.env.SITE_URL}/`,
+    redirectTo: `${process.env.SITE_URL || 'https://starmat.app'}/`,
   })
   if (error) {
     // Race: another concurrent webhook event may have just created this user — re-check once.
@@ -672,6 +674,125 @@ app.delete('/teams/:id/members/:userId', requireAuth, async (req, res) => {
   res.json({ success: true })
 })
 
+// ── COACH MODE: testing sessions (Phase 3) ──────────────────────────────────
+// Captures taken by a coach about other athletes. Kept out of public.
+// assessments so they never touch the coach's own Star Score, progress chart
+// or free-tier allowance.
+
+async function ownsSession(id, userId) {
+  const { data } = await supabase.from('test_sessions').select('id').eq('id', id).eq('owner_id', userId).single()
+  return !!data
+}
+
+app.post('/test-sessions', requireAuth, async (req, res) => {
+  const name = String(req.body?.name || '').trim().slice(0, 80)
+  if (name.length < 2) return res.status(400).json({ error: 'Give the session a name.' })
+  const { data, error } = await supabase.from('test_sessions').insert({
+    owner_id: req.user.id,
+    name,
+    location: String(req.body?.location || '').trim().slice(0, 80) || null,
+    notes: String(req.body?.notes || '').trim().slice(0, 500) || null,
+  }).select().single()
+  if (error) return res.status(500).json({ error: 'Could not create session' })
+  res.json({ session: data })
+})
+
+app.get('/test-sessions', requireAuth, async (req, res) => {
+  const { data: sessions } = await supabase.from('test_sessions')
+    .select('*').eq('owner_id', req.user.id).order('created_at', { ascending: false })
+  const ids = (sessions || []).map(s => s.id)
+  const counts = {}
+  if (ids.length) {
+    const { data: caps } = await supabase.from('test_captures').select('session_id, athlete_ref').in('session_id', ids)
+    for (const c of caps || []) {
+      counts[c.session_id] ||= { captures: 0, athletes: new Set() }
+      counts[c.session_id].captures++
+      counts[c.session_id].athletes.add(c.athlete_ref)
+    }
+  }
+  res.json({
+    sessions: (sessions || []).map(s => ({
+      ...s,
+      capture_count: counts[s.id]?.captures || 0,
+      athlete_count: counts[s.id]?.athletes.size || 0,
+    })),
+  })
+})
+
+app.get('/test-sessions/:id', requireAuth, async (req, res) => {
+  if (!(await ownsSession(req.params.id, req.user.id))) return res.status(404).json({ error: 'Session not found' })
+  const { data: session } = await supabase.from('test_sessions').select('*').eq('id', req.params.id).single()
+  const { data: captures } = await supabase.from('test_captures')
+    .select('*').eq('session_id', req.params.id).order('created_at', { ascending: false })
+  res.json({ session, captures: captures || [] })
+})
+
+app.post('/test-sessions/:id/captures', requireAuth, async (req, res) => {
+  if (!(await ownsSession(req.params.id, req.user.id))) return res.status(404).json({ error: 'Session not found' })
+  const b = req.body || {}
+  const ref = String(b.athlete_ref || '').trim().slice(0, 40)
+  if (!ref) return res.status(400).json({ error: 'Athlete reference required' })
+  if (typeof b.overall !== 'number' || !b.level || !b.categories) {
+    return res.status(400).json({ error: 'Invalid capture payload' })
+  }
+  const rating = b.coach_rating == null ? null : Number(b.coach_rating)
+  if (rating != null && (!Number.isInteger(rating) || rating < 1 || rating > 5)) {
+    return res.status(400).json({ error: 'Coach rating must be 1 to 5' })
+  }
+
+  const { data, error } = await supabase.from('test_captures').insert({
+    session_id: req.params.id,
+    athlete_ref: ref,
+    sport: String(b.sport || '').trim().slice(0, 40) || null,
+    sex: String(b.sex || '').trim().slice(0, 20) || null,
+    age_band: String(b.age_band || '').trim().slice(0, 20) || null,
+    overall: Math.round(b.overall),
+    level: b.level,
+    mobility: Math.round(b.categories.mobility ?? 0),
+    balance: Math.round(b.categories.balance ?? 0),
+    control: Math.round(b.categories.control ?? 0),
+    symmetry: Math.round(b.categories.symmetry ?? 0),
+    capture_quality: typeof b.capture_quality === 'number' ? b.capture_quality : null,
+    coach_rating: rating,
+    is_retest: !!b.is_retest,
+    notes: String(b.notes || '').trim().slice(0, 300) || null,
+  }).select().single()
+  if (error) return res.status(500).json({ error: 'Could not save capture' })
+  res.json({ capture: data })
+})
+
+app.delete('/test-sessions/:id/captures/:capId', requireAuth, async (req, res) => {
+  if (!(await ownsSession(req.params.id, req.user.id))) return res.status(404).json({ error: 'Session not found' })
+  await supabase.from('test_captures').delete().eq('id', req.params.capId).eq('session_id', req.params.id)
+  res.json({ success: true })
+})
+
+app.delete('/test-sessions/:id', requireAuth, async (req, res) => {
+  if (!(await ownsSession(req.params.id, req.user.id))) return res.status(404).json({ error: 'Session not found' })
+  await supabase.from('test_sessions').delete().eq('id', req.params.id)
+  res.json({ success: true })
+})
+
+// Spreadsheet export. One row per capture, ready for analysis.
+app.get('/test-sessions/:id/export', requireAuth, async (req, res) => {
+  if (!(await ownsSession(req.params.id, req.user.id))) return res.status(404).json({ error: 'Session not found' })
+  const { data: session } = await supabase.from('test_sessions').select('*').eq('id', req.params.id).single()
+  const { data: captures } = await supabase.from('test_captures')
+    .select('*').eq('session_id', req.params.id).order('created_at')
+
+  const cols = ['athlete_ref', 'is_retest', 'sport', 'sex', 'age_band', 'overall', 'level',
+    'mobility', 'balance', 'control', 'symmetry', 'coach_rating', 'capture_quality', 'notes', 'created_at']
+  // Quote every field: athlete refs and notes can contain commas, and a stray
+  // one silently shifts every later column in the spreadsheet.
+  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+  const rows = [cols.join(','), ...(captures || []).map(c => cols.map(k => esc(c[k])).join(','))]
+
+  const safeName = (session?.name || 'session').replace(/[^a-z0-9]+/gi, '-').toLowerCase()
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+  res.setHeader('Content-Disposition', `attachment; filename="starmat-${safeName}.csv"`)
+  res.send(rows.join('\n'))
+})
+
 // ── AI CHAT (kept open for now so the live site keeps working;
 //    will be gated by entitlement when the new frontend ships) ─────────────────
 app.post('/chat', chatLimiter, async (req, res) => {
@@ -690,6 +811,7 @@ app.post('/chat', chatLimiter, async (req, res) => {
   }
 })
 
-// Loopback only. nginx proxies /api/ to here, so this port must not be
-// reachable from the internet directly.
-app.listen(PORT, '127.0.0.1', () => console.log(`Star Fitness API running on 127.0.0.1:${PORT}`))
+// On the VPS this stays on loopback behind nginx. Managed hosts (Railway,
+// Render) route to the container and need 0.0.0.0, which they set via HOST.
+const HOST = process.env.HOST || '127.0.0.1'
+app.listen(PORT, HOST, () => console.log(`Star Fitness API running on ${HOST}:${PORT}`))

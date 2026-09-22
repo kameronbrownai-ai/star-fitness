@@ -109,3 +109,47 @@ export function deleteTeam(id) {
 export function removeMember(teamId, userId) {
   return api(`/teams/${teamId}/members/${userId}`, { method: 'DELETE' })
 }
+
+// ── Coach mode: testing sessions ─────────────────────────────────────────────
+// Captures taken by a coach about other athletes. Separate from the signed-in
+// user's own assessments on purpose.
+
+export function createTestSession(name, location, notes) {
+  return api('/test-sessions', { method: 'POST', body: JSON.stringify({ name, location, notes }) })
+}
+
+export function listTestSessions() {
+  return api('/test-sessions')
+}
+
+export function getTestSession(id) {
+  return api(`/test-sessions/${id}`)
+}
+
+export function addCapture(sessionId, capture) {
+  return api(`/test-sessions/${sessionId}/captures`, { method: 'POST', body: JSON.stringify(capture) })
+}
+
+export function deleteCapture(sessionId, captureId) {
+  return api(`/test-sessions/${sessionId}/captures/${captureId}`, { method: 'DELETE' })
+}
+
+export function deleteTestSession(id) {
+  return api(`/test-sessions/${id}`, { method: 'DELETE' })
+}
+
+/** Downloads the session as a CSV the browser saves to disk. */
+export async function exportTestSession(id, name) {
+  const t = await token()
+  const res = await fetch(`/api/test-sessions/${id}/export`, { headers: { Authorization: `Bearer ${t}` } })
+  if (!res.ok) throw new Error('Could not export')
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `starmat-${(name || 'session').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.csv`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}

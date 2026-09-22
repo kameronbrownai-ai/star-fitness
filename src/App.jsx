@@ -23,6 +23,8 @@ import Pricing from './pages/Pricing'
 import Account from './pages/Account'
 import Licenses from './pages/Licenses'
 import ScoreShare from './pages/ScoreShare'
+import Coach from './pages/Coach'
+import CoachSession from './pages/CoachSession'
 import Teams from './pages/Teams'
 import TeamPage from './pages/TeamPage'
 
@@ -86,6 +88,8 @@ function AnimatedRoutes() {
           <Route path="/account" element={<Account />} />
           <Route path="/licenses" element={<Licenses />} />
           <Route path="/score/:id" element={<ScoreShare />} />
+          <Route path="/coach" element={<Coach />} />
+          <Route path="/coach/:id" element={<CoachSession />} />
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/:id" element={<TeamPage />} />
           <Route path="/privacy" element={<Legal doc="privacy" />} />

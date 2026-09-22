@@ -62,6 +62,10 @@ export const ROUTE_META = {
     title: 'Teams & Leaderboards | Star Fitness',
     description: 'Create a team, share a code, and see every teammate\'s Star Score, streak, and progress on one board.',
   },
+  '/coach': {
+    title: 'Coach Mode | Star Fitness',
+    description: 'Run a Star Assessment testing session with a whole squad and export the results.',
+  },
   '/account': {
     title: 'Your Account | Star Fitness',
     description: 'Manage your Star Fitness membership, billing, Star Score history, and account settings.',
@@ -93,6 +97,7 @@ const FALLBACK = ROUTE_META['/']
 // Dynamic routes: match by prefix. ScoreShare sets its own title once the
 // score loads; this is the placeholder until then.
 const PREFIX_META = [
+  ['/coach/', { title: 'Testing Session | Star Fitness', description: 'Capture Star Scores for a group of athletes.' }],
   ['/teams/', { title: 'Team Leaderboard | Star Fitness', description: 'Star Score, streak, and most-improved rankings for a Star Mat team.' }],
   ['/score/', { title: 'Star Score | Star Fitness', description: 'A shared Star Score from the Star Assessment. Five moves, sixty seconds, one number.' }],
 ]

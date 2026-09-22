@@ -51,7 +51,13 @@ const MOVES = [
   { key: 'balanceRight',title: 'Single-Leg, R',    cue: 'Stand on your RIGHT leg over LOAD DECIDE. Hold steady.',        type: 'hold', seconds: 12 },
 ]
 
-export default function StarAssessment({ onClose }) {
+/**
+ * @param onResult  Coach mode. When given, the finished score is handed back
+ *   instead of being saved as the signed-in user's own Star Score. A coach
+ *   testing twenty athletes must not end up with twenty entries on their own
+ *   progress chart, and must not burn their assessment allowance doing it.
+ */
+export default function StarAssessment({ onClose, onResult }) {
   const { session, refreshEntitlement } = useAuth()
   const videoRef = useRef(null)
   const detectorRef = useRef(null)
@@ -185,6 +191,11 @@ export default function StarAssessment({ onClose }) {
     setPhase('computing')
     const r = computeStarScore(measuresRef.current)
     setResult(r)
+
+    // Coach mode: hand the score to the caller and stop. Nothing is written
+    // against this account.
+    if (onResult) { onResult(r); return }
+
     setPhase('results')
     // Save (gated server-side)
     setSaveState('saving')
