@@ -9,13 +9,37 @@ const WASM_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/w
 const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task'
 const LM = { L_SHOULDER: 11, R_SHOULDER: 12, L_HIP: 23, R_HIP: 24, L_KNEE: 25, R_KNEE: 26, L_ANKLE: 27, R_ANKLE: 28 }
 
-function angle(a, b, c) {
+// Joint angle in three dimensions. This must be fed MediaPipe's WORLD
+// landmarks (metres, origin at the hips), not the normalised screen ones:
+// screen x is divided by image width and y by image height, so on any
+// non-square camera the axes have different scales and every angle comes out
+// skewed. A true 135° knee reads 143° on a 4:3 camera and 151° on a 16:9 one.
+function angle3D(a, b, c) {
   if (!a || !b || !c) return null
-  const ab = { x: a.x - b.x, y: a.y - b.y }, cb = { x: c.x - b.x, y: c.y - b.y }
-  const dot = ab.x * cb.x + ab.y * cb.y
-  const mag = Math.hypot(ab.x, ab.y) * Math.hypot(cb.x, cb.y)
+  const ab = { x: a.x - b.x, y: a.y - b.y, z: (a.z ?? 0) - (b.z ?? 0) }
+  const cb = { x: c.x - b.x, y: c.y - b.y, z: (c.z ?? 0) - (b.z ?? 0) }
+  const dot = ab.x * cb.x + ab.y * cb.y + ab.z * cb.z
+  const mag = Math.hypot(ab.x, ab.y, ab.z) * Math.hypot(cb.x, cb.y, cb.z)
   if (!mag) return null
   return Math.round(Math.acos(Math.max(-1, Math.min(1, dot / mag))) * 180 / Math.PI)
+}
+
+// Every landmark carries a confidence. A limb the model is guessing at
+// produces a plausible-looking but wrong angle, so those frames are dropped
+// rather than averaged in.
+const MIN_VISIBILITY = 0.6
+function visible(...pts) {
+  return pts.every(p => p && (p.visibility ?? 1) >= MIN_VISIBILITY)
+}
+
+// Value at a percentile of a sorted sample. Used instead of Math.min for
+// depth: tracking drops a limb for a frame or two in nearly every capture,
+// and a single bad frame is enough to fake a very deep squat.
+function percentile(values, p) {
+  if (!values.length) return null
+  const a = [...values].sort((x, y) => x - y)
+  const i = Math.min(a.length - 1, Math.max(0, Math.round((a.length - 1) * p)))
+  return a[i]
 }
 
 // The scripted 5-move sequence, each cue references the Star Mat's own markers.
@@ -53,17 +77,34 @@ export default function StarAssessment({ onClose }) {
     if (v.readyState >= 2) {
       try {
         const res = detectorRef.current.detectForVideo(v, performance.now())
-        const lm = res?.landmarks?.[0]
+        const lm = res?.landmarks?.[0]         // normalised screen coords
+        const wl = res?.worldLandmarks?.[0]    // metres, origin at the hips
         if (lm && lm.length) {
           setPoseOk(true)
           if (recordingRef.current) {
+            // Angles come from the world landmarks so they do not depend on
+            // the camera's shape or how far away the athlete stood.
+            const w = wl && wl.length ? wl : null
+            const legsOk = visible(lm[LM.L_HIP], lm[LM.L_KNEE], lm[LM.L_ANKLE], lm[LM.R_HIP], lm[LM.R_KNEE], lm[LM.R_ANKLE])
+            // Torso length in screen space gives a body-size reference, so
+            // sway can be expressed relative to the athlete rather than in
+            // raw screen units that shrink as they step further back.
+            const shoulderY = (lm[LM.L_SHOULDER].y + lm[LM.R_SHOULDER].y) / 2
+            const hipYn = (lm[LM.L_HIP].y + lm[LM.R_HIP].y) / 2
+            const torso = Math.abs(hipYn - shoulderY) || 0.2
+            // x is normalised by image width and y by height, so x has to be
+            // rescaled before it can be compared with a y-measured torso.
+            // Without this the balance score still drifts with camera shape.
+            const aspect = (v.videoWidth || 640) / (v.videoHeight || 480)
             samplesRef.current.push({
-              lKnee: angle(lm[LM.L_HIP], lm[LM.L_KNEE], lm[LM.L_ANKLE]),
-              rKnee: angle(lm[LM.R_HIP], lm[LM.R_KNEE], lm[LM.R_ANKLE]),
-              lHip: angle(lm[LM.L_SHOULDER], lm[LM.L_HIP], lm[LM.L_KNEE]),
-              rHip: angle(lm[LM.R_SHOULDER], lm[LM.R_HIP], lm[LM.R_KNEE]),
-              hipX: (lm[LM.L_HIP].x + lm[LM.R_HIP].x) / 2,
-              hipY: (lm[LM.L_HIP].y + lm[LM.R_HIP].y) / 2,
+              ok: !!w && legsOk,
+              lKnee: w ? angle3D(w[LM.L_HIP], w[LM.L_KNEE], w[LM.L_ANKLE]) : null,
+              rKnee: w ? angle3D(w[LM.R_HIP], w[LM.R_KNEE], w[LM.R_ANKLE]) : null,
+              lHip: w ? angle3D(w[LM.L_SHOULDER], w[LM.L_HIP], w[LM.L_KNEE]) : null,
+              rHip: w ? angle3D(w[LM.R_SHOULDER], w[LM.R_HIP], w[LM.R_KNEE]) : null,
+              hipX: ((lm[LM.L_HIP].x + lm[LM.R_HIP].x) / 2) * aspect,
+              hipY: hipYn,
+              torso,
             })
           }
         } else setPoseOk(false)
@@ -268,6 +309,20 @@ export default function StarAssessment({ onClose }) {
 
               <p className="font-black text-3xl mt-4" style={{ color: LEVEL_COLOR[result.level] }}>{result.level}</p>
 
+              {/* A move the camera could not see properly falls back to a
+                  middling default, which would otherwise look like a real
+                  result. Say so rather than presenting a confident number. */}
+              {result.capture && !result.capture.confident && (
+                <div className="w-full max-w-sm mt-4 rounded-xl border border-star-yellow/30 bg-star-yellow/[0.07] px-4 py-3">
+                  <p className="text-star-yellow text-xs font-bold mb-1">
+                    Partial capture: {result.capture.movesScored} of {result.capture.movesTotal} moves tracked clearly
+                  </p>
+                  <p className="text-white/60 text-[11px] leading-relaxed">
+                    Retake it with your whole body in frame and good light for a score you can trust.
+                  </p>
+                </div>
+              )}
+
               <div className="w-full max-w-sm mt-6 space-y-2.5">
                 {Object.entries(result.categories).map(([k, v]) => (
                   <div key={k}>
@@ -315,33 +370,60 @@ export default function StarAssessment({ onClose }) {
 }
 
 // Reduce the frame samples for a move into the metrics the scorer expects.
+// Only frames where the model was confident about the whole limb are used.
 function summarize(move, samples) {
-  if (!samples.length) return {}
+  const good = samples.filter(s => s.ok)
+  // Share of the window the camera actually saw properly. The scorer reports
+  // this rather than letting a failed move pass as a mediocre result.
+  const quality = samples.length ? good.length / samples.length : 0
+  if (!good.length) return { quality: 0 }
+
   if (move.type === 'rep') {
-    // deepest point = smallest knee angle reached
-    const lKnees = samples.map(s => s.lKnee).filter(Boolean)
-    const rKnees = samples.map(s => s.rKnee).filter(Boolean)
-    const lMin = lKnees.length ? Math.min(...lKnees) : 120
-    const rMin = rKnees.length ? Math.min(...rKnees) : 120
-    const lHips = samples.map(s => s.lHip).filter(Boolean)
-    const rHips = samples.map(s => s.rHip).filter(Boolean)
-    const hipMin = Math.min(lHips.length ? Math.min(...lHips) : 130, rHips.length ? Math.min(...rHips) : 130)
+    // The deepest part of the movement, taken as a percentile rather than the
+    // single lowest frame. One mis-tracked frame used to be enough to fake a
+    // very deep squat and inflate the score.
+    const lKnees = good.map(s => s.lKnee).filter(n => n != null)
+    const rKnees = good.map(s => s.rKnee).filter(n => n != null)
+    const hips = [...good.map(s => s.lHip), ...good.map(s => s.rHip)].filter(n => n != null)
+    const lDeep = percentile(lKnees, 0.05)
+    const rDeep = percentile(rKnees, 0.05)
+    if (lDeep == null || rDeep == null) return { quality }
     return {
-      minKneeAngle: Math.min(lMin, rMin),
-      minHipAngle: hipMin,
-      kneeSymmetryDelta: Math.abs(lMin - rMin),
-      steadiness: steadinessOf(samples),
+      // Both legs averaged. Taking whichever leg went deeper rewarded a
+      // tracking error on one side.
+      kneeAngle: Math.round((lDeep + rDeep) / 2),
+      hipAngle: percentile(hips, 0.05) ?? 130,
+      kneeSymmetryDelta: Math.abs(lDeep - rDeep),
+      steadiness: steadinessOf(good),
+      quality,
     }
   }
-  // hold: steadiness of the hip center over the window
-  return { steadiness: steadinessOf(samples), hipLevelDelta: 0 }
+  return { steadiness: steadinessOf(good), quality }
 }
 
-// Lower positional variance during the window => steadier => higher score.
+// Sway relative to the athlete's own body size, so standing closer to the
+// camera does not read as being less steady. Raw screen movement grows as you
+// approach the lens even when the body is just as still.
 function steadinessOf(samples) {
-  const xs = samples.map(s => s.hipX), ys = samples.map(s => s.hipY)
-  const sd = (a) => { const m = a.reduce((x, y) => x + y, 0) / a.length; return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length) }
-  const wobble = (sd(xs) + sd(ys)) / 2 // in normalized 0..1 coords
-  // ~0.002 = very steady, ~0.05 = very wobbly
-  return Math.max(0, Math.min(100, Math.round(100 - (wobble - 0.004) / (0.05 - 0.004) * 100)))
+  // Skip the settling period: the first stretch of a hold is the athlete
+  // still finding the position, which is not a balance problem.
+  const settle = Math.floor(samples.length * 0.25)
+  const s = samples.slice(settle)
+  if (s.length < 4) return 50
+
+  const sd = (a) => {
+    const m = a.reduce((x, y) => x + y, 0) / a.length
+    return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length)
+  }
+  // Torso length is the body-size yardstick, measured in the same screen
+  // units as the sway, so the ratio is dimensionless and distance-invariant.
+  const torso = s.reduce((acc, x) => acc + x.torso, 0) / s.length || 0.2
+  const wobble = (sd(s.map(x => x.hipX)) + sd(s.map(x => x.hipY))) / 2 / torso
+
+  // Calibrated in torso-lengths, which is roughly half a metre on an adult:
+  // ~0.015 (under a centimetre of hip sway) is genuinely still, ~0.12 (six
+  // centimetres) is visibly correcting. The previous band was so wide that a
+  // wobbly athlete and a steady one both scored 100.
+  return Math.max(0, Math.min(100, Math.round(100 - ((wobble - 0.015) / (0.12 - 0.015)) * 100)))
 }
+

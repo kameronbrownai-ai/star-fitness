@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import StarAssessment from '../components/StarAssessment'
 import { LEVEL_COLOR } from '../lib/starScore'
 import ConsistencyCard from '../components/ConsistencyCard'
+import ProgressChart from '../components/ProgressChart'
 import { shareAssessment, logWorkout } from '../lib/progress'
 
 const PLAN_LABEL = {
@@ -256,6 +257,10 @@ export default function Account() {
           </div>
 
           {/* Consistency + streak */}
+          {history && history.length > 0 && (
+            <div className="mb-5"><ProgressChart history={history} /></div>
+          )}
+
           <div className="mb-5"><ConsistencyCard /></div>
 
           {/* Teams */}
