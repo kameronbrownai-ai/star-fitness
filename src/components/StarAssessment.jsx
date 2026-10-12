@@ -4,6 +4,31 @@ import { X, Loader2, Check, ArrowRight, RotateCcw } from 'lucide-react'
 import { computeStarScore, levelFor, LEVEL_COLOR, scoreInsights } from '../lib/starScore'
 import { useAuth } from '../context/AuthContext'
 import StarScoreDial from './StarScoreDial'
+import { track as trackEvent } from '../lib/analytics'
+
+/**
+ * Classifies an init failure as a camera problem, or not one at all.
+ * Returns null when the failure came from somewhere else (the MediaPipe model
+ * or WASM failing to load), so a CDN outage never shows up as people refusing
+ * the camera.
+ */
+function cameraFailureReason(err) {
+  switch (err?.name) {
+    case 'NotAllowedError':
+    case 'SecurityError':
+      return 'permission_denied'
+    case 'NotFoundError':
+    case 'OverconstrainedError':
+      return 'no_device'
+    case 'NotReadableError':
+    case 'AbortError':
+      return 'other'
+    default:
+      // getUserMedia is absent entirely outside a secure context.
+      if (!navigator.mediaDevices?.getUserMedia) return 'insecure_context'
+      return null
+  }
+}
 
 const WASM_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
 const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task'
@@ -57,7 +82,14 @@ const MOVES = [
  *   testing twenty athletes must not end up with twenty entries on their own
  *   progress chart, and must not burn their assessment allowance doing it.
  */
-export default function StarAssessment({ onClose, onResult }) {
+export default function StarAssessment({ onClose, onResult, entryPoint = 'account', isFirstEver = false }) {
+  // In coach mode (onResult set) the person in front of the camera is an
+  // athlete with no account, not the signed-in user. Firing the athlete
+  // funnel events here would attribute a whole squad's captures to one coach
+  // and wreck the activation numbers. Coach mode has its own events in the
+  // tracking plan.
+  const isSelfAssessment = !onResult
+  const track = (name, props) => { if (isSelfAssessment) trackEvent(name, props) }
   const { session, refreshEntitlement } = useAuth()
   const videoRef = useRef(null)
   const detectorRef = useRef(null)
@@ -66,6 +98,7 @@ export default function StarAssessment({ onClose, onResult }) {
   const mountedRef = useRef(true)
   const samplesRef = useRef([])       // collected during the active recording window
   const recordingRef = useRef(false)
+  const startedAtRef = useRef(null)   // set when the camera is live, for duration
 
   const [phase, setPhase] = useState('loading') // loading | intro | countdown | recording | computing | results | error
   const [moveIdx, setMoveIdx] = useState(0)
@@ -137,9 +170,19 @@ export default function StarAssessment({ onClose, onResult }) {
       videoRef.current.srcObject = stream
       await videoRef.current.play()
       setPhase('intro')
+      startedAtRef.current = Date.now()
+      track('assessment.started', {
+        entry_point: entryPoint,
+        is_first_ever: isFirstEver,
+      })
       loop()
     } catch (e) {
       console.error('assessment init', e)
+      // A camera refusal and a model that would not load are completely
+      // different problems wearing the same error screen. Only the first one
+      // is a funnel event, and it is a hard stop on the primary value action.
+      const reason = cameraFailureReason(e)
+      if (reason) track('assessment.camera_denied', { reason })
       if (mountedRef.current) setPhase('error')
     }
   }
@@ -191,6 +234,20 @@ export default function StarAssessment({ onClose, onResult }) {
     setPhase('computing')
     const r = computeStarScore(measuresRef.current)
     setResult(r)
+
+    // The primary value action. Derived score only: pose landmarks, joint
+    // angles and frames are biometric data and never leave the device.
+    track('assessment.completed', {
+      overall_score: r.overall,
+      level: r.level,
+      moves_scored: r.capture?.movesScored ?? 0,
+      moves_total: r.capture?.movesTotal ?? 0,
+      is_confident: Boolean(r.capture?.confident),
+      is_first_ever: isFirstEver,
+      duration_seconds: startedAtRef.current
+        ? Math.round((Date.now() - startedAtRef.current) / 1000)
+        : 0,
+    })
 
     // Coach mode: hand the score to the caller and stop. Nothing is written
     // against this account.

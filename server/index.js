@@ -5,6 +5,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import rateLimit from 'express-rate-limit'
 import ws from 'ws'
+import { trackServer } from './analytics.js'
 
 // Node 20 has no native WebSocket; Supabase's realtime client expects one.
 // We don't use realtime, but the client still initializes it — so polyfill.
@@ -90,6 +91,26 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
       } else if (!userId) {
         console.error('Mat purchase webhook: no client_reference_id or email on session', obj.id)
       }
+
+      // Hardware revenue, confirmed by Stripe. The browser cannot see this:
+      // the buyer completed payment on Stripe's own domain.
+      let itemCount = 1
+      let items = obj.metadata?.product || 'star_mat'
+      try {
+        const lines = await stripe.checkout.sessions.listLineItems(obj.id, { limit: 20 })
+        if (lines?.data?.length) {
+          itemCount = lines.data.reduce((n, l) => n + (l.quantity || 1), 0)
+          items = lines.data.map((l) => l.description).filter(Boolean).join(', ')
+        }
+      } catch { /* fall back to the metadata above; never fail the webhook */ }
+
+      await trackServer('order.completed', userId, {
+        value: (obj.amount_total ?? 0) / 100,
+        currency: (obj.currency || 'usd').toUpperCase(),
+        item_count: itemCount,
+        items,
+        stripe_event_id: event.id,
+      })
     }
     if (event.type === 'checkout.session.completed' && obj.subscription) {
       const sub = await stripe.subscriptions.retrieve(obj.subscription)
@@ -105,6 +126,13 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
       }
       if (uid) await supabase.from('subscriptions').upsert({ user_id: uid, ...patch }, { onConflict: 'user_id' })
       else await supabase.from('subscriptions').update(patch).eq('stripe_customer_id', obj.customer)
+
+      await trackServer('subscription.started', uid, {
+        plan: patch.plan === 'tier3' ? 'elite' : 'training',
+        value: amount / 100,
+        from_trial: Boolean(sub.trial_end),
+        stripe_event_id: event.id,
+      })
     }
     if (event.type === 'customer.subscription.updated') {
       const amount = obj.items?.data?.[0]?.price?.unit_amount ?? 0
@@ -116,9 +144,19 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
       }).eq('stripe_subscription_id', obj.id)
     }
     if (event.type === 'customer.subscription.deleted') {
-      await supabase.from('subscriptions').update({
-        status: 'canceled', plan: 'free', updated_at: new Date().toISOString(),
-      }).eq('stripe_subscription_id', obj.id)
+      const { data: rows } = await supabase.from('subscriptions')
+        .update({ status: 'canceled', plan: 'free', updated_at: new Date().toISOString() })
+        .eq('stripe_subscription_id', obj.id)
+        .select('user_id')
+
+      const amount = obj.items?.data?.[0]?.price?.unit_amount ?? 0
+      await trackServer('subscription.cancelled', rows?.[0]?.user_id ?? null, {
+        plan: tierFromAmount(amount) === 'tier3' ? 'elite' : 'training',
+        days_subscribed: obj.created
+          ? Math.max(0, Math.round((Date.now() / 1000 - obj.created) / 86400))
+          : 0,
+        stripe_event_id: event.id,
+      })
     }
   } catch (err) {
     console.error('Webhook handler error:', err.message)

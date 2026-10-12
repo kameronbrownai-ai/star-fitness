@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { setUser as setAnalyticsUser, track } from '../lib/analytics'
 
 const AuthContext = createContext(null)
 
@@ -24,8 +25,16 @@ export function AuthProvider({ children }) {
   }, [])
 
   // Global auth-modal control so any component can prompt sign-in
-  const [authModal, setAuthModal] = useState({ open: false, mode: 'signup', reason: null })
-  const openAuth = (opts = {}) => setAuthModal({ open: true, mode: opts.mode || 'signup', reason: opts.reason || null })
+  // `prompt` is the analytics label for what the modal was opened for. It is a
+  // separate field from `reason` on purpose: `reason` is user-facing copy that
+  // will be reworded, and matching on it would break the funnel silently.
+  const [authModal, setAuthModal] = useState({ open: false, mode: 'signup', reason: null, prompt: 'direct' })
+  const openAuth = (opts = {}) => setAuthModal({
+    open: true,
+    mode: opts.mode || 'signup',
+    reason: opts.reason || null,
+    prompt: opts.prompt || 'direct',
+  })
   const closeAuth = () => setAuthModal((s) => ({ ...s, open: false }))
 
   async function refreshEntitlement(activeSession) {
@@ -131,20 +140,40 @@ export function AuthProvider({ children }) {
     return () => sub.subscription.unsubscribe()
   }, [])
 
-  const signUp = (email, password, fullName) =>
-    supabase.auth.signUp({
+  const signUp = async (email, password, fullName) => {
+    const res = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     })
+    // Only on a real new account. Supabase returns a user with no identities
+    // when the address already exists, and that is not a signup.
+    if (!res.error && res.data?.user?.identities?.length) {
+      track('user.signed_up', {
+        trial_days: trialDaysOffer,
+        signup_prompt: authModal.prompt,
+      })
+    }
+    return res
+  }
 
-  const signIn = (email, password) =>
-    supabase.auth.signInWithPassword({ email, password })
+  const signIn = async (email, password) => {
+    const res = await supabase.auth.signInWithPassword({ email, password })
+    if (!res.error) track('user.signed_in', {})
+    return res
+  }
 
   const signOut = () => supabase.auth.signOut()
 
   // Derived helpers used across the app
   const tier = entitlement?.tier ?? 'free'
+
+  // Hand identity to analytics whenever the user or their tier changes. This
+  // is also what arms the internal-user guard: comp-tier accounts and the ids
+  // in src/config/analytics.js send nothing at all from here on.
+  useEffect(() => {
+    setAnalyticsUser(user?.id ?? null, tier)
+  }, [user?.id, tier])
   const hasFullLibrary = !!entitlement?.access          // all videos + AI coach
   const hasVision = !!entitlement?.vision               // voice + camera (tier3/comp/trial)
   const trialDaysLeft = subscription?.trial_ends_at && tier === 'trial'

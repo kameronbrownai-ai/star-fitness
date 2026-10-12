@@ -3,8 +3,9 @@ import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { Link } from 'react-router-dom'
 import CompassStar from './CompassStar'
-import { STRIPE_LINKS } from '../config/stripe'
+import { STRIPE_LINKS, STRIPE_ITEMS } from '../config/stripe'
 import { supabase } from '../lib/supabase'
+import { track } from '../lib/analytics'
 
 export default function CartSidebar() {
   const { items, open, setOpen, total, count, removeItem, increment, decrement, clearCart } = useCart()
@@ -15,6 +16,18 @@ export default function CartSidebar() {
   // Logged-in buyers pass their identity through so the purchase attaches to
   // their existing account instead of triggering a new-account invite email.
   const goToStripe = async (id) => {
+    // Last thing observable from the browser: once the redirect happens the
+    // visitor is on Stripe's domain and only the webhook can see the outcome.
+    // Pairing this with order.completed is how the real checkout drop-off
+    // becomes visible at all.
+    const item = STRIPE_ITEMS[id]
+    track('checkout.started', {
+      checkout_type: 'product',
+      item: item?.key ?? 'accessory',
+      value: item?.value ?? 0,
+      currency: 'USD',
+    })
+
     const { data: { session } } = await supabase.auth.getSession()
     const params = new URLSearchParams()
     if (session?.user) {

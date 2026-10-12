@@ -2,6 +2,14 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check, X as XIcon, Loader2, Star, Clock } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { track } from '../lib/analytics'
+
+// Plan labels and prices for analytics. tier2/tier3 are internal keys; the
+// tracking plan uses the names people actually see.
+const PLAN_ANALYTICS = {
+  tier2: { item: 'training', value: 5 },
+  tier3: { item: 'elite', value: 14.99 },
+}
 
 const TIERS = [
   {
@@ -63,7 +71,7 @@ export default function Pricing() {
   async function subscribe(tierKey) {
     setError(null)
     if (!user) {
-      openAuth({ mode: 'signup', reason: 'Create your account, then pick your plan.' })
+      openAuth({ mode: 'signup', prompt: 'checkout_gate', reason: 'Create your account, then pick your plan.' })
       return
     }
     setLoading(tierKey)
@@ -75,6 +83,17 @@ export default function Pricing() {
       })
       const data = await res.json()
       if (!res.ok || !data.url) throw new Error(data.error || 'Checkout unavailable')
+
+      // Fired only once Stripe has actually given us a URL, so a failed
+      // checkout call never counts as a started one.
+      const plan = PLAN_ANALYTICS[tierKey]
+      track('checkout.started', {
+        checkout_type: 'subscription',
+        item: plan?.item ?? tierKey,
+        value: plan?.value ?? 0,
+        currency: 'USD',
+      })
+
       window.location.href = data.url
     } catch (e) {
       setError(e.message || 'Could not start checkout. Try again.')

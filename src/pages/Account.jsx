@@ -368,7 +368,11 @@ export default function Account() {
 
       <AnimatePresence>
         {showAssessment && (
-          <StarAssessment onClose={() => { setShowAssessment(false); loadHistory(); logWorkout('assessment', 'star-assessment') }} />
+          <StarAssessment
+            entryPoint="account"
+            isFirstEver={Array.isArray(history) && history.length === 0}
+            onClose={() => { setShowAssessment(false); loadHistory(); logWorkout('assessment', 'star-assessment') }}
+          />
         )}
       </AnimatePresence>
     </main>

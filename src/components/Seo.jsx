@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { trackPageView } from '../lib/analytics'
 
 const SITE = 'Star Fitness'
 const ORIGIN = 'https://starmat.app'
@@ -149,6 +150,10 @@ export default function Seo() {
       document.head.appendChild(canonical)
     }
     canonical.setAttribute('href', url)
+
+    // Fired here rather than in App so the pageview carries the title this
+    // effect just set, instead of the previous route's.
+    trackPageView(pathname)
   }, [pathname])
 
   return null

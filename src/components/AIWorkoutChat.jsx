@@ -307,7 +307,7 @@ export default function AIWorkoutChat({ inline = false }) {
   // Voice + camera are Elite/trial features. Free & Training get text coaching.
   function requireVision(action) {
     if (!authUser) {
-      openAuth({ mode: 'signup', reason: 'Start your free trial to use voice and camera coaching.' })
+      openAuth({ mode: 'signup', prompt: 'assessment_gate', reason: 'Start your free trial to use voice and camera coaching.' })
       return
     }
     if (!hasVision) { navigate('/pricing'); return }

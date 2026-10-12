@@ -277,7 +277,7 @@ export default function CoachSession() {
       </div>
 
       <AnimatePresence>
-        {capturing && <StarAssessment onClose={() => setCapturing(false)} onResult={onResult} />}
+        {capturing && <StarAssessment entryPoint="coach_mode" onClose={() => setCapturing(false)} onResult={onResult} />}
       </AnimatePresence>
     </main>
   )
