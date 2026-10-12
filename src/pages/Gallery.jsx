@@ -236,11 +236,11 @@ export default function Gallery() {
                   <div className={`relative rounded-2xl overflow-hidden border border-star-border aspect-[4/3] flex items-center justify-center ${item.image || item.poster ? '' : `bg-gradient-to-br ${item.thumb}`}`}>
                     {/* Real photo */}
                     {item.image && (
-                      <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                      <img src={item.image} loading="lazy" decoding="async" alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
                     )}
                     {/* Real video thumbnail */}
                     {item.poster && (
-                      <img src={item.poster} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                      <img src={item.poster} loading="lazy" decoding="async" alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
                     )}
 
                     {/* Hover overlay */}

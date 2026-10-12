@@ -27,6 +27,7 @@ import Coach from './pages/Coach'
 import CoachSession from './pages/CoachSession'
 import Teams from './pages/Teams'
 import TeamPage from './pages/TeamPage'
+import NotFound from './pages/NotFound'
 
 const pageVariants = {
   initial: { opacity: 0 },
@@ -96,6 +97,7 @@ function AnimatedRoutes() {
           <Route path="/terms" element={<Legal doc="terms" />} />
           <Route path="/returns" element={<Legal doc="returns" />} />
           <Route path="/cookies" element={<Legal doc="cookies" />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </motion.div>

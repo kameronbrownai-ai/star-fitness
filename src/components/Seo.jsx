@@ -92,7 +92,10 @@ export const ROUTE_META = {
   },
 }
 
-const FALLBACK = ROUTE_META['/']
+const NOT_FOUND = {
+  title: 'Page Not Found | Star Fitness',
+  description: 'That page moved or never existed. Find the Star Mat, training by sport, and membership plans here.',
+}
 
 // Dynamic routes: match by prefix. ScoreShare sets its own title once the
 // score loads; this is the placeholder until then.
@@ -121,7 +124,13 @@ export default function Seo() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    const meta = ROUTE_META[pathname] || PREFIX_META.find(([p]) => pathname.startsWith(p))?.[1] || FALLBACK
+    const known = ROUTE_META[pathname] || PREFIX_META.find(([p]) => pathname.startsWith(p))?.[1]
+    const meta = known || NOT_FOUND
+
+    // The server answers every path with 200 and the same app shell, so a
+    // mistyped URL would otherwise be indexed as a duplicate of the homepage.
+    // App.jsx renders NotFound for these; this keeps them out of search.
+    setMeta('meta[name="robots"]', 'name', 'robots', known ? 'index, follow' : 'noindex, follow')
 
     document.title = meta.title
     setMeta('meta[name="description"]', 'name', 'description', meta.description)

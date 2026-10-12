@@ -233,13 +233,13 @@ export default function Shop() {
               initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
               className="rounded-3xl overflow-hidden border border-star-border bg-star-card"
             >
-              <img src="/images/mat-onesheet-specs.png" alt="Star Mat, all angles and specifications" className="w-full h-full object-cover" />
+              <img src="/images/mat-onesheet-specs.png" loading="lazy" decoding="async" alt="Star Mat, all angles and specifications" className="w-full h-full object-cover" />
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
               className="rounded-3xl overflow-hidden border border-star-border bg-star-card"
             >
-              <img src="/images/mat-onesheet-scale.png" alt="Star Mat, size and scale reference" className="w-full h-full object-cover" />
+              <img src="/images/mat-onesheet-scale.png" loading="lazy" decoding="async" alt="Star Mat, size and scale reference" className="w-full h-full object-cover" />
             </motion.div>
           </div>
         </div>

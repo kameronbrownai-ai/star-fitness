@@ -497,7 +497,7 @@ export default function Lessons() {
                     style={{ background: `linear-gradient(135deg, ${tab === 'recover' ? '#0d2b1a' : `${selectedSport.color}15`}, #111)` }}
                   >
                     {selectedSport.image && tab === 'train' && (
-                      <img src={selectedSport.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
+                      <img src={selectedSport.image} loading="lazy" decoding="async" alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
                     )}
                     <motion.button
                       onClick={() => handlePlay(cls)}

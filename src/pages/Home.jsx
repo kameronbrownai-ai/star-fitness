@@ -21,6 +21,7 @@ const MODE = {
     color: '#007AFF',
     label: 'General Performance',
     video: '/videos/star-mat-fv1.mp4',
+    poster: '/images/thumbs/star-mat-fv1.jpg',
   },
   golf: {
     badge: 'Ground Force Golf Training System',
@@ -33,6 +34,7 @@ const MODE = {
     color: '#30D158',
     label: '⛳ Golf Training',
     video: '/videos/golf-tee-off.mp4',
+    poster: '/images/thumbs/golf-tee-off.jpg',
   },
   wellness: {
     badge: 'Wellness & Rehab Training System',
@@ -45,6 +47,7 @@ const MODE = {
     color: '#BF5AF2',
     label: '🧘 Wellness & Rehab',
     video: '/videos/star-mat-feet-weight-transfer.mp4',
+    poster: '/images/thumbs/star-mat-feet-weight-transfer.jpg',
   },
 }
 
@@ -387,7 +390,8 @@ export default function Home() {
         <AnimatePresence>
           <motion.video
             key={m.video}
-            autoPlay muted loop playsInline
+            autoPlay muted loop playsInline preload="auto"
+            poster={m.poster}
             src={m.video}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ filter: 'brightness(0.28) saturate(0.7)' }}
@@ -555,7 +559,7 @@ export default function Home() {
               <div className="relative w-full">
                 <div className="absolute inset-0 rounded-3xl bg-star-blue/10 blur-3xl scale-95 pointer-events-none" />
                 <div className="relative rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl" style={{ height: '600px' }}>
-                  <img src="/images/commercial/unrolling-mat.jpeg" alt="Athlete unrolling Star Mat"
+                  <img src="/images/commercial/unrolling-mat.jpeg" loading="lazy" decoding="async" alt="Athlete unrolling Star Mat"
                     className="absolute inset-0 w-full h-full object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
                     <div className="flex items-end justify-between">
