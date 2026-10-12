@@ -1,6 +1,11 @@
 User-agent: *
 Allow: /
 
+# Gated pages: a crawler only ever sees a sign-in prompt, so indexing them
+# wastes crawl budget and puts thin pages in search results.
+Disallow: /account
+Disallow: /coach
+
 # ── AI crawler access (GEO / AEO) ──────────────────────────────────────────
 # OpenAI / ChatGPT
 User-agent: GPTBot
