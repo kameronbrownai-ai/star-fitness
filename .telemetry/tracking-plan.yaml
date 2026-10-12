@@ -1,0 +1,580 @@
+meta:
+  product: "Star Fitness / Star Mat"
+  version: 1
+  created: 2026-10-12
+  updated: 2026-10-12
+  owner: "Kameron Brown"
+  destinations: [posthog, ga4]
+  naming_convention: "object.action, snake_case (greenfield default)"
+  pii_policy: none
+  internal_user_policy: >
+    Exclude by flag. The tracking module hard-returns before sending when
+    is_internal is true on the profile, when the hostname is not starmat.app,
+    or when the session redeemed a comp/boss code. Filtering in the dashboard
+    is not sufficient: founder test data has already polluted a real athlete's
+    progress chart in this project.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ENTITIES
+# No email, no name, anywhere. The analytics user_id is the Supabase user id,
+# which is an opaque UUID and is not personally identifying on its own.
+# ─────────────────────────────────────────────────────────────────────────────
+entities:
+  user:
+    id_property: user_id
+    id_format: "supabase uuid"
+    traits:
+      # Classification
+      - name: plan
+        type: string
+        enum: [free, training, elite, comp]
+        required: true
+        update: on_change
+      - name: primary_sport
+        type: string
+        required: false
+        update: on_change
+        description: Sport chosen in AI Coach onboarding.
+      - name: is_coach
+        type: boolean
+        required: true
+        update: on_change
+        description: Has ever created a testing session.
+      - name: is_internal
+        type: boolean
+        required: true
+        update: on_change
+        description: Founders, staff, comp-code holders. Gates all tracking.
+
+      # Lifecycle dates
+      - name: signed_up_at
+        type: datetime
+        required: true
+        update: one_time
+      - name: trial_ends_at
+        type: datetime
+        required: false
+        update: on_change
+      - name: first_assessment_at
+        type: datetime
+        required: false
+        update: one_time
+        description: Activation moment. The single most important trait here.
+      - name: last_active_at
+        type: datetime
+        required: true
+        update: scheduled
+
+      # Snapshot metrics
+      - name: assessments_completed_count
+        type: integer
+        required: true
+        update: scheduled
+      - name: latest_star_score
+        type: integer
+        required: false
+        update: scheduled
+      - name: latest_star_level
+        type: string
+        enum: [foundation, developing, strong, elite]
+        required: false
+        update: scheduled
+      - name: workouts_logged_count
+        type: integer
+        required: true
+        update: scheduled
+      - name: current_streak_days
+        type: integer
+        required: true
+        update: scheduled
+      - name: teams_count
+        type: integer
+        required: true
+        update: scheduled
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GROUPS
+# One level. Teams are the only multi-user structure; there is no account or
+# organization above the user. Testing-session athletes are NOT users and get
+# no group, no identity, and no traits.
+# ─────────────────────────────────────────────────────────────────────────────
+groups:
+  - type: team
+    id_format: "team uuid"
+    is_top_level: true
+    traits: [sport, member_count, created_at, avg_star_score]
+    triggers:
+      - on_creation: "team.created fires a group() call"
+      - on_trait_change: "member joins or leaves"
+      - scheduled: "daily sync of member_count and avg_star_score"
+
+snapshot_sync:
+  cadence: daily
+  notes: >
+    Runs server-side against Supabase. Cheap: these are counts over tables the
+    API already queries for the /stats endpoint.
+  traits:
+    - entity: user
+      trait: assessments_completed_count
+      source: "COUNT of assessments per user"
+    - entity: user
+      trait: latest_star_score
+      source: "Most recent assessments.overall"
+    - entity: user
+      trait: latest_star_level
+      source: "Most recent assessments.level"
+    - entity: user
+      trait: workouts_logged_count
+      source: "COUNT of workouts per user"
+    - entity: user
+      trait: current_streak_days
+      source: "Existing streak calculation in /api/stats"
+    - entity: user
+      trait: teams_count
+      source: "COUNT of team_members per user"
+    - entity: user
+      trait: last_active_at
+      source: "MAX event timestamp"
+    - entity: team
+      trait: member_count
+      source: "COUNT of team_members per team"
+    - entity: team
+      trait: avg_star_score
+      source: "AVG of members' latest overall"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EVENTS — 23 total
+# ─────────────────────────────────────────────────────────────────────────────
+events:
+
+  # ── Lifecycle ──────────────────────────────────────────────────────────────
+  - name: user.signed_up
+    category: lifecycle
+    group_level: null
+    source: client
+    description: Supabase account created.
+    call_site: "src/context/AuthContext.jsx:134 signUp"
+    properties:
+      - name: trial_days
+        type: integer
+        required: true
+        description: 30 for the first 5,000 members, then 14.
+      - name: signup_prompt
+        type: string
+        enum: [direct, assessment_gate, checkout_gate, team_join, coach_mode]
+        required: true
+        description: What the modal was opened for. AuthContext already carries
+          this as authModal.reason.
+    expected_frequency: low
+
+  - name: user.signed_in
+    category: lifecycle
+    group_level: null
+    source: client
+    call_site: "src/context/AuthContext.jsx:142 signIn"
+    description: Returning sign-in. Distinguishes new from returning in GA4.
+    properties: []
+    expected_frequency: medium
+
+  # ── Configuration ──────────────────────────────────────────────────────────
+  - name: consent.accepted
+    category: configuration
+    group_level: null
+    source: client
+    call_site: "src/components/ConsentGateModal.jsx"
+    description: >
+      Waiver and biometric consent accepted. Tracked because it is the gate in
+      front of the camera and because an auditable count of consents is worth
+      having. Records that consent happened and its version - never its text.
+    properties:
+      - name: consent_version
+        type: string
+        required: true
+        description: Bump when the attorney's final text lands.
+    expected_frequency: low
+
+  - name: onboarding.completed
+    category: configuration
+    group_level: null
+    source: client
+    call_site: "src/components/AIOnboarding.jsx"
+    description: Sport and goals chosen for the AI Coach.
+    properties:
+      - name: sport
+        type: string
+        required: true
+      - name: experience_level
+        type: string
+        required: false
+    expected_frequency: low
+
+  # ── Core value: the Star Assessment ────────────────────────────────────────
+  - name: assessment.started
+    category: core_value
+    group_level: null
+    source: client
+    call_site: "src/components/StarAssessment.jsx"
+    description: Camera granted and the first move begins.
+    properties:
+      - name: entry_point
+        type: string
+        enum: [account, home, team, coach_mode, share_link]
+        required: true
+      - name: is_first_ever
+        type: boolean
+        required: true
+    expected_frequency: medium
+
+  - name: assessment.camera_denied
+    category: core_value
+    group_level: null
+    source: client
+    description: >
+      Camera permission refused or unavailable. This is a hard stop on the
+      primary value action and is completely invisible today. If this number is
+      large at launch, nothing else in the funnel matters.
+    properties:
+      - name: reason
+        type: string
+        enum: [permission_denied, no_device, insecure_context, other]
+        required: true
+    expected_frequency: medium
+
+  - name: assessment.abandoned
+    category: core_value
+    group_level: null
+    source: client
+    description: Left mid-capture. Fires on unmount before completion.
+    properties:
+      - name: moves_completed
+        type: integer
+        required: true
+      - name: last_move
+        type: string
+        required: true
+      - name: seconds_elapsed
+        type: integer
+        required: true
+    expected_frequency: medium
+
+  - name: assessment.completed
+    category: core_value
+    group_level: null
+    source: client
+    call_site: "src/components/StarAssessment.jsx:203 POST /api/assessment"
+    description: >
+      The primary value action. Carries the derived score only. Pose landmarks,
+      joint angles and frames are biometric data and are never sent.
+    properties:
+      - name: overall_score
+        type: integer
+        required: true
+      - name: level
+        type: string
+        enum: [foundation, developing, strong, elite]
+        required: true
+      - name: moves_scored
+        type: integer
+        required: true
+      - name: moves_total
+        type: integer
+        required: true
+      - name: is_confident
+        type: boolean
+        required: true
+        description: >
+          False on a partial capture. Lets you separate "score went up" from
+          "capture quality went up", which the scoring rewrite was all about.
+      - name: is_first_ever
+        type: boolean
+        required: true
+      - name: duration_seconds
+        type: integer
+        required: true
+    expected_frequency: medium
+
+  - name: score.shared
+    category: collaboration
+    group_level: null
+    source: client
+    call_site: "src/lib/progress.js:57 shareAssessment"
+    description: A share link was generated for a score.
+    properties:
+      - name: overall_score
+        type: integer
+        required: true
+    expected_frequency: low
+
+  - name: score.share_viewed
+    category: collaboration
+    group_level: null
+    source: client
+    call_site: "src/pages/ScoreShare.jsx"
+    description: >
+      A shared score was opened, by anyone, signed in or not. This is the only
+      measurement of whether sharing actually brings people in. Note that the
+      share card currently renders the generic homepage preview on every social
+      platform, so expect this to be low until that is fixed.
+    properties:
+      - name: is_authenticated
+        type: boolean
+        required: true
+    expected_frequency: low
+
+  # ── Core value: AI Coach and training ──────────────────────────────────────
+  - name: coach_chat.message_sent
+    category: core_value
+    group_level: null
+    source: client
+    call_site: "src/components/AIWorkoutChat.jsx:473 POST /api/chat"
+    description: >
+      One user turn in the AI Coach. Message text is never sent - it is free
+      text and would carry PII. Shape only.
+    properties:
+      - name: turn_index
+        type: integer
+        required: true
+        description: Turn number within the session. Depth of conversation is
+          the signal; one message is a bounce, eight is engagement.
+      - name: has_photo
+        type: boolean
+        required: true
+      - name: is_authenticated
+        type: boolean
+        required: true
+        description: >
+          The Coach is currently free to anonymous users while pricing puts it
+          in the $5 tier. This property sizes that leak.
+    expected_frequency: high
+
+  - name: workout.logged
+    category: core_value
+    group_level: null
+    source: client
+    call_site: "src/lib/progress.js:36 logWorkout"
+    description: A training day recorded. Drives streaks.
+    properties:
+      - name: source
+        type: string
+        enum: [class, coach, manual, assessment]
+        required: true
+    expected_frequency: high
+
+  # ── Collaboration: teams ───────────────────────────────────────────────────
+  - name: team.created
+    category: collaboration
+    group_level: team
+    source: client
+    call_site: "src/lib/progress.js:74 createTeam"
+    properties:
+      - name: sport
+        type: string
+        required: false
+    expected_frequency: low
+
+  - name: team.joined
+    category: collaboration
+    group_level: team
+    source: client
+    call_site: "src/lib/progress.js:78 joinTeam"
+    description: >
+      A teammate redeemed a code. The ratio of joins to creations is the whole
+      question for the team feature: a team of one is a failed team.
+    properties:
+      - name: member_count_after
+        type: integer
+        required: true
+    expected_frequency: low
+
+  - name: team.left
+    category: collaboration
+    group_level: team
+    source: client
+    properties:
+      - name: was_member_days
+        type: integer
+        required: false
+    expected_frequency: low
+
+  # ── Coach mode ─────────────────────────────────────────────────────────────
+  - name: test_session.created
+    category: core_value
+    group_level: null
+    source: client
+    call_site: "src/lib/progress.js:117 createTestSession"
+    properties: []
+    expected_frequency: low
+
+  - name: test_session.capture_added
+    category: core_value
+    group_level: null
+    source: client
+    call_site: "src/lib/progress.js:129 addCapture"
+    description: >
+      One athlete captured in a coach's session. Athletes here have no account
+      and are identified by jersey number - never send that identifier.
+    properties:
+      - name: has_coach_rating
+        type: boolean
+        required: true
+        description: Whether the coach gave a 1-5 read before seeing the score.
+          Captures without it cannot be used for calibration.
+      - name: is_retest
+        type: boolean
+        required: true
+      - name: overall_score
+        type: integer
+        required: true
+    expected_frequency: medium
+
+  - name: test_session.exported
+    category: core_value
+    group_level: null
+    source: client
+    call_site: "src/lib/progress.js:142 exportTestSession"
+    properties:
+      - name: capture_count
+        type: integer
+        required: true
+    expected_frequency: low
+
+  # ── Billing ────────────────────────────────────────────────────────────────
+  # The two purchase events are SERVER-SIDE from the Stripe webhook. Payment
+  # Links redirect off-site, so the browser cannot observe a completed payment.
+  # A client-side "purchase" here would be a guess, and it would be wrong every
+  # time someone abandons on Stripe's own page.
+  - name: checkout.started
+    category: billing
+    group_level: null
+    source: client
+    call_site: "src/components/CartSidebar.jsx:25 and src/pages/Pricing.jsx:71"
+    description: >
+      Fired immediately before the redirect to buy.stripe.com. Pair with
+      order.completed / subscription.started to get the true drop-off on
+      Stripe's hosted page - the single biggest blind spot right now.
+    properties:
+      - name: checkout_type
+        type: string
+        enum: [product, subscription]
+        required: true
+      - name: item
+        type: string
+        enum: [mat_pro, mat_lite, bundle_starter, bundle_elite, accessory, training, elite]
+        required: true
+      - name: value
+        type: number
+        required: true
+      - name: currency
+        type: string
+        required: true
+    expected_frequency: low
+
+  - name: order.completed
+    category: billing
+    group_level: null
+    source: server
+    call_site: "Stripe webhook, checkout.session.completed, mode=payment"
+    description: Hardware purchase confirmed by Stripe. GA4 purchase event.
+    properties:
+      - name: value
+        type: number
+        required: true
+      - name: currency
+        type: string
+        required: true
+      - name: item_count
+        type: integer
+        required: true
+      - name: items
+        type: string
+        required: true
+        description: Comma-separated item keys. No customer details.
+    expected_frequency: low
+
+  - name: subscription.started
+    category: billing
+    group_level: null
+    source: server
+    call_site: "Stripe webhook, customer.subscription.created"
+    properties:
+      - name: plan
+        type: string
+        enum: [training, elite]
+        required: true
+      - name: value
+        type: number
+        required: true
+      - name: from_trial
+        type: boolean
+        required: true
+    expected_frequency: low
+
+  - name: subscription.cancelled
+    category: billing
+    group_level: null
+    source: server
+    call_site: "Stripe webhook, customer.subscription.deleted"
+    properties:
+      - name: plan
+        type: string
+        enum: [training, elite]
+        required: true
+      - name: days_subscribed
+        type: integer
+        required: true
+    expected_frequency: low
+
+  - name: trial.started
+    category: billing
+    group_level: null
+    source: client
+    description: Free trial began. No card required, so this is not a Stripe event.
+    properties:
+      - name: trial_days
+        type: integer
+        required: true
+    expected_frequency: low
+
+  - name: promo_code.redeemed
+    category: billing
+    group_level: null
+    source: server
+    call_site: "src/pages/Account.jsx redeem path"
+    description: >
+      Codes grant comp access. The boss code is unlimited-use; if it leaks, this
+      event is the only thing that will tell you, and the spike will come before
+      the damage does. Never send the code string itself.
+    properties:
+      - name: code_type
+        type: string
+        enum: [comp, trial_extension, discount]
+        required: true
+      - name: grants_plan
+        type: string
+        enum: [training, elite]
+        required: true
+    expected_frequency: low
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DELIBERATELY NOT TRACKED
+# ─────────────────────────────────────────────────────────────────────────────
+excluded:
+  - item: "Manual page views"
+    why: >
+      PostHog autocaptures pageviews and GA4 gets them from the SPA router
+      shim. Hand-rolled page events would double-count and inflate volume for
+      no added signal.
+  - item: "Pose landmarks, joint angles, video frames, camera stills"
+    why: Biometric data. Never leaves the device as analytics.
+  - item: "AI Coach message text and form-check photos"
+    why: Free text and images. Unbounded PII risk, no analytical value.
+  - item: "Athlete jersey numbers or initials from coach mode"
+    why: >
+      These identify real minors in some cases and belong to people who never
+      agreed to anything. Shape only.
+  - item: "button.clicked, component.rendered, api.called"
+    why: Implementation events. Break with every UI change, answer nothing.
+  - item: "Scroll depth, mouse movement, video play progress"
+    why: High-frequency noise. PostHog session replay covers the rare case.
+  - item: "Email, name, or any Stripe customer detail"
+    why: pii_policy is none.
