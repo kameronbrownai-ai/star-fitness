@@ -23,7 +23,22 @@ The VPS auto-deploys from GitHub `main` and the site updates in **35–40
 seconds**. There is no manual upload step. `deploy.sh` in this repo is
 **obsolete** — ignore it.
 
-### The one exception: images and videos do NOT deploy
+### Exception 1: server code does NOT deploy
+
+The pipeline only syncs the built frontend. Nothing under `server/` ever
+reaches the VPS from a push, so an API change sits in GitHub looking deployed
+while production keeps running the old code. Check with
+`curl -s https://starmat.app/api/config` before assuming otherwise.
+
+```bash
+scp server/index.js server/analytics.js root@2.24.110.179:/var/www/starfitness/server/
+ssh root@2.24.110.179 'cd /var/www/starfitness/server && node --check index.js && pm2 restart star-fitness-api --update-env'
+```
+
+Back up first (`cp index.js /root/index.js.bak-$(date +%F-%H%M%S)`) and diff the
+production file against the repo before overwriting. Never copy `.env`.
+
+### Exception 2: images and videos do NOT deploy
 
 The pipeline syncs `assets/` and `index.html` but **never touches `images/` or
 `videos/`**. A new image pushed to GitHub will 404 on the live site forever.
