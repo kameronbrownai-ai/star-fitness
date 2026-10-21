@@ -85,6 +85,21 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
   }
   const priceOf = (sub) => sub?.items?.data?.[0]?.price ?? null
 
+  // Stripe moved current_period_end off the subscription and onto each
+  // subscription item in API version 2025-03-31. This library pins a much
+  // later version, so sub.current_period_end is undefined and
+  // `new Date(undefined * 1000).toISOString()` threw "Invalid time value"
+  // BEFORE the row was written: the customer paid and was never upgraded.
+  // That is the "Webhook handler error: Invalid time value" in the logs.
+  // Read the item first, keep the old field as a fallback, and return null
+  // rather than an invalid date so a missing value can be skipped instead of
+  // taking the whole write down with it.
+  const periodEndOf = (sub) => {
+    const secs = sub?.items?.data?.[0]?.current_period_end ?? sub?.current_period_end
+    return Number.isFinite(secs) ? new Date(secs * 1000).toISOString() : null
+  }
+  const withPeriodEnd = (patch, iso) => (iso ? { ...patch, current_period_end: iso } : patch)
+
   // billing_interval is added by server/migrations/yearly_billing.sql. If this
   // code reaches production before that migration is run, Postgres rejects the
   // whole write for an unknown column and the customer pays without being
@@ -155,15 +170,14 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
       const amount = price?.unit_amount ?? 0
       const interval = price?.recurring?.interval === 'year' ? 'year' : 'month'
       const uid = obj.client_reference_id
-      const patch = {
+      const patch = withPeriodEnd({
         stripe_subscription_id: sub.id,
         stripe_customer_id: obj.customer,
         status: 'active',
         plan: tierFromPrice(price),
         billing_interval: interval,
-        current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
         updated_at: new Date().toISOString(),
-      }
+      }, periodEndOf(sub))
       await saveSubscription(patch, uid
         ? { user_id: uid }
         : { column: 'stripe_customer_id', value: obj.customer })
@@ -178,13 +192,12 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
     }
     if (event.type === 'customer.subscription.updated') {
       const price = priceOf(obj)
-      await saveSubscription({
+      await saveSubscription(withPeriodEnd({
         status: obj.status,
         plan: obj.status === 'active' ? tierFromPrice(price) : 'free',
         billing_interval: price?.recurring?.interval === 'year' ? 'year' : 'month',
-        current_period_end: new Date(obj.current_period_end * 1000).toISOString(),
         updated_at: new Date().toISOString(),
-      }, { column: 'stripe_subscription_id', value: obj.id })
+      }, periodEndOf(obj)), { column: 'stripe_subscription_id', value: obj.id })
     }
     if (event.type === 'customer.subscription.deleted') {
       const { data: rows } = await supabase.from('subscriptions')
