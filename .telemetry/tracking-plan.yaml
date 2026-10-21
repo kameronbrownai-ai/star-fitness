@@ -461,6 +461,11 @@ events:
         type: string
         enum: [mat_pro, mat_lite, bundle_starter, bundle_elite, accessory, training, elite]
         required: true
+      - name: billing_interval
+        type: string
+        enum: [month, year]
+        required: true
+        description: Monthly or yearly. Added when yearly membership shipped.
       - name: value
         type: number
         required: true
@@ -501,6 +506,11 @@ events:
         type: string
         enum: [training, elite]
         required: true
+      - name: billing_interval
+        type: string
+        enum: [month, year]
+        required: true
+        description: Monthly or yearly. Added when yearly membership shipped.
       - name: value
         type: number
         required: true
@@ -519,6 +529,11 @@ events:
         type: string
         enum: [training, elite]
         required: true
+      - name: billing_interval
+        type: string
+        enum: [month, year]
+        required: true
+        description: Monthly or yearly. Added when yearly membership shipped.
       - name: days_subscribed
         type: integer
         required: true

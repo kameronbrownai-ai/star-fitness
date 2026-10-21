@@ -69,8 +69,45 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
   if (dupeError) return res.json({ received: true, duplicate: true })
 
   const obj = event.data.object
-  // Map a Stripe price amount to our tier
-  const tierFromAmount = (cents) => (cents >= 1400 ? 'tier3' : 'tier2')
+
+  // Map a Stripe price to our tier.
+  //
+  // This MUST look at the billing interval, not the amount alone. Training is
+  // $5/month or $50/year; Elite is $14.99/month or $149.99/year. A single
+  // amount threshold would see a $50 yearly Training payment as larger than a
+  // $14.99 monthly Elite one and hand that customer full Elite access for a
+  // third of the price. One threshold per interval, each sitting between the
+  // two plans at that interval.
+  const tierFromPrice = (price) => {
+    const cents = price?.unit_amount ?? 0
+    const yearly = price?.recurring?.interval === 'year'
+    return cents >= (yearly ? 10000 : 1400) ? 'tier3' : 'tier2'
+  }
+  const priceOf = (sub) => sub?.items?.data?.[0]?.price ?? null
+
+  // billing_interval is added by server/migrations/yearly_billing.sql. If this
+  // code reaches production before that migration is run, Postgres rejects the
+  // whole write for an unknown column and the customer pays without being
+  // upgraded. Dropping the one new field and retrying costs nothing and makes
+  // the deploy order stop mattering.
+  const withoutInterval = (patch) => {
+    const { billing_interval, ...rest } = patch
+    return rest
+  }
+  const isMissingColumn = (err) =>
+    err?.code === 'PGRST204' || /billing_interval/.test(err?.message || '')
+
+  async function saveSubscription(patch, match) {
+    const run = (p) => (match.user_id
+      ? supabase.from('subscriptions').upsert({ ...match, ...p }, { onConflict: 'user_id' })
+      : supabase.from('subscriptions').update(p).eq(match.column, match.value))
+    let { error } = await run(patch)
+    if (error && isMissingColumn(error)) {
+      console.warn('subscriptions.billing_interval missing — run server/migrations/yearly_billing.sql')
+      ;({ error } = await run(withoutInterval(patch)))
+    }
+    if (error) throw new Error(`subscription write failed: ${error.message}`)
+  }
   try {
     if (event.type === 'checkout.session.completed' && obj.mode === 'payment' && obj.metadata?.product === 'star_mat') {
       let userId = obj.client_reference_id || null
@@ -114,34 +151,40 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
     }
     if (event.type === 'checkout.session.completed' && obj.subscription) {
       const sub = await stripe.subscriptions.retrieve(obj.subscription)
-      const amount = sub.items?.data?.[0]?.price?.unit_amount ?? 0
+      const price = priceOf(sub)
+      const amount = price?.unit_amount ?? 0
+      const interval = price?.recurring?.interval === 'year' ? 'year' : 'month'
       const uid = obj.client_reference_id
       const patch = {
         stripe_subscription_id: sub.id,
         stripe_customer_id: obj.customer,
         status: 'active',
-        plan: tierFromAmount(amount),
+        plan: tierFromPrice(price),
+        billing_interval: interval,
         current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
         updated_at: new Date().toISOString(),
       }
-      if (uid) await supabase.from('subscriptions').upsert({ user_id: uid, ...patch }, { onConflict: 'user_id' })
-      else await supabase.from('subscriptions').update(patch).eq('stripe_customer_id', obj.customer)
+      await saveSubscription(patch, uid
+        ? { user_id: uid }
+        : { column: 'stripe_customer_id', value: obj.customer })
 
       await trackServer('subscription.started', uid, {
         plan: patch.plan === 'tier3' ? 'elite' : 'training',
+        billing_interval: interval,
         value: amount / 100,
         from_trial: Boolean(sub.trial_end),
         stripe_event_id: event.id,
       })
     }
     if (event.type === 'customer.subscription.updated') {
-      const amount = obj.items?.data?.[0]?.price?.unit_amount ?? 0
-      await supabase.from('subscriptions').update({
+      const price = priceOf(obj)
+      await saveSubscription({
         status: obj.status,
-        plan: obj.status === 'active' ? tierFromAmount(amount) : 'free',
+        plan: obj.status === 'active' ? tierFromPrice(price) : 'free',
+        billing_interval: price?.recurring?.interval === 'year' ? 'year' : 'month',
         current_period_end: new Date(obj.current_period_end * 1000).toISOString(),
         updated_at: new Date().toISOString(),
-      }).eq('stripe_subscription_id', obj.id)
+      }, { column: 'stripe_subscription_id', value: obj.id })
     }
     if (event.type === 'customer.subscription.deleted') {
       const { data: rows } = await supabase.from('subscriptions')
@@ -149,9 +192,10 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
         .eq('stripe_subscription_id', obj.id)
         .select('user_id')
 
-      const amount = obj.items?.data?.[0]?.price?.unit_amount ?? 0
+      const price = priceOf(obj)
       await trackServer('subscription.cancelled', rows?.[0]?.user_id ?? null, {
-        plan: tierFromAmount(amount) === 'tier3' ? 'elite' : 'training',
+        plan: tierFromPrice(price) === 'tier3' ? 'elite' : 'training',
+        billing_interval: price?.recurring?.interval === 'year' ? 'year' : 'month',
         days_subscribed: obj.created
           ? Math.max(0, Math.round((Date.now() / 1000 - obj.created) / 86400))
           : 0,
@@ -225,6 +269,10 @@ app.get('/config', async (_, res) => {
   res.json({
     paymentsEnabled: !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
     currentTrialDays: (count ?? 0) < 5000 ? 30 : 14,
+    // The Pricing page hides the yearly toggle unless BOTH yearly Payment
+    // Links exist. Offering a switch that errors on one plan is worse than
+    // not offering it yet.
+    yearlyEnabled: !!(process.env.STRIPE_LINK_TIER2_YEARLY && process.env.STRIPE_LINK_TIER3_YEARLY),
   })
 })
 
@@ -368,11 +416,26 @@ app.post('/subscribe/checkout', requireAuth, async (req, res) => {
     return res.status(503).json({ error: msg })
   }
   const links = {
-    tier2: process.env.STRIPE_LINK_TIER2,
-    tier3: process.env.STRIPE_LINK_TIER3,
+    'tier2:month': process.env.STRIPE_LINK_TIER2,
+    'tier3:month': process.env.STRIPE_LINK_TIER3,
+    'tier2:year': process.env.STRIPE_LINK_TIER2_YEARLY,
+    'tier3:year': process.env.STRIPE_LINK_TIER3_YEARLY,
   }
-  const url = links[req.body?.tier]
-  if (!url) return res.status(400).json({ error: 'Unknown tier' })
+  const tier = req.body?.tier
+  const interval = req.body?.interval === 'year' ? 'year' : 'month'
+  if (!['tier2', 'tier3'].includes(tier)) return res.status(400).json({ error: 'Unknown tier' })
+
+  const url = links[`${tier}:${interval}`]
+  if (!url) {
+    // The yearly Payment Links are created in Stripe by hand. Until both
+    // exist the page should not be offering yearly at all (see /config), so
+    // reaching this is a misconfiguration, not a customer mistake.
+    return res.status(503).json({
+      error: interval === 'year'
+        ? 'Yearly billing is not available yet. Choose monthly, or try again shortly.'
+        : 'That plan is not available right now.',
+    })
+  }
   // Attach the user so the webhook can link the subscription back to the account
   res.json({ url: `${url}?client_reference_id=${req.user.id}&prefilled_email=${encodeURIComponent(req.user.email)}` })
 })

@@ -7,16 +7,22 @@ import { track } from '../lib/analytics'
 // Plan labels and prices for analytics. tier2/tier3 are internal keys; the
 // tracking plan uses the names people actually see.
 const PLAN_ANALYTICS = {
-  tier2: { item: 'training', value: 5 },
-  tier3: { item: 'elite', value: 14.99 },
+  tier2: { item: 'training', value: { month: 5, year: 50 } },
+  tier3: { item: 'elite', value: { month: 14.99, year: 149.9 } },
 }
+
+// Yearly is priced at exactly ten months, so "two months free" is literally
+// true rather than approximately true. Changing a yearly price here means
+// changing the matching Stripe Payment Link too, or the page will advertise
+// one number and charge another.
+const MONTHS_PAID_YEARLY = 10
 
 const TIERS = [
   {
     key: 'free',
     name: 'Free',
-    price: '$0',
-    cadence: 'forever',
+    price: { month: '$0', year: '$0' },
+    cadence: { month: 'forever', year: 'forever' },
     color: '#8E8E93',
     blurb: 'Start moving with our hand-selected Starter Library.',
     features: [
@@ -31,8 +37,9 @@ const TIERS = [
   {
     key: 'tier2',
     name: 'Training',
-    price: '$5',
-    cadence: '/month',
+    price: { month: '$5', year: '$50' },
+    cadence: { month: '/month', year: '/year' },
+    monthly: 5,
     color: '#007AFF',
     blurb: 'Unlock every training class plus your AI training partner.',
     features: [
@@ -47,8 +54,9 @@ const TIERS = [
   {
     key: 'tier3',
     name: 'Elite',
-    price: '$14.99',
-    cadence: '/month',
+    price: { month: '$14.99', year: '$149.90' },
+    cadence: { month: '/month', year: '/year' },
+    monthly: 14.99,
     color: '#FFD700',
     featured: true,
     blurb: 'The complete system, measure, coach, and track your progress.',
@@ -64,9 +72,15 @@ const TIERS = [
 ]
 
 export default function Pricing() {
-  const { user, session, openAuth, tier: currentTier, trialDaysLeft, trialDaysOffer } = useAuth()
+  const { user, session, openAuth, tier: currentTier, trialDaysLeft, trialDaysOffer, yearlyEnabled } = useAuth()
   const [loading, setLoading] = useState(null)
   const [error, setError] = useState(null)
+  const [interval, setInterval] = useState('month')
+
+  // yearlyEnabled arrives from /api/config a moment after mount. If the yearly
+  // Payment Links are missing, fall back rather than leave someone stranded on
+  // a selection that cannot check out.
+  const billing = yearlyEnabled ? interval : 'month'
 
   async function subscribe(tierKey) {
     setError(null)
@@ -79,7 +93,7 @@ export default function Pricing() {
       const res = await fetch('/api/subscribe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ tier: tierKey }),
+        body: JSON.stringify({ tier: tierKey, interval: billing }),
       })
       const data = await res.json()
       if (!res.ok || !data.url) throw new Error(data.error || 'Checkout unavailable')
@@ -90,7 +104,8 @@ export default function Pricing() {
       track('checkout.started', {
         checkout_type: 'subscription',
         item: plan?.item ?? tierKey,
-        value: plan?.value ?? 0,
+        billing_interval: billing,
+        value: plan?.value?.[billing] ?? 0,
         currency: 'USD',
       })
 
@@ -116,6 +131,39 @@ export default function Pricing() {
             <p className="mt-4 inline-block px-4 py-2 rounded-full bg-star-yellow/10 border border-star-yellow/30 text-star-yellow text-sm font-semibold">
               {trialDaysLeft} {trialDaysLeft === 1 ? 'day' : 'days'} left in your free trial
             </p>
+          )}
+
+          {/* Monthly / yearly switch. Hidden entirely until both yearly
+              Payment Links exist in Stripe, so it can never offer a checkout
+              that fails. */}
+          {yearlyEnabled && (
+            <div role="radiogroup" aria-label="Billing period"
+              className="mt-8 inline-flex items-center gap-1 p-1 rounded-full border border-star-border bg-white/[0.03]">
+              {[
+                { id: 'month', label: 'Monthly' },
+                { id: 'year', label: 'Yearly' },
+              ].map((opt) => {
+                const on = billing === opt.id
+                return (
+                  <button
+                    key={opt.id}
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => setInterval(opt.id)}
+                    className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${
+                      on ? 'bg-star-yellow text-star-black' : 'text-star-grey hover:text-white'
+                    }`}
+                  >
+                    {opt.label}
+                    {opt.id === 'year' && (
+                      <span className={`ml-2 text-[11px] font-semibold ${on ? 'text-star-black/70' : 'text-star-green'}`}>
+                        2 months free
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           )}
         </motion.div>
       </section>
@@ -144,10 +192,19 @@ export default function Pricing() {
                 )}
 
                 <h2 className="text-white font-black text-xl mb-1">{t.name}</h2>
-                <div className="flex items-end gap-1 mb-2">
-                  <span className="text-4xl font-black" style={{ color: t.color }}>{t.price}</span>
-                  <span className="text-star-grey text-sm mb-1.5">{t.cadence}</span>
+                <div className="flex items-end gap-1">
+                  <span className="text-4xl font-black" style={{ color: t.color }}>{t.price[billing]}</span>
+                  <span className="text-star-grey text-sm mb-1.5">{t.cadence[billing]}</span>
                 </div>
+                {/* Reserve the line in both states so switching billing period
+                    does not jog the cards up and down. */}
+                <p className="text-xs mb-4 mt-1.5 h-4">
+                  {billing === 'year' && t.monthly ? (
+                    <span className="text-star-green font-semibold">
+                      ${(t.monthly * MONTHS_PAID_YEARLY / 12).toFixed(2)}/month, billed yearly
+                    </span>
+                  ) : <span>&nbsp;</span>}
+                </p>
                 <p className="text-star-grey text-sm leading-relaxed mb-6">{t.blurb}</p>
 
                 <ul className="space-y-2.5 mb-7 flex-1">
@@ -180,9 +237,12 @@ export default function Pricing() {
                       {loading === t.key ? <Loader2 size={16} className="animate-spin" />
                         : isCurrent ? 'Your current plan' : `Get ${t.name}`}
                     </button>
-                    {/* Auto-renew disclosure, required at the point of payment */}
+                    {/* Auto-renew disclosure, required at the point of
+                        payment. It has to name the amount and period actually
+                        being charged, so it follows the billing switch. */}
                     <p className="text-star-grey/70 text-[11px] leading-snug mt-2.5 text-center">
-                      Your {t.name} subscription renews automatically at {t.price}{t.cadence} until canceled. Cancel anytime in your account settings.
+                      Your {t.name} subscription renews automatically at {t.price[billing]}{' '}
+                      {billing === 'year' ? 'per year' : 'per month'} until canceled. Cancel anytime in your account settings.
                     </p>
                   </>
                 )}

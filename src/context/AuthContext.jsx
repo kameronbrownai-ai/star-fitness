@@ -18,9 +18,13 @@ export function AuthProvider({ children }) {
   // Fetched once so every page shows the same, live number instead of a
   // hardcoded string that goes stale the moment the threshold is crossed.
   const [trialDaysOffer, setTrialDaysOffer] = useState(14)
+  // Whether yearly Payment Links exist in Stripe yet. Defaults to false so the
+  // Pricing page never shows a yearly option it cannot complete.
+  const [yearlyEnabled, setYearlyEnabled] = useState(false)
   useEffect(() => {
     fetch('/api/config').then((r) => r.json()).then((d) => {
       if (d.currentTrialDays) setTrialDaysOffer(d.currentTrialDays)
+      setYearlyEnabled(Boolean(d.yearlyEnabled))
     }).catch(() => {})
   }, [])
 
@@ -185,7 +189,7 @@ export function AuthProvider({ children }) {
       user, session, loading, signUp, signIn, signOut,
       authModal, openAuth, closeAuth,
       entitlement, subscription, refreshEntitlement,
-      tier, hasFullLibrary, hasVision, trialDaysLeft, trialDaysOffer,
+      tier, hasFullLibrary, hasVision, trialDaysLeft, trialDaysOffer, yearlyEnabled,
       consents, recordConsent, openBillingPortal,
       requireConsent, hasAccepted, consentGate, acceptConsentGate, closeConsentGate,
     }}>
