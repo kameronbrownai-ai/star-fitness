@@ -193,8 +193,15 @@ descriptions in `src/components/Seo.jsx`. Sports lists live in `Lessons.jsx`,
   Privacy/Terms/Cookie bodies. The product captures camera and biometric data.
 - **Untested revenue path** — no real signup, login, or Stripe checkout has been
   run end to end. Highest-risk unknown before launch.
-- **Boss code `STAR-BOSS-K9F4-7Q2X-3M8L`** grants `comp` (full Elite) and is
-  **unlimited-use**. If leaked, revoking it cuts off every legitimate holder.
+- **The comp/boss code is unlimited-use.** Never write the code itself in this
+  file or anywhere else in the repo: it is **public on GitHub**, and a previous
+  version of this line published the code for seven weeks. Keep it in
+  `server/.env` or a password manager. Deactivating a leaked code is **safe** —
+  `entitlement()` reads `subscriptions.plan`, so existing holders keep access
+  and only new redemptions stop. An earlier note here claimed the opposite.
+- **`/redeem` lets the same account redeem the same code repeatedly**, which
+  inflates `redemption_codes.uses` (13 counted vs 9 audit rows vs 5 accounts).
+  Trust `code_redemptions`, not the counter.
 - **Two superiority claims remain** in hero copy on About and Lessons.
 - **AI Coach is free to anonymous users** but pricing puts it in the $5 tier.
   Rate limiting caps abuse; it does not require payment.

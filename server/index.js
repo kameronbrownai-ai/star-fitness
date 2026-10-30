@@ -223,6 +223,15 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
 
 app.use(express.json({ limit: '10mb' }))
 
+// generalLimiter was defined but never applied, so every endpoint except
+// /chat has been running with no rate limit at all. That matters most for
+// /redeem and /teams/join, where the whole secret is a short code and an
+// uncapped endpoint is a free guessing machine.
+//
+// Mounted here, after the Stripe webhook above, so Stripe's own retries and
+// bursts are never throttled.
+app.use(generalLimiter)
+
 // ── Auth middleware ───────────────────────────────────────────────────────────
 async function requireAuth(req, res, next) {
   const h = req.headers.authorization
