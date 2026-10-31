@@ -6,7 +6,7 @@ import { getTestSession, addCapture, deleteCapture, exportTestSession } from '..
 import { LEVEL_COLOR } from '../lib/starScore'
 import StarAssessment from '../components/StarAssessment'
 
-const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Pickleball', 'Tennis', 'Golf', 'Hockey', 'Lacrosse', 'MMA / Combat', 'General']
+const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Pickleball', 'Tennis', 'Golf', 'Hockey', 'Lacrosse', 'Wrestling', 'MMA / Combat', 'General']
 const AGE_BANDS = ['Under 14', '14–17', '18–24', '25–34', '35–49', '50+']
 const SEXES = ['Male', 'Female', 'Prefer not to say']
 

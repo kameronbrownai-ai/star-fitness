@@ -5,7 +5,7 @@ import { Users, Plus, KeyRound, Loader2, ArrowRight, Crown, Lock, Globe } from '
 import { useAuth } from '../context/AuthContext'
 import { myTeams, createTeam, joinTeam } from '../lib/progress'
 
-const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Pickleball', 'Tennis', 'Golf', 'Hockey', 'Lacrosse', 'MMA / Combat', 'Mixed']
+const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Pickleball', 'Tennis', 'Golf', 'Hockey', 'Lacrosse', 'Wrestling', 'MMA / Combat', 'Mixed']
 
 export default function Teams() {
   const { user, openAuth } = useAuth()

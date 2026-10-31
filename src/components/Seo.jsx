@@ -42,7 +42,7 @@ export const ROUTE_META = {
   '/community': {
     title: 'Star Mat Community & Partners | Star Fitness',
     description:
-      'One standard of precision across eleven sports. Meet the Star Mat community and the partner program built for facilities and coaches.',
+      'One standard of precision across twelve sports. Meet the Star Mat community and the partner program built for facilities and coaches.',
   },
   '/about': {
     title: 'Our Story & the S.T.A.R. Method | Star Fitness',

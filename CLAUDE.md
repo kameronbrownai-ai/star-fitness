@@ -132,15 +132,18 @@ companies) are deliberate. They are not gaps to fill.
   live camera coaching, unlimited assessments). **There is no "Pro" plan** — that
   error appeared in both the AI system prompt and the homepage FAQ.
 - Trial: 30 days for the first 5,000 members, then 14 days. No card required.
-- **11 sports:** Football, Basketball, Soccer, Baseball/Softball, Track & Field,
-  Pickleball, Tennis, Golf, Hockey, Lacrosse, MMA/Combat — plus a Wellness &
-  Rehab track.
+- **12 sports:** Football, Basketball, Soccer, Baseball/Softball, Track & Field,
+  Pickleball, Tennis, Golf, Hockey, Lacrosse, Wrestling, MMA/Combat — plus a
+  Wellness & Rehab track.
 
 If you add or remove a sport, the count is claimed in **five** places: Community
-stats card and hero line, About values copy and floating badge, and two
-descriptions in `src/components/Seo.jsx`. Sports lists live in `Lessons.jsx`,
-`AIOnboarding.jsx`, the `AIWorkoutChat.jsx` system prompt, `FAQ.jsx`,
-`Home.jsx`, and the JSON-LD in `index.html`.
+stats card and hero line, About values copy and floating badge, and the
+`/community` description in `src/components/Seo.jsx`. Sports lists live in
+`Lessons.jsx`, `AIOnboarding.jsx` (list *and* `POSITION_HINT`), the
+`AIWorkoutChat.jsx` system prompt, `FAQ.jsx`, `Home.jsx`, `Teams.jsx`,
+`CoachSession.jsx`, and three places in the `index.html` JSON-LD. The
+`twitter:description` in `index.html` carries a deliberately short list ending
+in "and more" and is left alone.
 
 ---
 

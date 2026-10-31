@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Check } from 'lucide-react'
 
 // Keep in sync with the sports advertised on Home, Lessons, and the FAQ.
-const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Pickleball', 'Tennis', 'Golf', 'Hockey', 'Lacrosse', 'MMA / Combat', 'General Fitness']
+const SPORTS = ['Football', 'Basketball', 'Soccer', 'Baseball / Softball', 'Track & Field', 'Pickleball', 'Tennis', 'Golf', 'Hockey', 'Lacrosse', 'Wrestling', 'MMA / Combat', 'General Fitness']
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Pro Level']
 const GOALS = ['Speed', 'Strength', 'Agility', 'Flexibility', 'Recovery', 'Endurance']
 const EQUIPMENT_OPTIONS = ['Open Field / Court', 'Full Gym', 'Resistance Bands', 'Free Weights', 'Home / Bodyweight Only']
@@ -27,6 +27,7 @@ const POSITION_HINT = {
   Pickleball: 'e.g. Singles, Doubles, Rec or Tournament',
   Hockey: 'e.g. Forward, Defense, Goalie',
   Lacrosse: 'e.g. Attack, Midfield, Defense',
+  Wrestling: 'e.g. 125 lb, Folkstyle, Freestyle',
 }
 const TOTAL_STEPS = 7
 

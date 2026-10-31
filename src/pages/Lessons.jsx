@@ -190,6 +190,24 @@ const sports = [
     ],
   },
   {
+    id: 'wrestling',
+    name: 'Wrestling',
+    emoji: '🤼',
+    color: '#5E5CE6',
+    desc: 'Grip, hips, and scramble power',
+    train: [
+      { id: 107, title: 'Takedown Drive Power', targets: ['Hips', 'Glutes', 'Legs'], instructor: 'Marcus Johnson', duration: '40 min', free: true, desc: 'Level-change and penetration-step drills on the Star Mat grid to build the hip drive behind every shot.' },
+      { id: 108, title: 'Grip & Hand Fighting', targets: ['Forearms', 'Grip', 'Shoulders'], instructor: 'Marcus Johnson', duration: '30 min', free: false, desc: 'Forearm and grip endurance for collar ties, underhooks, and winning the tie-up late in a match.' },
+      { id: 109, title: 'Scramble Conditioning', targets: ['Full Body', 'Core', 'Legs'], instructor: 'Marcus Johnson', duration: '45 min', free: false, desc: 'Directional mat circuits built for the stop-start output of a scramble and third-period gas tank.' },
+      { id: 110, title: 'Bridge & Hip Escape', targets: ['Hips', 'Core', 'Lower Back'], instructor: 'Elena Rodriguez', duration: '30 min', free: false, desc: 'Bridging, hip heists, and anti-rotation core work for escaping bottom position and defending turns.' },
+    ],
+    recover: [
+      { id: 111, title: 'Neck & Cervical Care', injury: 'Neck Strain', targets: ['Neck', 'Cervical Spine', 'Traps'], instructor: 'Sarah Chen', duration: '20 min', free: true, desc: 'Gentle mobility and isometric neck work for the loading that comes with front headlocks and scrambles.' },
+      { id: 112, title: 'Shoulder Stability Rebuild', injury: 'Shoulder Subluxation', targets: ['Shoulder', 'Rotator Cuff', 'Upper Back'], instructor: 'Elena Rodriguez', duration: '25 min', free: false, desc: 'Progressive rotator cuff and scapular strengthening after a shoulder comes loose in a tie-up or a sprawl.' },
+      { id: 113, title: 'Lower Back Recovery', injury: 'Lower Back Strain', targets: ['Lower Back', 'Core', 'Hips'], instructor: 'Sarah Chen', duration: '25 min', free: false, desc: 'Decompression, hip mobility, and controlled core loading to settle back strain from lifting and bridging.' },
+    ],
+  },
+  {
     id: 'wellness',
     name: 'Wellness & Rehab',
     emoji: '🧘',
